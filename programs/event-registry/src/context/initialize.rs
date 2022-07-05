@@ -26,6 +26,16 @@ pub struct Initialize<'info> {
   )]
   pub fund_manager: AccountInfo<'info>,
 
+  /// CHECK: The authority of the event nfts
+  #[account(
+    init,
+    payer = deployer,
+    space = 0,
+    seeds = [b"event_nft_authority", state.key().as_ref()],
+    bump,
+  )]
+  pub event_nft_authority: AccountInfo<'info>,
+
   #[account(mut)]
   pub deployer: Signer<'info>,
 

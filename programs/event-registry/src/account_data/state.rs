@@ -8,12 +8,14 @@ pub const SPACE_MARGIN: usize = 5000;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub fund_manager: u8,
+  pub event_nft_authority: u8,
 }
 
-
 #[account]
+#[derive(Default)]
 pub struct State {
   pub bumps: InitBumps,
+  pub n_events: u64,
   pub deployer: Pubkey,
   pub supported_currencies: Vec<Pubkey>,
 }
