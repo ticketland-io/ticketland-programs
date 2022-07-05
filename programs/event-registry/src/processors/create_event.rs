@@ -37,7 +37,7 @@ fn create_event_nft(
     mint: ctx.accounts.event_nft.clone(),
     mint_authority: ctx.accounts.event_nft_authority.clone(),
     metadata_account: ctx.accounts.metadata.clone(),
-    payer: ctx.accounts.creator.to_account_info(),
+    payer: ctx.accounts.event_organizer.to_account_info(),
     update_authority: ctx.accounts.event_nft_authority_ata.to_account_info(),
     system_program: ctx.accounts.system_program.to_account_info(),
     rent: ctx.accounts.rent.to_account_info(),
@@ -62,7 +62,7 @@ fn create_event_nft(
     mint: ctx.accounts.event_nft.clone(),
     mint_authority: ctx.accounts.event_nft_authority.clone(),
     metadata_account: ctx.accounts.metadata.clone(),
-    payer: ctx.accounts.creator.to_account_info(),
+    payer: ctx.accounts.event_organizer.to_account_info(),
     update_authority: ctx.accounts.event_nft_authority.to_account_info(),
     system_program: ctx.accounts.system_program.to_account_info(),
     rent: ctx.accounts.rent.to_account_info(),
@@ -73,6 +73,22 @@ fn create_event_nft(
     signer_seeds,
     Some(0),
   )
+}
+
+fn deposit(ctx: &Context<CreateEvent>) -> Result<()> {
+  let fund_manager_ata = &ctx.accounts.fund_manager_ata;
+  let deposit_token = &ctx.accounts.deposit_token;
+  let currency = &ctx.accounts.state.supported_currencies
+    .iter()
+    .find(|c| c.mint_account == deposit_token.key())
+    .unwrap();
+
+  // Check that enough tokens are 
+  if fund_manager_ata.amount >= (**currency).deposit_amount {
+
+  }
+
+  todo!()
 }
 
 pub fn exec(
@@ -90,6 +106,7 @@ pub fn exec(
     event.id = state.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
+    event.event_organizer = ctx.accounts.event_organizer.key();
 
     state.n_events = state.n_events.safe_add(1)?;
   }

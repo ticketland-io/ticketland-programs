@@ -16,16 +16,6 @@ pub struct Initialize<'info> {
   )]
   pub state: Account<'info, State>,
 
-  /// CHECK: The PDA that will be the authority to handle all deposits
-  #[account(
-    init,
-    payer = deployer,
-    space = 0,
-    seeds = [b"fund_manager", state.key().as_ref()],
-    bump,
-  )]
-  pub fund_manager: AccountInfo<'info>,
-
   /// CHECK: The authority of the event nfts
   #[account(
     init,

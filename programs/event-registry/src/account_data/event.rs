@@ -16,7 +16,7 @@ pub struct EventBumps {
 #[account]
 pub struct Event {
   pub bumps: EventBumps,
-  pub creator: Pubkey,
+  pub event_organizer: Pubkey,
   pub id: u64,
   pub start_time: SLOT,
   pub end_time: SLOT,

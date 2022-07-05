@@ -28,7 +28,7 @@ pub struct CreateEvent<'info> {
   // The newly created event 
   #[account(
     init,
-    payer = creator,
+    payer = event_organizer,
     space = 8 + size_of::<Event>() + SPACE_MARGIN,
     seeds = [b"event", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump
@@ -37,7 +37,7 @@ pub struct CreateEvent<'info> {
 
   #[account(
     init,
-    payer = creator,
+    payer = event_organizer,
     mint::decimals = 0,
     mint::authority = event_nft_authority,
     seeds = [b"event_nft", state.key().as_ref()],
@@ -55,7 +55,7 @@ pub struct CreateEvent<'info> {
   /// CHECK: The ATA that will receive the edition token which is needed for the master edition to be created
   #[account(
     init,
-    payer = creator,
+    payer = event_organizer,
     associated_token::mint = event_nft,
     associated_token::authority = event_nft_authority,
   )]
@@ -79,30 +79,34 @@ pub struct CreateEvent<'info> {
   )]
   pub master_edition: AccountInfo<'info>,
 
-  /// CHECK: The PDA that will be the authority to handle all deposits
-  #[account(
-    seeds = [b"fund_manager", state.key().as_ref()],
-    bump = state.bumps.fund_manager,
-  )]
-  pub fund_manager: AccountInfo<'info>,
-
   /// CHECK: The deposit token should be one of the supported currencies
   #[account(
     constraint = state.supported_currencies.iter().any(|c| c.mint_account == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
   )]
   pub deposit_token: Account<'info, Mint>,
 
-  /// CHECK: The ATA that will receive the edition token which is needed for the master edition to be created
+  /// CHECK: The PDA that will be the authority to handle all deposits for the given event_organizer
+  /// Each user will have his own PDA
   #[account(
     init_if_needed,
-    payer = creator,
+    payer = event_organizer,
+    space = 0,
+    seeds = [b"fund_manager", state.key().as_ref(), event_organizer.key().as_ref()],
+    bump,
+  )]
+  pub fund_manager: AccountInfo<'info>,
+
+  /// CHECK: The ATA that holds creators deposit in the given deposit token
+  #[account(
+    init_if_needed,
+    payer = event_organizer,
     associated_token::mint = deposit_token,
     associated_token::authority = fund_manager,
   )]
   pub fund_manager_ata: Account<'info, TokenAccount>,
 
   #[account(mut)]
-  pub creator: Signer<'info>,
+  pub event_organizer: Signer<'info>,
   
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
