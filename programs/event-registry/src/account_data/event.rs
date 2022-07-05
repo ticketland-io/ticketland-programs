@@ -7,8 +7,15 @@ pub const SPACE_MARGIN: usize = 1000;
 
 pub type SLOT = u64;
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct EventBumps {
+  pub event: u8,
+  pub event_nft: u8,
+}
+
 #[account]
 pub struct Event {
+  pub bumps: EventBumps,
   pub creator: Pubkey,
   pub start_time: SLOT,
   pub end_time: SLOT,

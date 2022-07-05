@@ -11,6 +11,9 @@ use anchor_metaplex::{
   }
 };
 use crate::{
+  utils::{
+    program_error::ErrorCode,
+  },
   account_data::{
     state::*,
     event::{Event, SPACE_MARGIN},
@@ -45,10 +48,11 @@ pub struct CreateMint<'info> {
   /// CHECK: The authority of the event nfts
   #[account(
     seeds = [b"event_nft_authority", state.key().as_ref()],
-    bump,
+    bump = state.bumps.event_nft_authority,
   )]
   pub event_nft_authority: AccountInfo<'info>,
 
+  /// CHECK: The ATA that will receive the edition token which is needed for the master edition to be created
   #[account(
     init,
     payer = creator,
@@ -74,6 +78,28 @@ pub struct CreateMint<'info> {
     bump,
   )]
   pub master_edition: AccountInfo<'info>,
+
+  /// CHECK: The PDA that will be the authority to handle all deposits
+  #[account(
+    seeds = [b"fund_manager", state.key().as_ref()],
+    bump = state.bumps.fund_manager,
+  )]
+  pub fund_manager: AccountInfo<'info>,
+
+  /// CHECK: The deposit token should be one of the supported currencies
+  #[account(
+    constraint = state.supported_currencies.iter().any(|c| *c == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
+  )]
+  pub deposit_token: Account<'info, Mint>,
+
+  /// CHECK: The ATA that will receive the edition token which is needed for the master edition to be created
+  #[account(
+    init_if_needed,
+    payer = creator,
+    associated_token::mint = deposit_token,
+    associated_token::authority = fund_manager,
+  )]
+  pub fund_manager_ata: Account<'info, TokenAccount>,
 
   #[account(mut)]
   pub creator: Signer<'info>,
