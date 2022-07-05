@@ -1,12 +1,11 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, MintTo};
+use anchor_safe_math::SafeMath;
 use anchor_metaplex::{
   CreateMetadata,
   CreateMasterEdition,
   create_metadata,
   create_master_edition,
-  UpdatePrimarySaleHappenedViaToken,
-  update_primary_sale_happened_via_token,
 };
 use crate::{
   context::create_event::CreateEvent, 
@@ -84,6 +83,27 @@ pub fn exec(
   symbol: String,
   uri: String,
 ) -> Result<()> {
-  
-  todo!()
+  {
+    let event = &mut ctx.accounts.event;
+    let state = &mut ctx.accounts.state;
+
+    event.id = state.n_events;
+    event.start_time = start_time;
+    event.end_time = end_time;
+
+    state.n_events = state.n_events.safe_add(1)?;
+  }
+
+  let state = &ctx.accounts.state;
+  let state_key = state.key();
+
+  let seeds: &[&[u8]] = &[
+    b"event_nft_authority", state_key.as_ref(),
+    &[state.bumps.event_nft_authority]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+
+  // We need this otherwise we get this error "Editions must have exactly one token"
+  mint_edition_token(&ctx, signer_seeds)?;
+  create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)
 }
