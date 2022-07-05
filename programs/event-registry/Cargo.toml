@@ -1,12 +1,12 @@
 [package]
-name = "ticket-land"
+name = "event-registry"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "ticket_land"
+name = "event_registry"
 
 [features]
 no-entrypoint = []
