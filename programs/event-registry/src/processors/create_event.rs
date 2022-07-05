@@ -8,6 +8,7 @@ use anchor_metaplex::{
   create_master_edition,
 };
 use crate::{
+  utils::program_error::ErrorCode,
   context::create_event::CreateEvent, 
   account_data::event::*,
 };
@@ -75,7 +76,7 @@ fn create_event_nft(
   )
 }
 
-fn deposit(ctx: &Context<CreateEvent>) -> Result<()> {
+fn check_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
   let fund_manager_ata = &ctx.accounts.fund_manager_ata;
   let deposit_token = &ctx.accounts.deposit_token;
   let currency = &ctx.accounts.state.supported_currencies
@@ -83,12 +84,12 @@ fn deposit(ctx: &Context<CreateEvent>) -> Result<()> {
     .find(|c| c.mint_account == deposit_token.key())
     .unwrap();
 
-  // Check that enough tokens are 
-  if fund_manager_ata.amount >= (**currency).deposit_amount {
-
+  // Check that enough tokens are deposited to the fund manager ata
+  if fund_manager_ata.amount < (**currency).deposit_amount {
+    return Err(ErrorCode::NotEnoughDeposit.into())
   }
 
-  todo!()
+  Ok(())
 }
 
 pub fn exec(
@@ -99,6 +100,8 @@ pub fn exec(
   symbol: String,
   uri: String,
 ) -> Result<()> {
+  check_deposit(&ctx)?;
+
   {
     let event = &mut ctx.accounts.event;
     let state = &mut ctx.accounts.state;
@@ -122,5 +125,7 @@ pub fn exec(
 
   // We need this otherwise we get this error "Editions must have exactly one token"
   mint_edition_token(&ctx, signer_seeds)?;
-  create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)
+  create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)?;
+
+  Ok(())
 }

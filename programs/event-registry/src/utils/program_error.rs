@@ -6,4 +6,6 @@ pub enum ErrorCode {
   OnlyDeployer,
   #[msg("Deposit token is not supported")]
   UnsupportedDepositToken,
+  #[msg("Not enough deposit")]
+  NotEnoughDeposit,
 }
