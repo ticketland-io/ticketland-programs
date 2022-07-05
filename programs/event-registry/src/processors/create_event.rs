@@ -96,10 +96,14 @@ pub fn exec(
   ctx: Context<CreateEvent>,
   start_time: SLOT,
   end_time: SLOT,
+  sale_start_time: SLOT,
+  ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,
   uri: String,
 ) -> Result<()> {
+  require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
+
   check_deposit(&ctx)?;
 
   {
@@ -109,6 +113,8 @@ pub fn exec(
     event.id = state.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
+    event.sale_start_time = sale_start_time;
+    event.ticket_types = ticket_types;
     event.event_organizer = ctx.accounts.event_organizer.key();
 
     state.n_events = state.n_events.safe_add(1)?;

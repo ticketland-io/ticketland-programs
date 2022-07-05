@@ -1,7 +1,8 @@
 use anchor_lang::prelude::*;
 use crate::{
+  utils::program_error::ErrorCode,
   context::initialize::Initialize, 
-  account_data::state::{InitBumps, Currency},
+  account_data::state::{InitBumps, Currency, MAX_CURRENCY_SUPPORT},
 };
 
 pub fn exec(
@@ -10,6 +11,8 @@ pub fn exec(
   service_fee: u16,
   seller_fee_basis_points: u16,
 ) -> Result<()> {
+  require!(supported_currencies.len() <= MAX_CURRENCY_SUPPORT, ErrorCode::TooManyCurrencies);
+  
   let state = &mut ctx.accounts.state;
 
   state.bumps = InitBumps {

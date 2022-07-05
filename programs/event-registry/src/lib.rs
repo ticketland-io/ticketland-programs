@@ -55,6 +55,8 @@ use super::*;
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `start_time` - The Solana slot that describes the start of the given event
 	/// * `end_time` - The Solana slot that describes the end of the given event
+	/// * `start_time` - The Solana slot that describes the start of the ticket sale for the event
+	/// * `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices
 	/// * `name` - The name that will be used in the Event NFT metadata
 	/// * `symbol` - The symbol that will be used in the Event NFT metadata
 	/// * `uri` - The uti that will be used in the Event NFT metadata
@@ -62,6 +64,8 @@ use super::*;
 		ctx: Context<CreateEvent>,
 		start_time: SLOT,
 		end_time: SLOT,
+		sale_start_time: SLOT,
+		ticket_types: Vec<TicketType>,
 		name: String,
 		symbol: String,
 		uri: String,
@@ -70,6 +74,8 @@ use super::*;
 			ctx,
 			start_time,
 			end_time,
+			sale_start_time,
+			ticket_types,
 			name,
 			symbol,
 			uri,

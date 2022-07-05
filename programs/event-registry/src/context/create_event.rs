@@ -16,7 +16,7 @@ use crate::{
   },
   account_data::{
     state::*,
-    event::{Event, SPACE_MARGIN},
+    event::{*, SPACE_MARGIN},
   },
 };
 
@@ -29,7 +29,7 @@ pub struct CreateEvent<'info> {
   #[account(
     init,
     payer = event_organizer,
-    space = 8 + size_of::<Event>() + SPACE_MARGIN,
+    space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES) + SPACE_MARGIN,
     seeds = [b"event", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump
   )]

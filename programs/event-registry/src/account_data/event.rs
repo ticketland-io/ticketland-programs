@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 
-pub const MAX_CURRENCY_SUPPORT: usize = 10;
-
 // Additional space in bytes (1kb) we want to allocate for potential future state expansion
 pub const SPACE_MARGIN: usize = 1000;
+
+pub const MAX_TICKET_TYPES: usize = 10;
 
 pub type SLOT = u64;
 
@@ -13,11 +13,30 @@ pub struct EventBumps {
   pub event_nft: u8,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum SaleType {
+  FixedPrice(u64),
+  DutchAuction {
+    start_price: u64,
+    end_price: u64,
+    curve_length: u16,
+    drop_interval: u16,
+  }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct TicketType {
+  pub n_tickets: u32,
+  pub sale_type: SaleType,
+}
+
 #[account]
 pub struct Event {
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
   pub id: u64,
+  pub sale_start_time: SLOT,
   pub start_time: SLOT,
   pub end_time: SLOT,
+  pub ticket_types: Vec<TicketType>,
 }
