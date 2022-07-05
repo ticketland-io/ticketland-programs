@@ -11,7 +11,7 @@ jbas = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
 jbas = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
 
 [registry]
-wallet = "./wallets-dev/deployer.json"
+url = "https://github.com/Apocentre/ticket-land-programs"
 
 [provider]
 cluster = "localnet"

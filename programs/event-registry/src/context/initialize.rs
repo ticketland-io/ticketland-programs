@@ -12,8 +12,6 @@ pub struct Initialize<'info> {
   #[account(
     init,
     payer = deployer,
-    // 200 bytes max length of the base_uri
-    // MAX Creators 5
     space = 8 + size_of::<State>() + size_of::<Pubkey>() * MAX_CURRENCY_SUPPORT + SPACE_MARGIN
   )]
   pub state: Account<'info, State>,
