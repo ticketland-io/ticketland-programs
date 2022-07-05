@@ -88,7 +88,7 @@ pub struct CreateMint<'info> {
 
   /// CHECK: The deposit token should be one of the supported currencies
   #[account(
-    constraint = state.supported_currencies.iter().any(|c| *c == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
+    constraint = state.supported_currencies.iter().any(|c| c.mint_account == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
   )]
   pub deposit_token: Account<'info, Mint>,
 

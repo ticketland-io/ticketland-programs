@@ -6,6 +6,9 @@ pub mod utils;
 
 use anchor_lang::prelude::*;
 use crate::{
+	account_data::{
+		state::Currency,
+	},
 	context::{
 		initialize::*,
 	},
@@ -18,8 +21,13 @@ pub mod ticker_land_programs {
 use super::*;
 	pub fn initialize(
 		ctx: Context<Initialize>,
-		supported_currencies: Vec<Pubkey>,
+		supported_currencies: Vec<Currency>,
+		service_fee: u16,
 	) -> Result<()> {
-    processors::initialize::exec(ctx, supported_currencies)
+    processors::initialize::exec(
+			ctx,
+			supported_currencies,
+			service_fee,
+		)
 	}
 }

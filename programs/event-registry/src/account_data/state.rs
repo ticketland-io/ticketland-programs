@@ -11,11 +11,18 @@ pub struct InitBumps {
   pub event_nft_authority: u8,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Currency {
+  pub mint_account: Pubkey,
+  pub deposit_amount: u64,
+}
+
 #[account]
 #[derive(Default)]
 pub struct State {
   pub bumps: InitBumps,
   pub n_events: u64,
+  pub service_fee: u16,
   pub deployer: Pubkey,
-  pub supported_currencies: Vec<Pubkey>,
+  pub supported_currencies: Vec<Currency>,
 }
