@@ -23,6 +23,7 @@ pub struct State {
   pub bumps: InitBumps,
   pub n_events: u64,
   pub service_fee: u16,
+  pub seller_fee_basis_points: u16,
   pub deployer: Pubkey,
   pub supported_currencies: Vec<Currency>,
 }

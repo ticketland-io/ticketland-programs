@@ -21,7 +21,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct CreateMint<'info> {
+pub struct CreateEvent<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
@@ -106,6 +106,6 @@ pub struct CreateMint<'info> {
   
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
-  system_program: Program<'info, System>,
-  rent: Sysvar<'info, Rent>,
+  pub system_program: Program<'info, System>,
+  pub rent: Sysvar<'info, Rent>,
 }
