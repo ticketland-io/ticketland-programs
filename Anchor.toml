@@ -2,13 +2,16 @@
 seeds = false
 
 [programs.mainnet]
-jbas = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 
 [programs.testnet]
-jbas = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 
 [programs.localnet]
-jbas = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 
 [registry]
 url = "https://github.com/Apocentre/ticket-land-programs"

@@ -1558,6 +1558,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ticket-sale"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang 0.25.0 (git+https://github.com/coral-xyz/anchor)",
+ "anchor-metaplex",
+ "anchor-safe-math",
+ "anchor-spl",
+ "mpl-token-metadata",
+]
+
+[[package]]
 name = "toml"
 version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
