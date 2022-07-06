@@ -9,11 +9,12 @@ use crate::{
 pub fn exec(
   ctx: Context<CreateSale>,
   ticket_type_index: u8,
+  event_id: u64,
   ticket_type: TicketType,
 ) -> Result<()> {
   let sale = &mut ctx.accounts.sale;
 
-  sale.event_id = ctx.accounts.event_registry_state.0.n_events;
+  sale.event_id = event_id;
   sale.ticket_type_index = ticket_type_index;
   sale.ticket_type = ticket_type;
 

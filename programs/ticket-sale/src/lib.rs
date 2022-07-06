@@ -38,15 +38,20 @@ pub mod ticket_sale {
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `ticket_type_index` - A unique index that will differentiate multiple sales of one single event. This is useful to 
 	/// create unique sale PDAs
+	/// * `cpi_authority_bump` - The bump of the cpi authority account created in the event registry program
+	/// * `event_id` - The event id for which this sale is created for
 	/// * `ticket_type` - The ticket type that will be sold during this sale
 	pub fn create_sale(
 		ctx: Context<CreateSale>,
 		ticket_type_index: u8,
+		_cpi_authority_bump: u8,
+		event_id: u64,
 		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,
 			ticket_type_index,
+			event_id,
 			ticket_type
 		)
 	}

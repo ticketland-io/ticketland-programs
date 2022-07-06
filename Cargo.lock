@@ -1567,7 +1567,6 @@ dependencies = [
  "anchor-safe-math",
  "anchor-spl",
  "common",
- "event-registry",
  "mpl-token-metadata",
 ]
 

@@ -1,10 +1,5 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
-use event_registry::{
-  account_data::{
-    state::{State as EventRegistryState},
-  }
-};
 use crate::{
   account_data::{
     state::*,
@@ -13,14 +8,14 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_type_index: u8)]
+#[instruction(ticket_type_index: u8, cpi_authority_bump: u8, event_id: u64)]
 pub struct CreateSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
 
   /// CHECK: The state account of the event registry program
   #[account()]
-  pub event_registry_state: Account<'info, EventRegistryState>,
+  pub event_registry_state: AccountInfo<'info>,
 
   /// The newly created Sale 
   #[account(
@@ -30,7 +25,7 @@ pub struct CreateSale<'info> {
     seeds = [
       b"sale", state.key().as_ref(),
       ticket_type_index.to_string().as_ref(),
-      &event_registry_state.0.n_events.to_string().as_ref()
+      &event_id.to_string().as_ref()
     ],
     bump
   )]
@@ -45,7 +40,7 @@ pub struct CreateSale<'info> {
     seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
     // the PDA should be owned by the Event Registry Program
     seeds::program = event_registry_program.key(),
-    bump = event_registry_state.0.bumps.cpi_authority,
+    bump = cpi_authority_bump,
     constraint = event_registry_cpi_authority.key() == state.event_registry_cpi_authority.key(),
   )]
   pub event_registry_cpi_authority: Signer<'info>,

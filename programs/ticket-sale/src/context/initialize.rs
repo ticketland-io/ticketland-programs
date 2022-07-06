@@ -1,10 +1,5 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
-use event_registry::{
-  account_data::{
-    state::{State as EventRegistryState},
-  }
-};
 use crate::{
   account_data::{
     state::*,
@@ -23,7 +18,7 @@ pub struct Initialize<'info> {
   
   /// CHECK: The state account of the event registry program
   #[account()]
-  pub event_registry_state: Account<'info, EventRegistryState>,
+  pub event_registry_state: AccountInfo<'info>,
 
   /// CHECK: This is the Event Registry Program account
   #[account()]

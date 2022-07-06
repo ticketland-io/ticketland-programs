@@ -6,15 +6,15 @@ pub mod utils;
 
 use anchor_lang::prelude::*;
 use common::{
-	account_data::{
-		event_registry_state::Currency,
-	},
   state::{
     alias::*,
     ticket_type::TicketType,
   },
 };
 use crate::{
+	account_data::{
+		state::*,
+	},
 	context::{
 		initialize::*,
 		create_event::*,

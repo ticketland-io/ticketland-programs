@@ -33,7 +33,7 @@ pub struct CreateEvent<'info> {
     init,
     payer = event_organizer,
     space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES) + SPACE_MARGIN,
-    seeds = [b"event", state.key().as_ref(), &state.0.n_events.to_string().as_ref()],
+    seeds = [b"event", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump
   )]
   pub event: Account<'info, Event>,
@@ -51,7 +51,7 @@ pub struct CreateEvent<'info> {
   /// CHECK: The authority of the event nfts
   #[account(
     seeds = [b"event_nft_authority", state.key().as_ref()],
-    bump = state.0.bumps.event_nft_authority,
+    bump = state.bumps.event_nft_authority,
   )]
   pub event_nft_authority: AccountInfo<'info>,
 
@@ -84,7 +84,7 @@ pub struct CreateEvent<'info> {
 
   /// CHECK: The deposit token should be one of the supported currencies
   #[account(
-    constraint = state.0.supported_currencies.iter().any(|c| c.mint_account == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
+    constraint = state.supported_currencies.iter().any(|c| c.mint_account == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
   )]
   pub deposit_token: Account<'info, Mint>,
 
