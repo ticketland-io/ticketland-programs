@@ -47,6 +47,7 @@ pub mod ticket_sale {
 		_cpi_authority_bump: u8,
 		event_id: u64,
 		ticket_type: TicketType,
+		_event_registry_program: Pubkey
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,

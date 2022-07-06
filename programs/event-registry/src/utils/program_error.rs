@@ -18,4 +18,6 @@ pub enum ErrorCode {
   WrongTicketSaleProgramStateAccount,
   #[msg("Only event organizer")]
   OnlyEventOrganizer,
+  #[msg("Invalid ticket type index")]
+  InvalidTicketTypeIndex,
 }

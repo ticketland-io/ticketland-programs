@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_type_index: u8, cpi_authority_bump: u8, event_id: u64)]
+#[instruction(ticket_type_index: u8, cpi_authority_bump: u8, event_id: u64, event_registry_program: Pubkey)]
 pub struct CreateSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
@@ -31,15 +31,11 @@ pub struct CreateSale<'info> {
   )]
   pub sale: Account<'info, Sale>,
 
-  /// CHECK: This is the Event Registry Program account
-  #[account()]
-  pub event_registry_program: AccountInfo<'info>,
-
   #[account(
     mut,
     seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
     // the PDA should be owned by the Event Registry Program
-    seeds::program = event_registry_program.key(),
+    seeds::program = event_registry_program,
     bump = cpi_authority_bump,
     constraint = event_registry_cpi_authority.key() == state.event_registry_cpi_authority.key(),
   )]
