@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(sale_type_index: usize)]
+#[instruction(ticket_type_index: u8)]
 pub struct CreateSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
@@ -29,7 +29,7 @@ pub struct CreateSale<'info> {
     space = 8 + size_of::<Sale>() + SPACE_MARGIN,
     seeds = [
       b"sale", state.key().as_ref(),
-      sale_type_index.to_string().as_ref(),
+      ticket_type_index.to_string().as_ref(),
       &event_registry_state.n_events.to_string().as_ref()
     ],
     bump

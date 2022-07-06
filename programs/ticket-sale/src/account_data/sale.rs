@@ -8,6 +8,8 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[account]
 pub struct Sale {
+  pub ticket_type_index: u8,
+
   /// The ticket type that decides the sale mechanism
   pub ticket_type: TicketType,
 }
