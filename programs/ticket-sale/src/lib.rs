@@ -5,7 +5,10 @@ mod utils;
 
 use anchor_lang::prelude::*;
 use common::{
-	state::ticket_type::TicketType,
+	state::{
+		alias::*,
+		ticket_type::TicketType,
+	},
 };
 use crate::{
   context::{
@@ -43,17 +46,19 @@ pub mod ticket_sale {
 	/// * `ticket_type` - The ticket type that will be sold during this sale
 	pub fn create_sale(
 		ctx: Context<CreateSale>,
-		ticket_type_index: usize,
 		_cpi_authority_bump: u8,
+		_event_registry_program: Pubkey,
+		ticket_type_index: usize,
 		event_id: u64,
 		ticket_type: TicketType,
-		_event_registry_program: Pubkey
+		sale_start_time: Slot,
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,
 			ticket_type_index,
 			event_id,
-			ticket_type
+			ticket_type,
+			sale_start_time,
 		)
 	}
 }

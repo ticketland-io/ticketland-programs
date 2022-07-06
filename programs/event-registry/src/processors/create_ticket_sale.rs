@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 use common::{
-  state::ticket_type::TicketType,
+  state::{
+    alias::*,
+    ticket_type::TicketType,
+  },
 };
 use crate::{
   program::EventRegistry,
@@ -12,6 +15,7 @@ pub fn exec(
   ctx: Context<CreateTicketSale>,
   ticket_type_index: usize,
   ticket_type: TicketType,
+  sale_start_time: Slot,
 ) -> Result<()> {
   {
     let ticket_type_at_index = &ctx.accounts.event.ticket_types[ticket_type_index as usize];
@@ -35,11 +39,12 @@ pub fn exec(
 
   ticket_sale::cpi::create_sale(
     cpi_ctx,
-    ticket_type_index,
 		state.bumps.cpi_authority,
+		EventRegistry::id(),
+    ticket_type_index,
 		event.id,
 		ticket_type,
-		EventRegistry::id(),
+    sale_start_time,
   )?;
 
   Ok(())

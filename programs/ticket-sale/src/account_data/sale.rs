@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 use common::{
-  state::ticket_type::TicketType,
+  state::{
+    ticket_type::TicketType,
+    alias::*,
+  },
 };
 
 // Additional space in bytes (1kb) we want to allocate for potential future state expansion
@@ -16,4 +19,7 @@ pub struct Sale {
 
   /// The ticket type that decides the sale mechanism
   pub ticket_type: TicketType,
+
+  /// When this sale will start
+  pub sale_start_time: Slot,
 }
