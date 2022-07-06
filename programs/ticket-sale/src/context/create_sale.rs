@@ -30,7 +30,7 @@ pub struct CreateSale<'info> {
     seeds = [
       b"sale", state.key().as_ref(),
       ticket_type_index.to_string().as_ref(),
-      &event_registry_state.n_events.to_string().as_ref()
+      &event_registry_state.0.n_events.to_string().as_ref()
     ],
     bump
   )]
@@ -45,7 +45,7 @@ pub struct CreateSale<'info> {
     seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
     // the PDA should be owned by the Event Registry Program
     seeds::program = event_registry_program.key(),
-    bump = event_registry_state.bumps.cpi_authority,
+    bump = event_registry_state.0.bumps.cpi_authority,
     constraint = event_registry_cpi_authority.key() == state.event_registry_cpi_authority.key(),
   )]
   pub event_registry_cpi_authority: Signer<'info>,

@@ -85,7 +85,7 @@ fn create_event_nft(
 fn check_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
   let fund_manager_ata = &ctx.accounts.fund_manager_ata;
   let deposit_token = &ctx.accounts.deposit_token;
-  let currency = &ctx.accounts.state.supported_currencies
+  let currency = &ctx.accounts.state.0.supported_currencies
     .iter()
     .find(|c| c.mint_account == deposit_token.key())
     .unwrap();
@@ -116,13 +116,13 @@ pub fn exec(
     let event = &mut ctx.accounts.event;
     let state = &mut ctx.accounts.state;
 
-    event.id = state.n_events;
+    event.id = state.0.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
-    event.ticket_types = ticket_types;
+    event.ticket_types = ticket_types.clone();
     event.event_organizer = ctx.accounts.event_organizer.key();
 
-    state.n_events = state.n_events.safe_add(1)?;
+    state.0.n_events = state.0.n_events.safe_add(1)?;
   }
 
   let state = &ctx.accounts.state;
@@ -130,13 +130,18 @@ pub fn exec(
 
   let seeds: &[&[u8]] = &[
     b"event_nft_authority", state_key.as_ref(),
-    &[state.bumps.event_nft_authority]
+    &[state.0.bumps.event_nft_authority]
   ];
   let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
 
   // We need this otherwise we get this error "Editions must have exactly one token"
   mint_edition_token(&ctx, signer_seeds)?;
-  create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)?;
+  create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.0.seller_fee_basis_points)?;
+
+  // Create a new sale for each ticket type
+  // for ticket_type in ticket_types {
+  //   let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
+  // }
 
   Ok(())
 }

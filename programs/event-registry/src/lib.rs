@@ -6,15 +6,15 @@ pub mod utils;
 
 use anchor_lang::prelude::*;
 use common::{
+	account_data::{
+		event_registry_state::Currency,
+	},
   state::{
     alias::*,
     ticket_type::TicketType,
   },
 };
 use crate::{
-	account_data::{
-		state::*,
-	},
 	context::{
 		initialize::*,
 		create_event::*,
@@ -24,7 +24,7 @@ use crate::{
 declare_id!("TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE");
 
 #[program]
-pub mod ticker_land_programs {
+pub mod event_registry {
 use super::*;
 	/// Initializes the state i.e. instance of a given program
 	/// 

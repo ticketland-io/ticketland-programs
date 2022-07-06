@@ -1,5 +1,8 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
+use common::{
+  account_data::event_registry_state::{Currency},
+};
 use crate::{
   account_data::{
     state::*,
