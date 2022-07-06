@@ -99,13 +99,11 @@ use super::*;
 		ctx: Context<CreateTicketSale>,
 		ticket_type_index: usize,
 		ticket_type: TicketType,
-		sale_start_time: Slot,
 	) -> Result<()> {
 		processors::create_ticket_sale::exec(
 			ctx,
 			ticket_type_index,
 			ticket_type,
-			sale_start_time,
 		)
 	}
 }

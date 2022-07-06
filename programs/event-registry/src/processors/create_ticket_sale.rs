@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use common::{
   state::{
-    alias::*,
     ticket_type::TicketType,
   },
 };
@@ -15,7 +14,6 @@ pub fn exec(
   ctx: Context<CreateTicketSale>,
   ticket_type_index: usize,
   ticket_type: TicketType,
-  sale_start_time: Slot,
 ) -> Result<()> {
   {
     let ticket_type_at_index = &ctx.accounts.event.ticket_types[ticket_type_index as usize];
@@ -44,7 +42,6 @@ pub fn exec(
     ticket_type_index,
 		event.id,
 		ticket_type,
-    sale_start_time,
   )?;
 
   Ok(())

@@ -6,7 +6,6 @@ mod utils;
 use anchor_lang::prelude::*;
 use common::{
 	state::{
-		alias::*,
 		ticket_type::TicketType,
 	},
 };
@@ -51,14 +50,12 @@ pub mod ticket_sale {
 		ticket_type_index: usize,
 		event_id: u64,
 		ticket_type: TicketType,
-		sale_start_time: Slot,
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,
 			ticket_type_index,
 			event_id,
 			ticket_type,
-			sale_start_time,
 		)
 	}
 }
