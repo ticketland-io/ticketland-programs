@@ -106,6 +106,4 @@ use super::*;
 			ticket_type,
 		)
 	}
-
-	// * `sale_start_time` - The Solana slot that describes the start of the ticket sale for each ticket type
 }
