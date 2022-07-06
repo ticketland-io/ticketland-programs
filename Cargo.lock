@@ -728,6 +728,7 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
+ "common",
  "mpl-token-metadata",
 ]
 

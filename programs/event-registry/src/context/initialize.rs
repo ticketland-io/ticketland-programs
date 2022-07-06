@@ -26,6 +26,16 @@ pub struct Initialize<'info> {
   )]
   pub event_nft_authority: AccountInfo<'info>,
 
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TickerSale Program
+  #[account(
+    init,
+    payer = deployer,
+    space = 0,
+    seeds = [b"manager", state.key().as_ref()],
+    bump,
+  )]
+  pub manager: AccountInfo<'info>,
+
   #[account(mut)]
   pub deployer: Signer<'info>,
 

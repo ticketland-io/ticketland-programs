@@ -10,6 +10,9 @@ use anchor_metaplex::{
     state::{PREFIX},
   }
 };
+use common::{
+  state::ticket_type::TicketType,
+};
 use crate::{
   utils::{
     program_error::ErrorCode,

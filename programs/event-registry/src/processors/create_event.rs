@@ -7,6 +7,12 @@ use anchor_metaplex::{
   create_metadata,
   create_master_edition,
 };
+use common::{
+  state::{
+    alias::*,
+    ticket_type::TicketType,
+  },
+};
 use crate::{
   utils::program_error::ErrorCode,
   context::create_event::CreateEvent, 
@@ -94,9 +100,9 @@ fn check_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
 
 pub fn exec(
   ctx: Context<CreateEvent>,
-  start_time: SLOT,
-  end_time: SLOT,
-  sale_start_time: SLOT,
+  start_time: Slot,
+  end_time: Slot,
+  sale_start_time: Slot,
   ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,

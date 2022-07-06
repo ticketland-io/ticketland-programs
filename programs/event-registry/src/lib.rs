@@ -5,10 +5,15 @@ pub mod acl;
 pub mod utils;
 
 use anchor_lang::prelude::*;
+use common::{
+  state::{
+    alias::*,
+    ticket_type::TicketType,
+  },
+};
 use crate::{
 	account_data::{
 		state::*,
-		event::*,
 	},
 	context::{
 		initialize::*,
@@ -62,9 +67,9 @@ use super::*;
 	/// * `uri` - The uti that will be used in the Event NFT metadata
 	pub fn create_event(
 		ctx: Context<CreateEvent>,
-		start_time: SLOT,
-		end_time: SLOT,
-		sale_start_time: SLOT,
+		start_time: Slot,
+		end_time: Slot,
+		sale_start_time: Slot,
 		ticket_types: Vec<TicketType>,
 		name: String,
 		symbol: String,
