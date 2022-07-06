@@ -28,6 +28,10 @@ pub enum SaleType {
 pub struct TicketType {
   pub n_tickets: u32,
   pub sale_type: SaleType,
+  pub sale_start_time: SLOT,
+  pub start_time: SLOT,
+  pub end_time: SLOT,
+  pub merkle_root: [u8; 32],
 }
 
 #[account]
@@ -35,8 +39,7 @@ pub struct Event {
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
   pub id: u64,
-  pub sale_start_time: SLOT,
-  pub start_time: SLOT,
-  pub end_time: SLOT,
   pub ticket_types: Vec<TicketType>,
+  // A bitmap which has n_tickets bits that represent each seat e.g bit at position 0
+  pub seats: Vec<u8>,
 }

@@ -12,4 +12,6 @@ pub enum ErrorCode {
   UnsupportedDepositToken,
   #[msg("Not enough deposit")]
   NotEnoughDeposit,
+  #[msg("Invalid Merkle proof")]
+  InvalidMerkleProof,
 }
