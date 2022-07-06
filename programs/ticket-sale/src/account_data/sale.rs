@@ -12,7 +12,7 @@ pub struct Sale {
   pub event_id: u64,
 
   /// A unique index that will differentiate multiple sales of one single event
-  pub ticket_type_index: u8,
+  pub ticket_type_index: usize,
 
   /// The ticket type that decides the sale mechanism
   pub ticket_type: TicketType,

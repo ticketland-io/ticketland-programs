@@ -4,7 +4,7 @@ use super::{
   alias::Slot,
 };
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Eq, PartialEq)]
 pub struct TicketType {
   pub n_tickets: u32,
   pub sale_type: SaleType,

@@ -20,4 +20,6 @@ pub enum ErrorCode {
   OnlyEventOrganizer,
   #[msg("Invalid ticket type index")]
   InvalidTicketTypeIndex,
+  #[msg("Wrong ticket type for index")]
+  WrongTicketTypeForIndex,
 }

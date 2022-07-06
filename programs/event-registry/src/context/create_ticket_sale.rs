@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_type_index: u8)]
+#[instruction(ticket_type_index: usize)]
 pub struct CreateTicketSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
@@ -43,7 +43,7 @@ pub struct CreateTicketSale<'info> {
       &event.id.to_string().as_ref()
     ],
     bump,
-    constraint = ticket_type_index <= event.ticket_types.len() as u8 @ ErrorCode::InvalidTicketTypeIndex
+    constraint = ticket_type_index <= event.ticket_types.len() @ ErrorCode::InvalidTicketTypeIndex
   )]
   pub ticket_sale_state: AccountInfo<'info>,
 

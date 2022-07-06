@@ -8,7 +8,7 @@ use crate::{
 
 pub fn exec(
   ctx: Context<CreateSale>,
-  ticket_type_index: u8,
+  ticket_type_index: usize,
   event_id: u64,
   ticket_type: TicketType,
 ) -> Result<()> {

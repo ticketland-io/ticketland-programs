@@ -4,14 +4,20 @@ use common::{
 };
 use crate::{
   program::EventRegistry,
+  utils::program_error::ErrorCode,
   context::create_ticket_sale::CreateTicketSale, 
 };
 
 pub fn exec(
   ctx: Context<CreateTicketSale>,
-  ticket_type_index: u8,
+  ticket_type_index: usize,
   ticket_type: TicketType,
 ) -> Result<()> {
+  {
+    let ticket_type_at_index = &ctx.accounts.event.ticket_types[ticket_type_index as usize];
+    require!(*ticket_type_at_index == ticket_type,  ErrorCode::WrongTicketTypeForIndex);
+  }
+
   let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
   let cpi_accounts = ticket_sale::cpi::accounts::CreateSale {
     state: ctx.accounts.ticket_sale_program_state.to_account_info(),

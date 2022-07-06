@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Eq, PartialEq)]
 pub enum SaleType {
   FixedPrice(u64),
   DutchAuction {

@@ -97,7 +97,7 @@ use super::*;
 	/// * `ticket_type` - The ticket type of the given ticket for which we want to create a sale
 	pub fn create_ticket_sale(
 		ctx: Context<CreateTicketSale>,
-		ticket_type_index: u8,
+		ticket_type_index: usize,
 		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_ticket_sale::exec(
