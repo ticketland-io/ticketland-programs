@@ -17,6 +17,7 @@ pub fn exec(
 
   state.bumps = InitBumps {
     event_nft_authority: *ctx.bumps.get("event_nft_authority").unwrap(),
+    cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
   };
   state.supported_currencies = supported_currencies;
   state.deployer = ctx.accounts.deployer.key();

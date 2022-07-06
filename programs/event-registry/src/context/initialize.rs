@@ -31,10 +31,10 @@ pub struct Initialize<'info> {
     init,
     payer = deployer,
     space = 0,
-    seeds = [b"manager", state.key().as_ref()],
+    seeds = [b"cpi_authority", state.key().as_ref()],
     bump,
   )]
-  pub manager: AccountInfo<'info>,
+  pub cpi_authority: AccountInfo<'info>,
 
   #[account(mut)]
   pub deployer: Signer<'info>,

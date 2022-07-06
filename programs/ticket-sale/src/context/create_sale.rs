@@ -36,6 +36,20 @@ pub struct CreateSale<'info> {
   )]
   pub sale: Account<'info, Sale>,
 
+  /// CHECK: This is the Event Registry Program account
+  #[account()]
+  pub event_registry_program: AccountInfo<'info>,
+
+  #[account(
+    mut,
+    seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
+    // the PDA should be owned by the Event Registry Program
+    seeds::program = event_registry_program.key(),
+    bump = event_registry_state.bumps.cpi_authority,
+    constraint = event_registry_cpi_authority.key() == state.event_registry_cpi_authority.key(),
+  )]
+  pub event_registry_cpi_authority: Signer<'info>,
+
   /// This is the user that calls the create event in the event registry program
   #[account(mut)]
   pub event_organizer: Signer<'info>,

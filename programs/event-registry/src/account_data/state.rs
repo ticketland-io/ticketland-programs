@@ -8,6 +8,7 @@ pub const SPACE_MARGIN: usize = 5000;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub event_nft_authority: u8,
+  pub cpi_authority: u8,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
