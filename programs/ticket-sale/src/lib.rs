@@ -19,10 +19,11 @@ pub mod ticket_sale {
 
 	pub fn initialize(
 		ctx: Context<Initialize>,
-		_event_registry_state: Pubkey,
+		event_registry_state: Pubkey,
 	) -> Result<()> {
     processors::initialize::exec(
 			ctx,
+			event_registry_state
 		)
 	}
 }

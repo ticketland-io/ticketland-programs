@@ -25,7 +25,7 @@ use crate::{
 
 #[derive(Accounts)]
 pub struct CreateEvent<'info> {
-  #[account()]
+  #[account(mut)]
   pub state: Account<'info, State>,
 
   // The newly created event 

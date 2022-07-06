@@ -8,4 +8,10 @@ pub const SPACE_MARGIN: usize = 1000;
 pub struct State {
   /// The Event Registry Program
   pub event_registry_program: Pubkey,
+
+  /// A State account of the Event Registry Program
+  pub event_registry_state: Pubkey,
+    
+  /// The event registry manager PDA that will be allowed to call this Program's instructions
+  pub event_registry_manager: Pubkey,
 }
