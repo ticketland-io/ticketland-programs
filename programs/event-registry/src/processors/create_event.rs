@@ -102,7 +102,6 @@ pub fn exec(
   ctx: Context<CreateEvent>,
   start_time: Slot,
   end_time: Slot,
-  sale_start_time: Vec<Slot>,
   ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,
@@ -119,7 +118,6 @@ pub fn exec(
     event.id = state.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
-    event.ticket_types = ticket_types.clone();
     event.event_organizer = ctx.accounts.event_organizer.key();
 
     state.n_events = state.n_events.safe_add(1)?;
@@ -137,11 +135,6 @@ pub fn exec(
   // We need this otherwise we get this error "Editions must have exactly one token"
   mint_edition_token(&ctx, signer_seeds)?;
   create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)?;
-
-  // Create a new sale for each ticket type
-  // for ticket_type in ticket_types {
-  //   let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
-  // }
 
   Ok(())
 }

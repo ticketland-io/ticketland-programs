@@ -111,8 +111,6 @@ pub struct CreateEvent<'info> {
   #[account(mut)]
   pub event_organizer: Signer<'info>,
   
-  // pub ticket_sale_program: Program<'info, TickerSale>,
-
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
   pub system_program: Program<'info, System>,

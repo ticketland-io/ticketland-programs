@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum ErrorCode {
-  #[msg("Only Deployer")]
+  #[msg("Only deployer")]
   OnlyDeployer,
   #[msg("Too many currencies")]
   TooManyCurrencies,
@@ -14,4 +14,8 @@ pub enum ErrorCode {
   NotEnoughDeposit,
   #[msg("Invalid Merkle proof")]
   InvalidMerkleProof,
+  #[msg("Wrong ticket sale program state account")]
+  WrongTicketSaleProgramStateAccount,
+  #[msg("Only event organizer")]
+  OnlyEventOrganizer,
 }

@@ -24,6 +24,7 @@ pub struct Event {
   pub id: u64,
   pub start_time: Slot,
   pub end_time: Slot,
+  pub sale_start_time: Option<Vec<Slot>>,
   pub ticket_types: Vec<TicketType>,
   // A bitmap which has n_tickets bits that represent each seat e.g bit at position 0
   pub seats: Vec<u8>,

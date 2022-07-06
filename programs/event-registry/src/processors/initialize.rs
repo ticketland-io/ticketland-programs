@@ -20,6 +20,7 @@ pub fn exec(
     cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
   };
   state.supported_currencies = supported_currencies;
+  state.cpi_authority = ctx.accounts.cpi_authority.key();
   state.deployer = ctx.accounts.deployer.key();
   state.service_fee = service_fee;
   state.seller_fee_basis_points = seller_fee_basis_points;

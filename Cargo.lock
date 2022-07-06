@@ -730,6 +730,7 @@ dependencies = [
  "anchor-spl",
  "common",
  "mpl-token-metadata",
+ "ticket-sale",
 ]
 
 [[package]]

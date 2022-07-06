@@ -26,7 +26,7 @@ pub struct Initialize<'info> {
   )]
   pub event_nft_authority: AccountInfo<'info>,
 
-  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TickerSale Program
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(
     init,
     payer = deployer,
