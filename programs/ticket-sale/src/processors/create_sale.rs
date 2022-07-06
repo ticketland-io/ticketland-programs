@@ -13,6 +13,7 @@ pub fn exec(
 ) -> Result<()> {
   let sale = &mut ctx.accounts.sale;
 
+  sale.event_id = ctx.accounts.event_registry_state.n_events;
   sale.ticket_type_index = ticket_type_index;
   sale.ticket_type = ticket_type;
 

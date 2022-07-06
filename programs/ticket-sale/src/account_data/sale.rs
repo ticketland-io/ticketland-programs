@@ -8,6 +8,10 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[account]
 pub struct Sale {
+  /// The unique id of the event which this sale is part of
+  pub event_id: u64,
+
+  /// A unique index that will differentiate multiple sales of one single event
   pub ticket_type_index: u8,
 
   /// The ticket type that decides the sale mechanism
