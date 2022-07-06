@@ -30,6 +30,9 @@ pub struct Initialize<'info> {
   )]
   pub event_registry_manager: Signer<'info>,
 
+  #[account(mut)]
+  pub deployer: Signer<'info>,
+  
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }

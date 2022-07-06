@@ -102,7 +102,7 @@ pub fn exec(
   ctx: Context<CreateEvent>,
   start_time: Slot,
   end_time: Slot,
-  sale_start_time: Slot,
+  sale_start_time: Vec<Slot>,
   ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,
@@ -119,7 +119,6 @@ pub fn exec(
     event.id = state.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
-    event.sale_start_time = sale_start_time;
     event.ticket_types = ticket_types;
     event.event_organizer = ctx.accounts.event_organizer.key();
 

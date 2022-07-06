@@ -9,7 +9,7 @@ pub const SPACE_MARGIN: usize = 1000;
 #[account]
 pub struct Sale {
   /// A State account of the Event Registry Program
-  pub event_registry_account: Pubkey,
+  pub event_registry_state: Pubkey,
 
   /// The ticket type that decides the sale mechanism
   pub ticket_type: TicketType,

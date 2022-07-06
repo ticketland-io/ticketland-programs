@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 use common::{
-  state::ticket_type::TicketType,
+  state::{
+    ticket_type::TicketType,
+    alias::*,
+  },
 };
 
 // Additional space in bytes (1kb) we want to allocate for potential future state expansion
@@ -19,6 +22,8 @@ pub struct Event {
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
   pub id: u64,
+  pub start_time: Slot,
+  pub end_time: Slot,
   pub ticket_types: Vec<TicketType>,
   // A bitmap which has n_tickets bits that represent each seat e.g bit at position 0
   pub seats: Vec<u8>,

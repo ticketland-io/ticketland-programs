@@ -9,7 +9,5 @@ pub struct TicketType {
   pub n_tickets: u32,
   pub sale_type: SaleType,
   pub sale_start_time: Slot,
-  pub start_time: Slot,
-  pub end_time: Slot,
   pub merkle_root: [u8; 32],
 }
