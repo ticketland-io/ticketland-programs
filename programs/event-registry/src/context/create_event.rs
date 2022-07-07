@@ -26,7 +26,7 @@ use crate::{
 #[derive(Accounts)]
 pub struct CreateEvent<'info> {
   #[account(mut)]
-  pub state: Account<'info, State>,
+  pub state: Box<Account<'info, State>>,
 
   // The newly created event 
   #[account(
@@ -36,7 +36,7 @@ pub struct CreateEvent<'info> {
     seeds = [b"event", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump
   )]
-  pub event: Account<'info, Event>,
+  pub event: Box<Account<'info, Event>>,
 
   #[account(
     init,
@@ -46,7 +46,7 @@ pub struct CreateEvent<'info> {
     seeds = [b"event_nft", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump,
   )]
-  pub event_nft: Account<'info, Mint>,
+  pub event_nft: Box<Account<'info, Mint>>,
 
   /// CHECK: The authority of the event nfts
   #[account(
@@ -86,7 +86,7 @@ pub struct CreateEvent<'info> {
   #[account(
     constraint = state.supported_currencies.iter().any(|c| c.mint_account == deposit_token.key()) @ ErrorCode::UnsupportedDepositToken
   )]
-  pub deposit_token: Account<'info, Mint>,
+  pub deposit_token: Box<Account<'info, Mint>>,
 
   /// CHECK: The PDA that will be the authority to handle all deposits for the given event_organizer
   /// Each user will have his own PDA
@@ -106,7 +106,7 @@ pub struct CreateEvent<'info> {
     associated_token::mint = deposit_token,
     associated_token::authority = fund_manager,
   )]
-  pub fund_manager_ata: Account<'info, TokenAccount>,
+  pub fund_manager_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(mut)]
   pub event_organizer: Signer<'info>,
@@ -114,7 +114,7 @@ pub struct CreateEvent<'info> {
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
   // /// CHECK: The metadata program
-  // pub metadata_program: AccountInfo<'info>,
+  pub metadata_program: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }

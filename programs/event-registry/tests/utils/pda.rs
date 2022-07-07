@@ -28,12 +28,12 @@ pub fn event(state: &Pubkey, event_id: u64) -> (Pubkey, u8) {
 
 pub fn event_nft(state: &Pubkey, event_id: u64) -> (Pubkey, u8) {
   Pubkey::find_program_address(
-    &[b"event", state.as_ref(), &event_id.to_string().as_ref()],
+    &[b"event_nft", state.as_ref(), &event_id.to_string().as_ref()],
     &event_registry::id()
   )
 }
 
-pub fn fund_manager(state: &Pubkey, event_organizer: Pubkey) -> (Pubkey, u8) {
+pub fn fund_manager(state: &Pubkey, event_organizer: &Pubkey) -> (Pubkey, u8) {
   Pubkey::find_program_address(
     &[b"fund_manager", state.as_ref(), &event_organizer.as_ref()],
     &event_registry::id()

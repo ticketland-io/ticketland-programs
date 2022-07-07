@@ -12,6 +12,7 @@ use solana_test_utils::{
   test_account::{TestAccount},
   spl_associated_token_account,
   spl::Spl,
+  utils::{to_base},
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -22,6 +23,7 @@ use solana_sdk::{
   signature::{Keypair, Signer},
   instruction::Instruction,
 };
+use anchor_spl::token::{Token};
 use anchor_metaplex::{
   mpl_token_metadata::{
     pda::{
@@ -29,6 +31,12 @@ use anchor_metaplex::{
       find_master_edition_account,
     },
   },
+};
+use common::{
+  state::{
+    ticket_type::TicketType,
+    alias::*,
+  }
 };
 use event_registry::{
   account_data::state::*,
@@ -67,10 +75,14 @@ impl Runner {
     }
   }
 
+  pub fn get_participant(&self, index: usize) -> Keypair {
+    Keypair::from_bytes(self.test_account.participants[index].to_bytes().as_ref()).unwrap()
+  }
+
   async fn create_deposit_tokens(&mut self) { 
     let mut deposit_tokens = vec![];
 
-    for i in 0..2 {
+    for _ in 0..2 {
       let mint_token = Keypair::new();
       let authority = Keypair::new();
 
@@ -85,7 +97,7 @@ impl Runner {
         &mint_token.pubkey(),
         &authority,
         &self.test_account.participants,
-        1_000_000 * (1e6 as u64)
+        to_base(1_000_000, 6),
       ).await;
 
       deposit_tokens.push(mint_token.pubkey());
@@ -96,7 +108,7 @@ impl Runner {
     for mint_account in &deposit_tokens {
       supported_currencies.push(Currency {
         mint_account: *mint_account,
-        deposit_amount: 1_000 * (1e6 as u64), // 1000 USDC for example
+        deposit_amount: to_base(1000, 6), // 1000 USDC for example
       })
     }
 
@@ -161,8 +173,17 @@ impl Runner {
   ) -> AnchorResult<()> {
     let event_nft = pda::event_nft(&state, event_id).0;
     let event_nft_authority = pda::event_nft_authority(&state).0;
-    let fund_manager = pda::fund_manager(&sate, &event_organizer.pubkey()).0;
+    let fund_manager = pda::fund_manager(&state, &event_organizer.pubkey()).0;
     
+    println!("event_nft -> {:?}", event_nft);
+    println!("event_nft_authority -> {:?}", event_nft_authority);
+    println!("fund_manager -> {:?}", fund_manager);
+    println!("fund_manager_ata -> {:?}", pda::fund_manager_ata(&fund_manager, &deposit_token));
+    println!("event_nft_authority_ata -> {:?}", pda::event_nft_authority_ata(&event_nft_authority, &event_nft));
+    println!("metadata -> {:?}", find_metadata_account(&event_nft).0);
+    println!("deposit_token -> {:?}", deposit_token);
+    println!("event_organizer -> {:?}", event_organizer.pubkey());
+
     let accounts = event_registry::accounts::CreateEvent {
       state,
       event: pda::event(&state, event_id).0,
@@ -176,7 +197,7 @@ impl Runner {
       fund_manager_ata: pda::fund_manager_ata(&fund_manager, &deposit_token),
       event_organizer: event_organizer.pubkey(),
 
-      // metadata_program: anchor_metaplex::mpl_token_metadata::ID,
+      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
       system_program: system_program::ID,
@@ -198,6 +219,24 @@ impl Runner {
       data,
     };
 
-    Self::process_transaction(&[ix], Some(&[&event_organizer])).await
+    self.process_transaction(&[ix], Some(&[&event_organizer])).await
+  }
+
+  // deposit the amount that is needed to create a new event
+  pub async fn add_create_event_deposit(
+    &mut self,
+    deposit_token: Pubkey,
+    deposit_amount: u64,
+    event_organizer: &Keypair,
+    fund_manager_ata: Pubkey,
+  ) {
+    let organizer_ata = Spl::get_associated_token_address(&event_organizer.pubkey(), &deposit_token);
+
+    self.spl.transfer(
+      &organizer_ata,
+      &fund_manager_ata,
+      event_organizer,
+      deposit_amount,
+    ).await;
   }
 }

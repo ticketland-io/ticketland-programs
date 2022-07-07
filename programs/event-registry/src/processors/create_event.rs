@@ -41,7 +41,7 @@ fn create_event_nft(
   seller_fee_basis_points: u16,
 ) -> Result<()> {
   let cpi_accounts = CreateMetadata {
-    mint: ctx.accounts.event_nft.clone(),
+    mint: *ctx.accounts.event_nft.clone(),
     mint_authority: ctx.accounts.event_nft_authority.clone(),
     metadata_account: ctx.accounts.metadata.clone(),
     payer: ctx.accounts.event_organizer.to_account_info(),
@@ -66,7 +66,7 @@ fn create_event_nft(
 
   let cpi_accounts = CreateMasterEdition {
     edition: ctx.accounts.master_edition.clone(),
-    mint: ctx.accounts.event_nft.clone(),
+    mint: *ctx.accounts.event_nft.clone(),
     mint_authority: ctx.accounts.event_nft_authority.clone(),
     metadata_account: ctx.accounts.metadata.clone(),
     payer: ctx.accounts.event_organizer.to_account_info(),
