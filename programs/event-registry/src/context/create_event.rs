@@ -38,6 +38,14 @@ pub struct CreateEvent<'info> {
   )]
   pub event: Box<Account<'info, Event>>,
 
+  /// CHECK: The authority of the event nfts
+  #[account(
+    mut,
+    seeds = [b"event_nft_authority", state.key().as_ref()],
+    bump = state.bumps.event_nft_authority,
+  )]
+  pub event_nft_authority: AccountInfo<'info>,
+
   #[account(
     init,
     payer = event_organizer,
@@ -47,22 +55,16 @@ pub struct CreateEvent<'info> {
     bump,
   )]
   pub event_nft: Box<Account<'info, Mint>>,
-
-  /// CHECK: The authority of the event nfts
-  #[account(
-    seeds = [b"event_nft_authority", state.key().as_ref()],
-    bump = state.bumps.event_nft_authority,
-  )]
-  pub event_nft_authority: AccountInfo<'info>,
-
+  
   /// CHECK: The ATA that will receive the edition token which is needed for the master edition to be created
+  /// This will be under the event organizer's control. However, the metadata will be controlled by the event_nft_authority
   #[account(
     init,
     payer = event_organizer,
     associated_token::mint = event_nft,
-    associated_token::authority = event_nft_authority,
+    associated_token::authority = event_organizer,
   )]
-  pub event_nft_authority_ata: Account<'info, TokenAccount>,
+  pub organizer_event_nft_ata: Account<'info, TokenAccount>,
 
   /// CHECK: The metadata account that will be initialized in the processor
   #[account(
@@ -88,18 +90,26 @@ pub struct CreateEvent<'info> {
   )]
   pub deposit_token: Box<Account<'info, Mint>>,
 
+  /// The deposit token ATA from which the event creation deposit will be transferred from
+  #[account(
+    mut,
+    associated_token::mint = deposit_token,
+    associated_token::authority = event_organizer,
+  )]
+  pub event_organizer_ata: Box<Account<'info, TokenAccount>>,
+
   /// CHECK: The PDA that will be the authority to handle all deposits for the given event_organizer
   /// Each user will have his own PDA
   #[account(
     init_if_needed,
     payer = event_organizer,
     space = 0,
-    seeds = [b"fund_manager", state.key().as_ref(), event_organizer.key().as_ref()],
+    seeds = [b"fund_manager", state.key().as_ref(), event.key().as_ref(), event_organizer.key().as_ref()],
     bump,
   )]
   pub fund_manager: AccountInfo<'info>,
 
-  /// CHECK: The ATA that holds creators deposit in the given deposit token
+  /// The ATA that holds creators deposit in the given deposit token
   #[account(
     init_if_needed,
     payer = event_organizer,

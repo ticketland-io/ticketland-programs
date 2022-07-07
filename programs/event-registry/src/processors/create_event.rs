@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, MintTo};
+use anchor_spl::token::{self, Transfer, MintTo};
 use anchor_safe_math::SafeMath;
 use anchor_metaplex::{
   CreateMetadata,
@@ -22,7 +22,7 @@ use crate::{
 fn mint_edition_token(ctx: &Context<CreateEvent>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
   let cpi_accounts = MintTo {
     mint: ctx.accounts.event_nft.to_account_info(),
-    to: ctx.accounts.event_nft_authority_ata.to_account_info(),
+    to: ctx.accounts.organizer_event_nft_ata.to_account_info(),
     authority: ctx.accounts.event_nft_authority.to_account_info(),
   };
   
@@ -45,7 +45,7 @@ fn create_event_nft(
     mint_authority: ctx.accounts.event_nft_authority.clone(),
     metadata_account: ctx.accounts.metadata.clone(),
     payer: ctx.accounts.event_organizer.to_account_info(),
-    update_authority: ctx.accounts.event_nft_authority_ata.to_account_info(),
+    update_authority: ctx.accounts.event_nft_authority.to_account_info(),
     system_program: ctx.accounts.system_program.to_account_info(),
     rent: ctx.accounts.rent.to_account_info(),
   };
@@ -82,20 +82,22 @@ fn create_event_nft(
   )
 }
 
-fn check_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
-  let fund_manager_ata = &ctx.accounts.fund_manager_ata;
-  let deposit_token = &ctx.accounts.deposit_token;
+/// Transfer the deposit amount to the fund manager ata
+fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
+  let cpi_accounts = Transfer {
+    from: ctx.accounts.event_organizer_ata.to_account_info(),
+    to: ctx.accounts.fund_manager_ata.to_account_info(),
+    authority: ctx.accounts.event_organizer.to_account_info(),
+  };
+  let cpi_program = ctx.accounts.token_program.to_account_info();
+  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+    
   let currency = &ctx.accounts.state.supported_currencies
     .iter()
-    .find(|c| c.mint_account == deposit_token.key())
+    .find(|c| c.mint_account == ctx.accounts.deposit_token.key())
     .unwrap();
 
-  // Check that enough tokens are deposited to the fund manager ata
-  if fund_manager_ata.amount < (**currency).deposit_amount {
-    return Err(ErrorCode::NotEnoughDeposit.into())
-  }
-
-  Ok(())
+  token::transfer(cpi_ctx, currency.deposit_amount)
 }
 
 pub fn exec(
@@ -109,7 +111,7 @@ pub fn exec(
 ) -> Result<()> {
   require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
 
-  check_deposit(&ctx)?;
+  lock_deposit(&ctx)?;
 
   {
     let event = &mut ctx.accounts.event;

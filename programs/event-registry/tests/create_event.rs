@@ -1,15 +1,12 @@
 #![cfg(feature = "test-bpf")]
 mod utils;
 
-use std::{assert_eq};
-use anchor_lang::prelude::Pubkey;
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
 use solana_test_utils::{
   utils::{to_base},
-  spl::Spl,
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
@@ -64,15 +61,6 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     },
   ];
 
-  let (fund_manager, _) = pda::fund_manager(&state.pubkey(), &event_organizer.pubkey());
-  let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
-  runner.add_create_event_deposit(
-    deposit_token,
-    to_base(1000, 6),
-    &event_organizer,
-    fund_manager_ata,
-  ).await;
-
   let result = runner.create_event(
     state.pubkey(),
     event_id,
@@ -95,7 +83,13 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     let account = pt.context.banks_client.get_account(metadata).await.unwrap().unwrap();
     let metadata = meta_deser(&mut &account.data[..]).unwrap();
 
-    println!(">>>>> {:?}", metadata);
+    assert_eq!(metadata.update_authority, pda::event_nft_authority(&state.pubkey()).0);
+    assert_eq!(metadata.mint, event_nft);
+    assert_eq!(metadata.collection, None);
+    assert_eq!(metadata.data.name.trim_matches(char::from(0)), "Ticket Land Coolest Event".to_owned());
+    assert_eq!(metadata.data.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
+    assert_eq!(metadata.data.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
+    assert_eq!(metadata.data.seller_fee_basis_points, 1000);
   }
 
 }

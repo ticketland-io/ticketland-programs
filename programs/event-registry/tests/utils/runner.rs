@@ -171,30 +171,23 @@ impl Runner {
 		symbol: String,
 		uri: String,
   ) -> AnchorResult<()> {
+    let event = pda::event(&state, event_id).0;
     let event_nft = pda::event_nft(&state, event_id).0;
     let event_nft_authority = pda::event_nft_authority(&state).0;
-    let fund_manager = pda::fund_manager(&state, &event_organizer.pubkey()).0;
-    
-    println!("event_nft -> {:?}", event_nft);
-    println!("event_nft_authority -> {:?}", event_nft_authority);
-    println!("fund_manager -> {:?}", fund_manager);
-    println!("fund_manager_ata -> {:?}", pda::fund_manager_ata(&fund_manager, &deposit_token));
-    println!("event_nft_authority_ata -> {:?}", pda::event_nft_authority_ata(&event_nft_authority, &event_nft));
-    println!("metadata -> {:?}", find_metadata_account(&event_nft).0);
-    println!("deposit_token -> {:?}", deposit_token);
-    println!("event_organizer -> {:?}", event_organizer.pubkey());
+    let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
 
     let accounts = event_registry::accounts::CreateEvent {
       state,
-      event: pda::event(&state, event_id).0,
+      event,
       event_nft,
       event_nft_authority,
-      event_nft_authority_ata: pda::event_nft_authority_ata(&event_nft_authority, &event_nft),
+      organizer_event_nft_ata: pda::organizer_event_nft_ata(&event_organizer.pubkey(), &event_nft),
       metadata: find_metadata_account(&event_nft).0,
       master_edition: find_master_edition_account(&event_nft).0,
       deposit_token,
       fund_manager,
       fund_manager_ata: pda::fund_manager_ata(&fund_manager, &deposit_token),
+      event_organizer_ata: pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token),
       event_organizer: event_organizer.pubkey(),
 
       metadata_program: anchor_metaplex::mpl_token_metadata::ID,

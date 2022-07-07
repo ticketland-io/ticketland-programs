@@ -33,14 +33,18 @@ pub fn event_nft(state: &Pubkey, event_id: u64) -> (Pubkey, u8) {
   )
 }
 
-pub fn fund_manager(state: &Pubkey, event_organizer: &Pubkey) -> (Pubkey, u8) {
+pub fn fund_manager(state: &Pubkey, event: &Pubkey, event_organizer: &Pubkey) -> (Pubkey, u8) {
   Pubkey::find_program_address(
-    &[b"fund_manager", state.as_ref(), &event_organizer.as_ref()],
+    &[b"fund_manager", state.as_ref(), &event.as_ref(), &event_organizer.as_ref()],
     &event_registry::id()
   )
 }
 
-pub fn event_nft_authority_ata(authority: &Pubkey, mint: &Pubkey) -> Pubkey {
+pub fn event_organizer_ata(authority: &Pubkey, mint: &Pubkey) -> Pubkey {
+  Spl::get_associated_token_address(authority, mint)
+}
+
+pub fn organizer_event_nft_ata(authority: &Pubkey, mint: &Pubkey) -> Pubkey {
   Spl::get_associated_token_address(authority, mint)
 }
 
