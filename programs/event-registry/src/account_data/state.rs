@@ -11,7 +11,7 @@ pub struct InitBumps {
   pub cpi_authority: u8,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Eq, PartialEq, Debug, Clone)]
 pub struct Currency {
   pub mint_account: Pubkey,
   pub deposit_amount: u64,
