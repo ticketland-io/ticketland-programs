@@ -23,7 +23,6 @@ pub fn exec(
   let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
   let cpi_accounts = ticket_sale::cpi::accounts::CreateSale {
     state: ctx.accounts.ticket_sale_program_state.to_account_info(),
-    event_registry_state: ctx.accounts.state.to_account_info(),
     sale: ctx.accounts.ticket_sale_state.to_account_info(),
     event_registry_cpi_authority: ctx.accounts.cpi_authority.to_account_info(),
     event_organizer: ctx.accounts.event_organizer.to_account_info(),

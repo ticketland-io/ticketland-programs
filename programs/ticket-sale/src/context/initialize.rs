@@ -26,7 +26,7 @@ pub struct Initialize<'info> {
 
   #[account(
     mut,
-    seeds = [b"manager", event_registry_state.key().as_ref()],
+    seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
     // the PDA should be owned by the Event Registry Program
     seeds::program = event_registry_program.key(),
     bump

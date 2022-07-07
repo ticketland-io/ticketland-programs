@@ -11,7 +11,4 @@ pub struct State {
 
   /// A State account of the Event Registry Program
   pub event_registry_state: Pubkey,
-    
-  /// The event registry cpi authority PDA that will be allowed to call this Program's instructions
-  pub event_registry_cpi_authority: Pubkey,
 }

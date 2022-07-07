@@ -8,14 +8,10 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, event_registry_program: Pubkey, ticket_type_index: u8, event_id: u64)]
+#[instruction(cpi_authority_bump: u8, ticket_type_index: u8, event_id: u64)]
 pub struct CreateSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
-
-  /// CHECK: The state account of the event registry program
-  #[account()]
-  pub event_registry_state: AccountInfo<'info>,
 
   /// The newly created Sale 
   #[account(
@@ -33,11 +29,10 @@ pub struct CreateSale<'info> {
 
   #[account(
     mut,
-    seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
-    // the PDA should be owned by the Event Registry Program
-    seeds::program = event_registry_program,
+    seeds = [b"cpi_authority", state.event_registry_state.as_ref()],
     bump = cpi_authority_bump,
-    constraint = event_registry_cpi_authority.key() == state.event_registry_cpi_authority.key(),
+    // the PDA should be owned by the Event Registry Program
+    seeds::program = state.event_registry_program,
   )]
   pub event_registry_cpi_authority: Signer<'info>,
 

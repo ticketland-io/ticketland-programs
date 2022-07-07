@@ -10,7 +10,6 @@ pub fn exec(
 
   state.event_registry_program = ctx.accounts.event_registry_program.key();
   state.event_registry_state = ctx.accounts.event_registry_state.key();
-  state.event_registry_cpi_authority = ctx.accounts.event_registry_cpi_authority.key();
 
   Ok(())
 }
