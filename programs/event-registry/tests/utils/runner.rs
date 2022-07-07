@@ -221,22 +221,4 @@ impl Runner {
 
     self.process_transaction(&[ix], Some(&[&event_organizer])).await
   }
-
-  // deposit the amount that is needed to create a new event
-  pub async fn add_create_event_deposit(
-    &mut self,
-    deposit_token: Pubkey,
-    deposit_amount: u64,
-    event_organizer: &Keypair,
-    fund_manager_ata: Pubkey,
-  ) {
-    let organizer_ata = Spl::get_associated_token_address(&event_organizer.pubkey(), &deposit_token);
-
-    self.spl.transfer(
-      &organizer_ata,
-      &fund_manager_ata,
-      event_organizer,
-      deposit_amount,
-    ).await;
-  }
 }
