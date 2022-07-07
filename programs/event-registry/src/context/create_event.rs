@@ -43,7 +43,7 @@ pub struct CreateEvent<'info> {
     payer = event_organizer,
     mint::decimals = 0,
     mint::authority = event_nft_authority,
-    seeds = [b"event_nft", state.key().as_ref()],
+    seeds = [b"event_nft", state.key().as_ref(), &state.n_events.to_string().as_ref()],
     bump,
   )]
   pub event_nft: Account<'info, Mint>,
@@ -113,6 +113,8 @@ pub struct CreateEvent<'info> {
   
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
+  // /// CHECK: The metadata program
+  // pub metadata_program: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }
