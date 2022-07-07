@@ -2,6 +2,7 @@
 mod utils;
 
 use test_context::{test_context, futures};
+use anchor_lang::{prelude::*};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
@@ -11,13 +12,19 @@ use solana_test_utils::{
 use anchor_metaplex::{
   mpl_token_metadata::{
     deser::meta_deser,
-    pda::{find_metadata_account},
+    pda::{
+      find_metadata_account,
+      find_master_edition_account,
+    },
   },
 };
 use solana_program_test::{tokio};
 use utils::{
   pda,
   test_context::TestContext,
+};
+use anchor_spl::{
+  token::{Mint as TokenMint, TokenAccount},
 };
 use common::{
   state::{
@@ -76,8 +83,32 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 
   assert!(result.is_ok());
 
+  
+  // Assert event state
   {
-    let event_nft = pda::event_nft(&state.pubkey(), event_id).0;
+    let mut pt = runner.pt.lock().await;
+    let event = pda::event(&state.pubkey(), event_id).0;
+    let event_data = pt.get_account::<event_registry::account_data::event::Event>(event).await;
+
+    assert_eq!(event_data.id, event_id);
+    assert_eq!(event_data.start_time, 100);
+    assert_eq!(event_data.end_time, 1000);
+    assert_eq!(event_data.event_organizer, event_organizer.pubkey());
+  }
+
+  // Assert state
+  {
+    let mut pt = runner.pt.lock().await;
+    let state_data = pt.get_account::<event_registry::account_data::state::State>(state.pubkey()).await;
+
+    // number of events increased by one
+    assert_eq!(state_data.n_events, 1);
+  }
+  
+  let event_nft = pda::event_nft(&state.pubkey(), event_id).0;
+
+  // Assert event nft metadata
+  {
     let metadata = find_metadata_account(&event_nft).0;
     let mut pt = runner.pt.lock().await;
     let account = pt.context.banks_client.get_account(metadata).await.unwrap().unwrap();
@@ -92,4 +123,44 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     assert_eq!(metadata.data.seller_fee_basis_points, 1000);
   }
 
+  // Assert the token mint account
+  {
+    let mut pt = runner.pt.lock().await;
+    let event_nft_data = pt.context.banks_client.get_account(event_nft).await.unwrap().unwrap();
+    let event_nft_data = TokenMint::try_deserialize_unchecked(&mut &event_nft_data.data[..]).unwrap();
+
+    // mint authority is transferred to the master edition when the latter is created
+    assert_eq!(event_nft_data.mint_authority.unwrap(), find_master_edition_account(&event_nft).0);
+    assert_eq!(event_nft_data.supply, 1);
+  }
+
+  // Assert the ATA account
+  {
+    let mut pt = runner.pt.lock().await;
+
+    let event_organizer_ata = pda::event_organizer_ata(&event_organizer.pubkey(), &event_nft);
+    let event_organizer_ata = pt.context.banks_client.get_account(event_organizer_ata).await.unwrap().unwrap();
+    let event_organizer_ata = TokenAccount::try_deserialize_unchecked(&mut &event_organizer_ata.data[..]).unwrap();
+  
+    assert_eq!(event_organizer_ata.mint, event_nft);
+    assert_eq!(event_organizer_ata.owner, event_organizer.pubkey());
+    assert_eq!(event_organizer_ata.amount, 1);
+  }
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_revert_if_max_ticker_types_violated(ctx: &mut TestContext) {}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {}
+
