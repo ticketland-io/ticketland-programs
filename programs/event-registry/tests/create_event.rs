@@ -22,6 +22,7 @@ use solana_program_test::{tokio};
 use utils::{
   pda,
   test_context::TestContext,
+  error::Error,
 };
 use anchor_spl::{
   token::{Mint as TokenMint, TokenAccount},
@@ -150,7 +151,54 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_revert_if_max_ticker_types_violated(ctx: &mut TestContext) {}
+async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
+  let state = Keypair::new();
+  let runner = &mut ctx.runner;
+  
+  runner.initialize(
+    &state,
+    500, // 5%
+		1_000, // 10%
+  ).await;
+
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  let deposit_token = runner.deposit_tokens[0];
+  let ticket_types = vec![
+    TicketType {
+      n_tickets: 1000,
+      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      sale_start_time: 50,
+      merkle_root: [0; 32],
+    },
+    TicketType {
+      n_tickets: 1000,
+      sale_type: SaleType::DutchAuction {
+        start_price: 150,
+        end_price: 110,
+        curve_length: 200 * 60,
+        drop_interval: 20 * 60,
+      },
+      sale_start_time: 50,
+      merkle_root: [0; 32],
+    },
+  ];
+
+  let result = runner.create_event(
+    state.pubkey(),
+    event_id,
+    deposit_token,
+    &event_organizer,
+    100,
+		1000,
+		ticket_types.clone(),
+		"Ticket Land Coolest Event".to_owned(),
+		"TICKT".to_owned(),
+		"https://ticketland.io".to_owned(),
+  ).await;
+
+  Error::assert_err(result, event_registry::program_error::ErrorCode::TooManyTicketTypes);
+}
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
