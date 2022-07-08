@@ -26,6 +26,7 @@ use common_test::{
   },
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
+    pda as ticket_sale_pda,
   },
   test_context::TestContext,
 };
@@ -131,16 +132,32 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   // init the ticker sale program first
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
+  let ticket_type_index = 0;
+  let event_id = 0;
 
   // Create a new ticket sale for the first ticket type
   let result = runner.create_ticket_sale(
     state.pubkey(),
-    0,
+    event_id,
     &event_organizer,
     ticket_sale_program_state,
-    0,
+    ticket_type_index,
     ticket_types[0].clone(),
   ).await;
 
   assert!(result.is_ok());
+
+  {
+    let mut pt = runner.pt.lock().await;
+    let ticket_sale_state = ticket_sale_pda::ticket_sale_state(
+      &ticket_sale_program_state,
+      ticket_type_index,
+      event_id,
+    ).0;
+    let sale_data = pt.get_account::<ticket_sale::account_data::sale::Sale>(ticket_sale_state).await;
+    
+    assert_eq!(sale_data.event_id, event_id);
+    assert_eq!(sale_data.ticket_type_index, ticket_type_index);
+    assert_eq!(sale_data.ticket_type, ticket_types[0].clone());
+  }
 }

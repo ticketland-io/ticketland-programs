@@ -235,10 +235,6 @@ impl Runner {
       event_id,
     ).0;
 
-    println!("event {:?}", event);
-    println!("cpi_authority {:?}", cpi_authority);
-    println!("ticket_sale_state {:?}", ticket_sale_state);
-
     let accounts = event_registry::accounts::CreateTicketSale {
       state,
       event,

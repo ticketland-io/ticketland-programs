@@ -37,6 +37,7 @@ pub struct CreateTicketSale<'info> {
   /// data. However, since this is will further be passed as a CPI account to the Ticket Sale, the latter will
   /// do all the checks needed.
   #[account(
+    mut,
     seeds = [
       b"sale",
       ticket_sale_program_state.key().as_ref(),
@@ -51,6 +52,7 @@ pub struct CreateTicketSale<'info> {
 
   /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(
+    mut,
     seeds = [b"cpi_authority", state.key().as_ref()],
     bump = state.bumps.cpi_authority,
   )]

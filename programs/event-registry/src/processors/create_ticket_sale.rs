@@ -5,7 +5,6 @@ use common::{
   },
 };
 use crate::{
-  program::EventRegistry,
   utils::program_error::ErrorCode,
   context::create_ticket_sale::CreateTicketSale, 
 };
@@ -30,14 +29,21 @@ pub fn exec(
     rent: ctx.accounts.rent.to_account_info(),
   };
 
-  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
   let state = &ctx.accounts.state;
+  let state_key = state.key();
+
+  let seeds: &[&[u8]] = &[
+    b"cpi_authority", state_key.as_ref(),
+    &[state.bumps.cpi_authority]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+
+  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
   let event = &ctx.accounts.event;
 
   ticket_sale::cpi::create_sale(
     cpi_ctx,
 		state.bumps.cpi_authority,
-		EventRegistry::id(),
     ticket_type_index,
 		event.id,
 		ticket_type,
