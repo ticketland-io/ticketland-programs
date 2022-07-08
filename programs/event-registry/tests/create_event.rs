@@ -312,3 +312,72 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 
   assert!(!result.is_ok());
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
+  let runner = &mut ctx.runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
+
+  // create a new token that is not part of the supported currencies
+  let mint_token = Keypair::new();
+  let authority = Keypair::new();
+
+  runner.spl.create_mint(
+    &mint_token,
+    &authority.pubkey(),
+    None,
+    6
+  ).await;
+
+  runner.spl.airdrop(
+    &mint_token.pubkey(),
+    &authority,
+    &vec![event_organizer],
+    to_base(1_000_000, 6),
+  ).await;
+
+  let ticket_types = vec![
+    TicketType {
+      n_tickets: 1000,
+      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      sale_start_time: 50,
+      merkle_root: [0; 32],
+    },
+    TicketType {
+      n_tickets: 1000,
+      sale_type: SaleType::DutchAuction {
+        start_price: 150,
+        end_price: 110,
+        curve_length: 200 * 60,
+        drop_interval: 20 * 60,
+      },
+      sale_start_time: 50,
+      merkle_root: [0; 32],
+    },
+  ];
+
+  runner.initialize(
+    &state,
+    500, // 5%
+    1_000, // 10%
+  ).await;
+
+  let result = runner.create_event(
+    state.pubkey(),
+    event_id,
+    mint_token.pubkey(),
+    &event_organizer_clone,
+    100,
+		1000,
+		ticket_types.clone(),
+		"Ticket Land Coolest Event".to_owned(),
+		"TICKT".to_owned(),
+		"https://ticketland.io".to_owned(),
+  ).await;
+
+  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::UnsupportedDepositToken);
+}
