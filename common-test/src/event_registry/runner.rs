@@ -41,6 +41,9 @@ use common::{
 use event_registry::{
   account_data::state::*,
 };
+use crate::program_id::{
+-ticket_sale_program_id,
+};
 use super::pda;
 
 pub struct Runner {
@@ -205,6 +208,45 @@ impl Runner {
       uri,
     }.data();
     
+    let ix = Instruction {
+      program_id: event_registry::id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&event_organizer])).await
+  }
+
+  pub async fn create_ticket_sale(
+    &self,
+    state: Pubkey,
+    event_id: u64,
+    event_organizer: &Keypair,
+    ticket_sale_program_state: Pubkey,
+    ticket_sale_state: Pubkey,
+    ticket_type_index: usize,
+    ticket_type: TicketType,
+  ) -> AnchorResult<()> {
+    let event = pda::event(&state, event_id).0;
+    let cpi_authority = pda::cpi_authority(&state).0;
+
+    let accounts = event_registry::accounts::CreateTicketSale {
+      state,
+      event,
+      event_organizer: event_organizer.pubkey(),
+      ticket_sale_program_state,
+      ticket_sale_state,
+      cpi_authority,
+      ticket_sale_program: ticket_sale_program_id(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = event_registry::instruction::CreateTicketSale {
+      ticket_type_index,
+      ticket_type,
+    }.data();
+
     let ix = Instruction {
       program_id: event_registry::id(),
       accounts,
