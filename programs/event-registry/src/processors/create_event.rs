@@ -117,10 +117,16 @@ pub fn exec(
     let event = &mut ctx.accounts.event;
     let state = &mut ctx.accounts.state;
 
+    event.bumps = EventBumps {
+      event: *ctx.bumps.get("event").unwrap(),
+      event_nft: *ctx.bumps.get("event_nft").unwrap(),
+    };
+
     event.id = state.n_events;
     event.start_time = start_time;
     event.end_time = end_time;
     event.event_organizer = ctx.accounts.event_organizer.key();
+    event.ticket_types = ticket_types;
 
     state.n_events = state.n_events.safe_add(1)?;
   }

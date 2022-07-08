@@ -40,7 +40,7 @@ use common::{
   },
 };
 
-async fn custom_create__event(
+async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
   state: &Keypair,
@@ -101,7 +101,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  let result = custom_create__event(
+  let result = custom_create_event(
     false,
     runner,
     &state,
@@ -230,7 +230,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  let _ = custom_create__event(
+  let _ = custom_create_event(
     false,
     runner,
     &state,
@@ -255,7 +255,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  let _ = custom_create__event(
+  let _ = custom_create_event(
     false,
     runner,
     &state,
@@ -303,7 +303,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
     to_base(999, 6), // 1 less than the min deposit amount
   ).await;
 
-  let result = custom_create__event(
+  let result = custom_create_event(
     true,
     runner,
     &state,

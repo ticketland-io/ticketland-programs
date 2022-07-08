@@ -253,6 +253,7 @@ impl Runner {
 
     let data = event_registry::instruction::CreateTicketSale {
       ticket_type_index,
+      _event_id: event_id,
       ticket_type,
     }.data();
 

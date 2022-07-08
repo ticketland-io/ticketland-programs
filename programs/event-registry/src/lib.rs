@@ -98,6 +98,7 @@ use super::*;
 	pub fn create_ticket_sale(
 		ctx: Context<CreateTicketSale>,
 		ticket_type_index: usize,
+		_event_id: u64,
 		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_ticket_sale::exec(

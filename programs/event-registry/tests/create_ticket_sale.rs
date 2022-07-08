@@ -43,7 +43,7 @@ use common::{
   },
 };
 
-async fn custom_create__event(
+async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
   state: &Keypair,
@@ -119,7 +119,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  let ticket_types = custom_create__event(
+  let ticket_types = custom_create_event(
     false,
     runner,
     &state,
