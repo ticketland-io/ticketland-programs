@@ -2,7 +2,7 @@
 mod utils;
 
 use test_context::{test_context, futures};
-use anchor_lang::{prelude::{*, Pubkey}};
+use anchor_lang::{prelude::*};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
@@ -39,17 +39,20 @@ use common::{
 };
 
 async fn custom_create__event(
+  skip_init: bool,
   runner: &mut Runner,
   state: &Keypair,
   event_id: u64,
   event_organizer: &Keypair,
   deposit_token_idx: usize,
 ) -> AnchorResult<()> {
-  runner.initialize(
-    &state,
-    500, // 5%
-		1_000, // 10%
-  ).await;
+  if !skip_init {
+    runner.initialize(
+      &state,
+      500, // 5%
+      1_000, // 10%
+    ).await;
+  }
 
   let deposit_token = runner.deposit_tokens[deposit_token_idx];
 
@@ -97,6 +100,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let event_organizer = runner.get_participant(1);
   
   let result = custom_create__event(
+    false,
     runner,
     &state,
     event_id,
@@ -224,7 +228,8 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  custom_create__event(
+  let _ = custom_create__event(
+    false,
     runner,
     &state,
     event_id,
@@ -242,8 +247,68 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {}
+async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
+  let runner = &mut ctx.runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  
+  let _ = custom_create__event(
+    false,
+    runner,
+    &state,
+    event_id,
+    &event_organizer,
+    0,
+  ).await;
+
+  let deposit_token = runner.deposit_tokens[0];
+  let event = pda::event(&state.pubkey(), event_id).0;
+  let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
+  let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
+  let event_organizer_ata = pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token);
+
+  // Organizer tries to transfer the funds from the fund manager ata
+  let result = runner.spl.transfer(
+    &fund_manager_ata, 
+    &event_organizer_ata,
+    &event_organizer,
+    to_base(1000, 6),
+  ).await;
+
+  assert!(!result.is_ok());
+}
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {}
+async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
+  let runner = &mut ctx.runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = Keypair::new();
+  let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
+
+  runner.initialize(
+    &state,
+    500, // 5%
+		1_000, // 10%
+  ).await;
+
+  runner.spl.airdrop(
+    &runner.deposit_tokens[0],
+    &runner.deposit_token_authorities[0],
+    &vec![event_organizer],
+    to_base(999, 6), // 1 less than the min deposit amount
+  ).await;
+
+  let result = custom_create__event(
+    true,
+    runner,
+    &state,
+    event_id,
+    &event_organizer_clone,
+    0,
+  ).await;
+
+  assert!(!result.is_ok());
+}

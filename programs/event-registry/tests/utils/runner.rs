@@ -50,6 +50,7 @@ pub struct Runner {
   pub deployer: Keypair,
   pub supported_currencies: Vec<Currency>,
   pub deposit_tokens: Vec<Pubkey>,
+  pub deposit_token_authorities: Vec<Keypair>,
 }
 
 impl Runner {
@@ -72,6 +73,7 @@ impl Runner {
       deployer,
       supported_currencies: vec![],
       deposit_tokens: vec![],
+      deposit_token_authorities: vec![],
     }
   }
 
@@ -81,6 +83,7 @@ impl Runner {
 
   async fn create_deposit_tokens(&mut self) { 
     let mut deposit_tokens = vec![];
+    let mut deposit_token_authorities = vec![];
 
     for _ in 0..2 {
       let mint_token = Keypair::new();
@@ -101,6 +104,7 @@ impl Runner {
       ).await;
 
       deposit_tokens.push(mint_token.pubkey());
+      deposit_token_authorities.push(authority);
     }
 
     let mut supported_currencies = vec![];
@@ -113,6 +117,7 @@ impl Runner {
     }
 
     self.deposit_tokens = deposit_tokens;
+    self.deposit_token_authorities = deposit_token_authorities;
     self.supported_currencies = supported_currencies;
   }
 
