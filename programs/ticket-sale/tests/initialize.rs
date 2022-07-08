@@ -15,9 +15,10 @@ use common_test::{
 #[tokio::test(flavor = "multi_thread")]
 async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
   let state = Keypair::new();
-  let runner = &mut ctx.runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   
-  runner.initialize(
+  event_registry_runner.initialize(
     &state,
     500, // 5%
 		1_000, // 10%

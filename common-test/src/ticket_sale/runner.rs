@@ -63,4 +63,30 @@ impl Runner {
       deployer,
     }
   }
+
+  pub async fn initialize(
+    &mut self,
+    state: &Keypair,
+    event_registry_state: Pubkey,
+  ) {
+    let accounts = ticket_sale::accounts::Initialize {
+      state: state.pubkey(),
+      event_registry_state,
+      event_registry_program: event_registry::id(),
+      deployer: self.deployer.pubkey(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = ticket_sale::instruction::Initialize {}.data();
+
+    let ix = Instruction {
+      program_id: ticket_sale::id(),
+      accounts,
+      data,
+    };
+
+    let mut lock_pt = self.pt.lock().await;
+    assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
+  }
 }

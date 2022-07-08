@@ -24,15 +24,6 @@ pub struct Initialize<'info> {
   #[account()]
   pub event_registry_program: AccountInfo<'info>,
 
-  #[account(
-    mut,
-    seeds = [b"cpi_authority", event_registry_state.key().as_ref()],
-    // the PDA should be owned by the Event Registry Program
-    seeds::program = event_registry_program.key(),
-    bump
-  )]
-  pub event_registry_cpi_authority: Signer<'info>,
-
   #[account(mut)]
   pub deployer: Signer<'info>,
   
