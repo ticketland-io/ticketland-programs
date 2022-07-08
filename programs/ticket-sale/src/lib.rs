@@ -1,7 +1,7 @@
-mod account_data;
-mod context;
-mod processors;
-mod utils;
+pub mod account_data;
+pub mod context;
+pub mod processors;
+pub mod utils;
 
 use anchor_lang::prelude::*;
 use common::{

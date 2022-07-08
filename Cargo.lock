@@ -711,6 +711,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "common-test"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-metaplex",
+ "anchor-spl",
+ "async-trait",
+ "common",
+ "event-registry",
+ "solana-program-test",
+ "solana-sdk",
+ "solana-test-utils",
+ "test-context",
+ "ticket-sale",
+]
+
+[[package]]
 name = "console"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1159,6 +1176,7 @@ dependencies = [
  "anchor-spl",
  "async-trait",
  "common",
+ "common-test",
  "mpl-token-metadata",
  "solana-program-test",
  "solana-sdk",
@@ -4279,8 +4297,14 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
+ "async-trait",
  "common",
+ "common-test",
  "mpl-token-metadata",
+ "solana-program-test",
+ "solana-sdk",
+ "solana-test-utils",
+ "test-context",
 ]
 
 [[package]]

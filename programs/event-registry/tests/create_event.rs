@@ -1,5 +1,4 @@
 #![cfg(feature = "test-bpf")]
-mod utils;
 
 use test_context::{test_context, futures};
 use anchor_lang::{prelude::*};
@@ -19,12 +18,15 @@ use anchor_metaplex::{
   },
 };
 use solana_program_test::{tokio};
-use utils::{
-  pda,
-  runner::Runner,
+use common_test::{
+  event_registry::{
+    pda,
+    runner::Runner,
+    error::Error,
+  },
   test_context::TestContext,
-  error::Error,
 };
+
 use anchor_lang::{
   prelude::Result as AnchorResult,
 };
@@ -94,7 +96,7 @@ async fn custom_create__event(
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_create_a_new_event(ctx: &mut TestContext) {
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
@@ -178,7 +180,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 #[tokio::test(flavor = "multi_thread")]
 async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   
   runner.initialize(
     &state,
@@ -223,7 +225,7 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
@@ -248,7 +250,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
@@ -282,7 +284,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = Keypair::new();
@@ -316,7 +318,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = runner.get_participant(1);

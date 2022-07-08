@@ -1,5 +1,4 @@
 #![cfg(feature = "test-bpf")]
-mod utils;
 
 use std::{assert_eq};
 use test_context::{test_context, futures};
@@ -7,8 +6,8 @@ use solana_sdk::{
   signature::{Signer, Keypair},
 };
 use solana_program_test::{tokio};
-use utils::{
-  pda,
+use common_test::{
+  event_registry::pda,
   test_context::TestContext,
 };
 
@@ -16,7 +15,7 @@ use utils::{
 #[tokio::test(flavor = "multi_thread")]
 async fn should_initialize(ctx: &mut TestContext) {
   let state = Keypair::new();
-  let runner = &mut ctx.runner;
+  let runner = &mut ctx.event_registry_runner;
   
   runner.initialize(
     &state,
