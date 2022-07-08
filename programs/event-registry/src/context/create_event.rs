@@ -123,7 +123,7 @@ pub struct CreateEvent<'info> {
   
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
-  // /// CHECK: The metadata program
+  /// CHECK: The metadata program
   pub metadata_program: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,

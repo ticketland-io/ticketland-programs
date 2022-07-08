@@ -6,21 +6,37 @@ use solana_sdk::{
   signature::{Signer, Keypair},
 };
 use solana_program_test::{tokio};
+use anchor_lang::{
+  Id,
+};
 use common_test::{
   ticket_sale::pda,
-  test_context::TestContext,
+  test_context::TestContext, event_registry,
+  program_id::event_registry_program_id,
 };
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
-  let state = Keypair::new();
+  let event_registry_state = Keypair::new();
+  let ticket_sale_state = Keypair::new();
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   
   event_registry_runner.initialize(
-    &state,
+    &event_registry_state,
     500, // 5%
 		1_000, // 10%
   ).await;
+
+  ticket_sale_runner.initialize(
+    &ticket_sale_state,
+    event_registry_state.pubkey(),
+  ).await;
+
+  let mut pt = ticket_sale_runner.pt.lock().await;
+  let state_data = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
+
+  assert_eq!(state_data.event_registry_program, event_registry_program_id());
+  assert_eq!(state_data.event_registry_state, event_registry_state.pubkey());
 }

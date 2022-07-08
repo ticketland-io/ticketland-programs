@@ -34,6 +34,11 @@ use anchor_lang::{
 use ticket_sale::{
   account_data::state::*,
 };
+use crate::program_id::{
+  event_registry_program_id,
+  ticket_sale_program_id
+};
+
 use super::pda;
 
 pub struct Runner {
@@ -46,7 +51,7 @@ pub struct Runner {
 impl Runner {
   pub async fn new() -> Self {
     let metadata_id = anchor_metaplex::mpl_token_metadata::ID;
-    let mut program_test = solana_program_test::ProgramTest::new("ticket_sale", ticket_sale::id(), None);
+    let mut program_test = solana_program_test::ProgramTest::new("ticket_sale", ticket_sale_program_id(), None);
     ProgramTest::add_program(&mut program_test, "mpl_token_metadata", metadata_id, None);
     program_test.set_compute_max_units(250_000);
 
@@ -72,7 +77,7 @@ impl Runner {
     let accounts = ticket_sale::accounts::Initialize {
       state: state.pubkey(),
       event_registry_state,
-      event_registry_program: event_registry::id(),
+      event_registry_program: event_registry_program_id(),
       deployer: self.deployer.pubkey(),
       system_program: system_program::ID,
       rent: Rent::id(),
@@ -81,7 +86,7 @@ impl Runner {
     let data = ticket_sale::instruction::Initialize {}.data();
 
     let ix = Instruction {
-      program_id: ticket_sale::id(),
+      program_id: ticket_sale_program_id(),
       accounts,
       data,
     };
