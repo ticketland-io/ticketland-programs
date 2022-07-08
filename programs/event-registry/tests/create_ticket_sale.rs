@@ -24,6 +24,9 @@ use common_test::{
     runner::Runner,
     error::Error,
   },
+  ticket_sale::{
+    runner::Runner as TicketSaleRunner,
+  },
   test_context::TestContext,
 };
 
@@ -47,7 +50,7 @@ async fn custom_create__event(
   event_id: u64,
   event_organizer: &Keypair,
   deposit_token_idx: usize,
-) -> AnchorResult<()> {
+) -> Vec<TicketType> {
   if !skip_init {
     runner.initialize(
       &state,
@@ -78,7 +81,7 @@ async fn custom_create__event(
     },
   ];
 
-  runner.create_event(
+  let _ = runner.create_event(
     state.pubkey(),
     event_id,
     deposit_token,
@@ -89,8 +92,23 @@ async fn custom_create__event(
 		"Ticket Land Coolest Event".to_owned(),
 		"TICKT".to_owned(),
 		"https://ticketland.io".to_owned(),
-  ).await
+  ).await;
 
+  ticket_types
+}
+
+async fn initialize_ticket_sale(
+  ticket_sale_runner: &mut TicketSaleRunner,
+  event_registry_state: Pubkey
+) -> Pubkey {
+  let ticket_sale_state = Keypair::new();
+
+  ticket_sale_runner.initialize(
+    &ticket_sale_state,
+    event_registry_state,
+  ).await;
+
+  ticket_sale_state.pubkey()
 }
 
 #[test_context(TestContext)]
@@ -101,7 +119,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
-  let result = custom_create__event(
+  let ticket_types = custom_create__event(
     false,
     runner,
     &state,
@@ -110,6 +128,19 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
     0,
   ).await;
 
+  // init the ticker sale program first
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
+
   // Create a new ticket sale for the first ticket type
-  
+  let result = runner.create_ticket_sale(
+    state.pubkey(),
+    0,
+    &event_organizer,
+    ticket_sale_program_state,
+    0,
+    ticket_types[0].clone(),
+  ).await;
+
+  assert!(result.is_ok());
 }

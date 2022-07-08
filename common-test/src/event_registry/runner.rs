@@ -41,8 +41,9 @@ use common::{
 use event_registry::{
   account_data::state::*,
 };
-use crate::program_id::{
--ticket_sale_program_id,
+use crate::{
+  program_id::ticket_sale_program_id,
+  ticket_sale::pda as ticket_sale_pda,
 };
 use super::pda;
 
@@ -223,12 +224,20 @@ impl Runner {
     event_id: u64,
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
-    ticket_sale_state: Pubkey,
     ticket_type_index: usize,
     ticket_type: TicketType,
   ) -> AnchorResult<()> {
     let event = pda::event(&state, event_id).0;
     let cpi_authority = pda::cpi_authority(&state).0;
+    let ticket_sale_state = ticket_sale_pda::ticket_sale_state(
+      &ticket_sale_program_state,
+      ticket_type_index,
+      event_id,
+    ).0;
+
+    println!("event {:?}", event);
+    println!("cpi_authority {:?}", cpi_authority);
+    println!("ticket_sale_state {:?}", ticket_sale_state);
 
     let accounts = event_registry::accounts::CreateTicketSale {
       state,

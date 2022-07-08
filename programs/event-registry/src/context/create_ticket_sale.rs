@@ -38,11 +38,13 @@ pub struct CreateTicketSale<'info> {
   /// do all the checks needed.
   #[account(
     seeds = [
-      b"sale", ticket_sale_program_state.key().as_ref(),
+      b"sale",
+      ticket_sale_program_state.key().as_ref(),
       ticket_type_index.to_string().as_ref(),
       &event.id.to_string().as_ref()
     ],
     bump,
+    seeds::program = ticket_sale_program.key(),
     constraint = ticket_type_index <= event.ticket_types.len() @ ErrorCode::InvalidTicketTypeIndex
   )]
   pub ticket_sale_state: AccountInfo<'info>,
