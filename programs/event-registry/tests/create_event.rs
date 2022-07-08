@@ -164,25 +164,20 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   let deposit_token = runner.deposit_tokens[0];
-  let ticket_types = vec![
-    TicketType {
-      n_tickets: 1000,
-      sale_type: SaleType::FixedPrice(to_base(100, 6)),
-      sale_start_time: 50,
-      merkle_root: [0; 32],
-    },
-    TicketType {
-      n_tickets: 1000,
-      sale_type: SaleType::DutchAuction {
-        start_price: 150,
-        end_price: 110,
-        curve_length: 200 * 60,
-        drop_interval: 20 * 60,
-      },
-      sale_start_time: 50,
-      merkle_root: [0; 32],
-    },
-  ];
+
+  // Create more that 10 ticket types which is the current limit
+  let mut ticket_types = vec![];
+
+  for _ in 0..11 {
+    ticket_types.push(
+      TicketType {
+        n_tickets: 1000,
+        sale_type: SaleType::FixedPrice(to_base(100, 6)),
+        sale_start_time: 50,
+        merkle_root: [0; 32],
+      }
+    )
+  }
 
   let result = runner.create_event(
     state.pubkey(),
@@ -197,7 +192,7 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
 		"https://ticketland.io".to_owned(),
   ).await;
 
-  Error::assert_err(result, event_registry::program_error::ErrorCode::TooManyTicketTypes);
+  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TooManyTicketTypes);
 }
 
 #[test_context(TestContext)]
