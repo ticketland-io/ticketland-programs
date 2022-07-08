@@ -2,7 +2,7 @@
 mod utils;
 
 use test_context::{test_context, futures};
-use anchor_lang::{prelude::*};
+use anchor_lang::{prelude::{*, Pubkey}};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
@@ -21,8 +21,12 @@ use anchor_metaplex::{
 use solana_program_test::{tokio};
 use utils::{
   pda,
+  runner::Runner,
   test_context::TestContext,
   error::Error,
+};
+use anchor_lang::{
+  prelude::Result as AnchorResult,
 };
 use anchor_spl::{
   token::{Mint as TokenMint, TokenAccount},
@@ -34,21 +38,21 @@ use common::{
   },
 };
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_create_a_new_event(ctx: &mut TestContext) {
-  let state = Keypair::new();
-  let runner = &mut ctx.runner;
-  
+async fn custom_create__event(
+  runner: &mut Runner,
+  state: &Keypair,
+  event_id: u64,
+  event_organizer: &Keypair,
+  deposit_token_idx: usize,
+) -> AnchorResult<()> {
   runner.initialize(
     &state,
     500, // 5%
 		1_000, // 10%
   ).await;
 
-  let event_id = 0;
-  let event_organizer = runner.get_participant(1);
-  let deposit_token = runner.deposit_tokens[0];
+  let deposit_token = runner.deposit_tokens[deposit_token_idx];
+
   let ticket_types = vec![
     TicketType {
       n_tickets: 1000,
@@ -69,7 +73,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     },
   ];
 
-  let result = runner.create_event(
+  runner.create_event(
     state.pubkey(),
     event_id,
     deposit_token,
@@ -80,11 +84,28 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 		"Ticket Land Coolest Event".to_owned(),
 		"TICKT".to_owned(),
 		"https://ticketland.io".to_owned(),
+  ).await
+
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_create_a_new_event(ctx: &mut TestContext) {
+  let runner = &mut ctx.runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  
+  let result = custom_create__event(
+    runner,
+    &state,
+    event_id,
+    &event_organizer,
+    0,
   ).await;
 
   assert!(result.is_ok());
 
-  
   // Assert event state
   {
     let mut pt = runner.pt.lock().await;
@@ -197,7 +218,27 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {}
+async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
+  let runner = &mut ctx.runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  
+  custom_create__event(
+    runner,
+    &state,
+    event_id,
+    &event_organizer,
+    0,
+  ).await;
+
+  let deposit_token = runner.deposit_tokens[0];
+  let event = pda::event(&state.pubkey(), event_id).0;
+  let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
+  let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
+
+  assert_eq!(runner.spl.get_token_account(fund_manager_ata).await.amount, to_base(1000, 6));
+}
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
@@ -206,4 +247,3 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {}
-
