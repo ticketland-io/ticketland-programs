@@ -6,11 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-test-bpf = []
 
 [dependencies]
-event-registry = { path = "../programs/event-registry" }
 ticket-sale = { path = "../programs/ticket-sale" }
+event-registry = { path = "../programs/event-registry" }
 anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 anchor-spl = "0.25.0"
 anchor-metaplex = { git = "https://github.com/Apocentre/anchor-metaplex", version = "0.4.1" }

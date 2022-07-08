@@ -4,8 +4,8 @@
 		"test-validator": "./scripts/test-validator.sh",
 		"airdrop": "./scripts/airdrop.sh",
 		"setup:dev": "ENV=dev ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js",
-		"deploy:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/jbas.json target/deploy/jbas.so",
-		"deploy:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/jbas.json target/deploy/jbas.so",
+		"deploy:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
+		"deploy:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
 		"setup:testnet": "ENV=testnet ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js"
 	},
 	"dependencies": {

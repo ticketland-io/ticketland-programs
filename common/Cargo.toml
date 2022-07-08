@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anchor-lang = "0.25.0"
+anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 thiserror = "1.0.31"
 anyhow = "1.0.0"

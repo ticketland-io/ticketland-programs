@@ -54,20 +54,14 @@ pub struct Runner {
 }
 
 impl Runner {
-  pub async fn new() -> Self {
-    let metadata_id = anchor_metaplex::mpl_token_metadata::ID;
-    let mut program_test = solana_program_test::ProgramTest::new("event_registry", event_registry::id(), None);
-    ProgramTest::add_program(&mut program_test, "mpl_token_metadata", metadata_id, None);
-    program_test.set_compute_max_units(250_000);
-
-    let mut pt = ProgramTest::start_new(program_test).await;
-    let deployer = pt.create_account(0, &system_program::ID).await;
-    let test_account = TestAccount::new(&mut pt, 10).await;
-    let pt = Arc::new(Mutex::new(pt));
+  pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
+    let mut pt_lock = pt.lock().await;
+    let deployer = pt_lock.create_account(0, &system_program::ID).await;
+    let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let spl = Spl::new(Arc::clone(&pt));
 
     Self {
-      pt,
+      pt: Arc::clone(&pt),
       test_account,
       spl,
       deployer,
