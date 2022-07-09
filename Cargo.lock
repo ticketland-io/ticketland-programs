@@ -3822,8 +3822,8 @@ dependencies = [
 
 [[package]]
 name = "solana-test-utils"
-version = "0.2.5"
-source = "git+https://github.com/Apocentre/solana-test-utils#2f7db19b0d37bca1f46c3dea19623e9a6a6bd2fd"
+version = "0.2.10"
+source = "git+https://github.com/Apocentre/solana-test-utils#b564370ae1aa176e98e6b01fa3e2a3a8e89cf15c"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

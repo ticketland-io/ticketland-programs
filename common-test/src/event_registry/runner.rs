@@ -5,7 +5,7 @@ use anchor_lang::{
   prelude::Result as AnchorResult,
   Id,
   InstructionData,
-  ToAccountMetas
+  ToAccountMetas,
 };
 use solana_test_utils::{
   program_test::ProgramTest,
@@ -61,7 +61,7 @@ pub struct Runner {
 impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
-    let deployer = pt_lock.create_account(0, &system_program::ID).await;
+    let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
     let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let spl = Spl::new(Arc::clone(&pt));
 
@@ -106,11 +106,7 @@ impl Runner {
       deposit_token_authorities.push(authority);
     }
 
-    // Wrapped Sol will be treated as the Native Sol. We do so to have consistent mint_accounts
-    let mut supported_currencies = vec![Currency {
-      mint_account: "So11111111111111111111111111111111111111112".try_into().unwrap(),
-      deposit_amount: sol_to_lamports(10_f64),
-    }];
+    let mut supported_currencies = vec![];
 
     for mint_account in &deposit_tokens {
       supported_currencies.push(Currency {
@@ -119,6 +115,31 @@ impl Runner {
       })
     }
 
+    // Wrapped Sol will be treated as the Native Sol. We do so to have consistent mint_accounts
+    // We should create the wraped sol mint account in test since it doesn't exist
+    let wrapped_sol = "So11111111111111111111111111111111111111112".try_into().unwrap();
+    
+    // make sure the account is available in the test environment
+    {
+      self.spl.set_mint_account(
+        &wrapped_sol,
+        sol_to_lamports(1_f64),
+        to_base(1000, 9),
+        9,
+      ).await;
+
+      // Create an ATA for each participant
+      for participant in &self.test_account.participants {
+        self.spl.create_associated_account(&participant.pubkey(), &wrapped_sol).await;
+      }
+    }
+
+    supported_currencies.push(Currency {
+      mint_account: wrapped_sol,
+      deposit_amount: sol_to_lamports(10_f64),
+    });
+
+    deposit_tokens.push(wrapped_sol);
     self.deposit_tokens = deposit_tokens;
     self.deposit_token_authorities = deposit_token_authorities;
     self.supported_currencies = supported_currencies;

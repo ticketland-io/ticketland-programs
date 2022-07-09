@@ -16,6 +16,7 @@ use solana_sdk::{
   pubkey::Pubkey,
   signature::{Keypair, Signer},
   instruction::Instruction,
+  native_token::sol_to_lamports,
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
@@ -51,7 +52,7 @@ pub struct Runner {
 impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
-    let deployer = pt_lock.create_account(0, &system_program::ID).await;
+    let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
     let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let spl = Spl::new(Arc::clone(&pt));
 

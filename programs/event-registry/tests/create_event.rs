@@ -1,9 +1,15 @@
 #![cfg(feature = "test-bpf")]
 
+use std::println;
+
 use test_context::{test_context, futures};
-use anchor_lang::{prelude::*};
+use anchor_lang::{
+  prelude::*,
+  solana_program::rent::Rent,
+};
 use solana_sdk::{
   signature::{Signer, Keypair},
+  native_token::sol_to_lamports,
 };
 use solana_test_utils::{
   utils::{to_base},
@@ -245,6 +251,35 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
 
   assert_eq!(runner.spl.get_token_account(fund_manager_ata).await.amount, to_base(1000, 6));
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
+  let runner = &mut ctx.event_registry_runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+
+  let _ = custom_create_event(
+    false,
+    runner,
+    &state,
+    event_id,
+    &event_organizer,
+    2, // native sol
+  ).await;
+
+  {
+    let event = pda::event(&state.pubkey(), event_id).0;
+    let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
+    let mut pt = runner.pt.lock().await;
+    let account = pt.context.banks_client.get_account(fund_manager).await.unwrap().unwrap();
+
+    // Not 890880 is the lamports stored in the account balamce because of rent exception
+    // when the account was create
+    assert_eq!(account.lamports, sol_to_lamports(10_f64) + 890880);
+  }
 }
 
 #[test_context(TestContext)]
