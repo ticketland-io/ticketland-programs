@@ -129,6 +129,7 @@ fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
 
 pub fn exec(
   ctx: Context<CreateEvent>,
+  n_tickets: u32,
   start_time: Slot,
   end_time: Slot,
   ticket_types: Vec<TicketType>,
@@ -154,10 +155,12 @@ pub fn exec(
     };
 
     event.id = state.n_events;
+    event.n_tickets = n_tickets;
     event.start_time = start_time;
     event.end_time = end_time;
     event.event_organizer = ctx.accounts.event_organizer.key();
     event.ticket_types = ticket_types;
+    event.event_capacity = ctx.accounts.event_capacity.key();
 
     state.n_events = state.n_events.safe_add(1)?;
   }

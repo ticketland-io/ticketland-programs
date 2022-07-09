@@ -21,11 +21,11 @@ pub struct EventBumps {
 pub struct Event {
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
+  pub event_capacity: Pubkey,
+  pub n_tickets: u32,
   pub id: u64,
   pub start_time: Slot,
   pub end_time: Slot,
   pub sale_start_time: Option<Vec<Slot>>,
   pub ticket_types: Vec<TicketType>,
-  // A bitmap which has n_tickets bits that represent each seat e.g bit at position 0
-  pub seats: Vec<u8>,
 }

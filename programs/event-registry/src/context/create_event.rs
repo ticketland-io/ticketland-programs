@@ -13,6 +13,11 @@ use anchor_metaplex::{
 use common::{
   state::ticket_type::TicketType,
 };
+use ticket_sale::account_data::{
+  event_capacity::{
+    EventCapacity, SPACE_MARGIN as event_capacity_space_margin,
+  },
+};
 use crate::{
   utils::{
     program_error::ErrorCode,
@@ -24,6 +29,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
+#[instruction(total_tickets: u32)]
 pub struct CreateEvent<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -37,6 +43,14 @@ pub struct CreateEvent<'info> {
     bump
   )]
   pub event: Box<Account<'info, Event>>,
+
+  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  #[account(
+    init,
+    payer = event_organizer,
+    space = 8 + size_of::<EventCapacity>() + event_capacity_space_margin + ((total_tickets / 8) as usize + 8) // this is the bytes needed to store the seat bitmap
+  )]
+  pub event_capacity: AccountInfo<'info>,
 
   /// CHECK: The authority of the event nfts
   #[account(
