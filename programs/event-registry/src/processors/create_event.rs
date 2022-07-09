@@ -127,6 +127,36 @@ fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
   token::transfer(cpi_ctx, currency.deposit_amount)
 }
 
+fn init_event_capacity(ctx: &Context<CreateEvent>,) -> Result<()> {
+  let state = &ctx.accounts.state;
+  let state_key = state.key();
+
+  let seeds: &[&[u8]] = &[
+    b"cpi_authority", state_key.as_ref(),
+    &[state.bumps.cpi_authority]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+
+  let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
+  let cpi_accounts = ticket_sale::cpi::accounts::InitEventCapacity {
+    state: ctx.accounts.ticket_sale_program_state.to_account_info(),
+    event_capacity: ctx.accounts.event_capacity.to_account_info(),
+    event_registry_cpi_authority: ctx.accounts.cpi_authority.to_account_info(),
+  };
+
+  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+  let event = &ctx.accounts.event;
+
+  ticket_sale::cpi::init_event_capacity(
+    cpi_ctx,
+		state.bumps.cpi_authority,
+		event.id,
+		event.n_tickets,
+  )?;
+  
+  Ok(())
+}
+
 pub fn exec(
   ctx: Context<CreateEvent>,
   n_tickets: u32,
@@ -177,6 +207,7 @@ pub fn exec(
   // We need this otherwise we get this error "Editions must have exactly one token"
   mint_edition_token(&ctx, signer_seeds)?;
   create_event_nft(&ctx, signer_seeds, name, symbol, uri, state.seller_fee_basis_points)?;
+  init_event_capacity(&ctx)?;
 
   Ok(())
 }

@@ -41,12 +41,6 @@ pub struct CreateEvent<'info> {
   )]
   pub event: Box<Account<'info, Event>>,
 
-  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
-  #[account(
-    constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
-  )]
-  pub event_capacity: AccountInfo<'info>,
-
   /// CHECK: The authority of the event nfts
   #[account(
     mut,
@@ -126,6 +120,27 @@ pub struct CreateEvent<'info> {
     associated_token::authority = fund_manager,
   )]
   pub fund_manager_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: The state of the ticker program sale
+  #[account(
+    mut,
+    constraint = ticket_sale_program_state.owner.key() == ticket_sale_program.key() @ ErrorCode::WrongTicketSaleProgramStateAccount
+  )]
+  pub ticket_sale_program_state: AccountInfo<'info>,
+
+  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  #[account(
+    constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
+  )]
+  pub event_capacity: AccountInfo<'info>,
+
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    mut,
+    seeds = [b"cpi_authority", state.key().as_ref()],
+    bump = state.bumps.cpi_authority,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
 
   #[account(mut)]
   pub event_organizer: Signer<'info>,

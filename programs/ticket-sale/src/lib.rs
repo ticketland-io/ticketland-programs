@@ -12,6 +12,7 @@ use common::{
 use crate::{
   context::{
     initialize::*,
+		init_event_capacity::*,
 		create_sale::*,
   },
 };
@@ -33,6 +34,26 @@ pub mod ticket_sale {
     processors::initialize::exec(ctx)
 	}
 
+	/// Initializes the event capacity account for a single event. This account will be used by all the
+	/// ticket sale when a purchase happens. This will be a CPI call from the event registry which will be
+	/// called before any ticket sale is created.
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `cpi_authority_bump` - The bump of the cpi authority account created in the event registry program
+	/// * `event_id` - The event id for which this sale is created for
+	/// * `n_tickets` - Total tickets for the given event
+	pub fn init_event_capacity(
+		ctx: Context<InitEventCapacity>,
+		_cpi_authority_bump: u8,
+		event_id: u64,
+		n_tickets: u32,
+	) -> Result<()> {
+    processors::init_event_capacity::exec(ctx, event_id, n_tickets)
+	}
+
+
 	/// Creates a new sale
 	/// 
 	/// # Arguments
@@ -42,21 +63,18 @@ pub mod ticket_sale {
 	/// * `ticket_type_index` - A unique index that will differentiate multiple sales of one single event. This is useful to 
 	/// create unique sale PDAs
 	/// * `event_id` - The event id for which this sale is created for
-	/// * `n_tickets` - Total tickets for the given event
 	/// * `ticket_type` - The ticket type that will be sold during this sale
 	pub fn create_sale(
 		ctx: Context<CreateSale>,
 		_cpi_authority_bump: u8,
 		ticket_type_index: usize,
 		event_id: u64,
-		n_tickets: u32,
 		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,
 			ticket_type_index,
 			event_id,
-			n_tickets,
 			ticket_type,
 		)
 	}
