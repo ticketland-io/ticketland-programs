@@ -22,4 +22,6 @@ pub enum ErrorCode {
   InvalidTicketTypeIndex,
   #[msg("Wrong ticket type for index")]
   WrongTicketTypeForIndex,
+  #[msg("Ticket sale must the the owner")]
+  TicketSaleMustBeOwner,
 }

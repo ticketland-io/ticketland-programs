@@ -195,7 +195,11 @@ impl Runner {
     let mut pt_lock = self.pt.lock().await;
     let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (n_tickets / 8) as usize + 8;
     
-    pt_lock.create_account(sol_to_lamports(1000_f64), space as u64, &system_program::ID).await.pubkey()
+    pt_lock.create_account(
+      sol_to_lamports(1000_f64),
+      space as u64, 
+      &ticket_sale_program_id(),
+    ).await.pubkey()
   }
 
   pub async fn create_event(
@@ -233,6 +237,7 @@ impl Runner {
       event_organizer_ata: pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token),
       event_organizer: event_organizer.pubkey(),
 
+      ticket_sale_program: ticket_sale_program_id(),
       metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,

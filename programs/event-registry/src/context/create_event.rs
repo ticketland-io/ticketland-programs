@@ -13,6 +13,9 @@ use anchor_metaplex::{
 use common::{
   state::ticket_type::TicketType,
 };
+use ticket_sale::{
+  program::TicketSale,
+};
 use crate::{
   utils::{
     program_error::ErrorCode,
@@ -39,7 +42,10 @@ pub struct CreateEvent<'info> {
   pub event: Box<Account<'info, Event>>,
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
-  #[account(zero)]
+  #[account(
+    zero,
+    constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
+  )]
   pub event_capacity: AccountInfo<'info>,
 
   /// CHECK: The authority of the event nfts
@@ -125,6 +131,7 @@ pub struct CreateEvent<'info> {
   #[account(mut)]
   pub event_organizer: Signer<'info>,
   
+  pub ticket_sale_program: Program<'info, TicketSale>,
   pub token_program: Program<'info, Token>,
   associated_token_program: Program<'info, AssociatedToken>,
   /// CHECK: The metadata program
