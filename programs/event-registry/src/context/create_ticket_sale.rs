@@ -25,6 +25,13 @@ pub struct CreateTicketSale<'info> {
   )]
   pub event: Account<'info, Event>,
 
+  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  #[account(
+    zero,
+    constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
+  )]
+  pub event_capacity: AccountInfo<'info>,
+
   /// CHECK: The state of the ticker program sale
   #[account(
     mut,

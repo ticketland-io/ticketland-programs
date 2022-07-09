@@ -1,10 +1,13 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
 use crate::{
+  ID,
   account_data::{
     state::*,
     sale::{Sale, SPACE_MARGIN},
+    event_capacity::EventCapacity,
   },
+  utils::program_error::ErrorCode,
 };
 
 #[derive(Accounts)]
@@ -27,6 +30,13 @@ pub struct CreateSale<'info> {
     bump
   )]
   pub sale: Account<'info, Sale>,
+
+  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  #[account(
+    zero,
+    constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
+  )]
+  pub event_capacity: AccountLoader<'info, EventCapacity>,
 
   #[account(
     mut,

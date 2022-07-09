@@ -45,6 +45,7 @@ use event_registry::{
 use ticket_sale::account_data::event_capacity::{
   EventCapacity,
   SPACE_MARGIN as event_capacity_space_margin,
+  MAX_VENUE_CAPACITY,
 };
 use crate::{
   program_id::ticket_sale_program_id,
@@ -191,9 +192,9 @@ impl Runner {
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
   }
 
-  pub async fn create_event_capacity_account(&mut self, n_tickets: u32) -> Pubkey {
+  pub async fn create_event_capacity_account(&mut self) -> Pubkey {
     let mut pt_lock = self.pt.lock().await;
-    let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (n_tickets / 8) as usize + 8;
+    let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (MAX_VENUE_CAPACITY / 8) as usize + 8;
     
     pt_lock.create_account(
       sol_to_lamports(1000_f64),

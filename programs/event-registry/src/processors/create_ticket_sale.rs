@@ -23,6 +23,7 @@ pub fn exec(
   let cpi_accounts = ticket_sale::cpi::accounts::CreateSale {
     state: ctx.accounts.ticket_sale_program_state.to_account_info(),
     sale: ctx.accounts.ticket_sale_state.to_account_info(),
+    event_capacity: ctx.accounts.event_capacity.to_account_info(),
     event_registry_cpi_authority: ctx.accounts.cpi_authority.to_account_info(),
     event_organizer: ctx.accounts.event_organizer.to_account_info(),
     system_program: ctx.accounts.system_program.to_account_info(),
@@ -46,6 +47,7 @@ pub fn exec(
 		state.bumps.cpi_authority,
     ticket_type_index,
 		event.id,
+    event.n_tickets,
 		ticket_type,
   )?;
 

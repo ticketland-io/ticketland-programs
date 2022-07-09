@@ -110,7 +110,7 @@ async fn custom_create_event(
 async fn should_create_a_new_event(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -229,7 +229,7 @@ async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(c
 async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
   let runner = &mut ctx.event_registry_runner;
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   
   runner.initialize(
     &state,
@@ -278,7 +278,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
 async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -305,7 +305,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
 async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
 
@@ -336,7 +336,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
 async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -372,7 +372,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
 async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = Keypair::new();
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
@@ -408,7 +408,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();

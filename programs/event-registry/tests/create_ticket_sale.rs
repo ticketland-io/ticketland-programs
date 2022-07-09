@@ -120,7 +120,7 @@ async fn initialize_ticket_sale(
 async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(100_000).await;
+  let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
