@@ -198,7 +198,7 @@ impl Runner {
     pt_lock.create_account(
       sol_to_lamports(1000_f64),
       space as u64, 
-      &ticket_sale_program_id(),
+      &ticket_sale_program_id()
     ).await.pubkey()
   }
 

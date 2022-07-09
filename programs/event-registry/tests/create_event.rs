@@ -8,6 +8,7 @@ use anchor_lang::{
   solana_program::rent::Rent,
 };
 use solana_sdk::{
+  system_program,
   signature::{Signer, Keypair},
   native_token::sol_to_lamports,
 };
@@ -32,7 +33,6 @@ use common_test::{
   },
   test_context::TestContext,
 };
-
 use anchor_lang::{
   prelude::Result as AnchorResult,
 };
@@ -45,7 +45,10 @@ use common::{
     sale_type::SaleType,
   },
 };
-use ticket_sale::account_data::event_capacity;
+use ticket_sale::account_data::event_capacity::{
+  EventCapacity,
+  SPACE_MARGIN as event_capacity_space_margin,
+};
 
 async fn custom_create_event(
   skip_init: bool,
@@ -191,7 +194,39 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
+async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(ctx: &mut TestContext) {
+  let runner = &mut ctx.event_registry_runner;
+  let state = Keypair::new();
+  let event_id = 0;
+  let event_organizer = runner.get_participant(1);
+  
+  let event_capacity;
+  {
+    let mut pt_lock = runner.pt.lock().await;
+    let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (10_000 / 8) as usize + 8;
+    event_capacity = pt_lock.create_account(
+      sol_to_lamports(1000_f64),
+      space as u64, 
+      &system_program::ID, // the owner must be the ticket sale program
+    ).await.pubkey();
+  }
+
+  let result = custom_create_event(
+    false,
+    runner,
+    &state,
+    event_capacity,
+    event_id,
+    &event_organizer,
+    0,
+  ).await;
+
+  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner);
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
   let runner = &mut ctx.event_registry_runner;
   let event_capacity = runner.create_event_capacity_account(100_000).await;
