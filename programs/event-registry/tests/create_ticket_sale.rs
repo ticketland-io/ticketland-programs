@@ -50,6 +50,7 @@ use ticket_sale::{
 async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
+  ticket_sale_runner: &mut TicketSaleRunner,
   state: &Keypair,
   event_capacity: Pubkey,
   event_id: u64,
@@ -63,7 +64,8 @@ async fn custom_create_event(
       1_000, // 10%
     ).await;
   }
-
+  
+  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
   let deposit_token = runner.deposit_tokens[deposit_token_idx];
 
   let ticket_types = vec![
@@ -89,6 +91,7 @@ async fn custom_create_event(
   let _ = runner.create_event(
     state.pubkey(),
     event_capacity,
+    ticket_sale_program_state,
     event_id,
     deposit_token,
     &event_organizer,
@@ -122,6 +125,7 @@ async fn initialize_ticket_sale(
 #[tokio::test(flavor = "multi_thread")]
 async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -130,6 +134,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   let ticket_types = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -146,7 +151,6 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   // Create a new ticket sale for the first ticket type
   let result = runner.create_ticket_sale(
     state.pubkey(),
-    event_capacity,
     event_id,
     &event_organizer,
     ticket_sale_program_state,
@@ -176,7 +180,6 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
 
   let result = runner.create_ticket_sale(
     state.pubkey(),
-    event_capacity,
     event_id,
     &event_organizer,
     ticket_sale_program_state,

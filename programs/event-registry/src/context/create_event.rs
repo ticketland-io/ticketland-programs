@@ -121,18 +121,18 @@ pub struct CreateEvent<'info> {
   )]
   pub fund_manager_ata: Box<Account<'info, TokenAccount>>,
 
-  /// CHECK: The state of the ticker program sale
-  #[account(
-    mut,
-    constraint = ticket_sale_program_state.owner.key() == ticket_sale_program.key() @ ErrorCode::WrongTicketSaleProgramStateAccount
-  )]
-  pub ticket_sale_program_state: AccountInfo<'info>,
-
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
   #[account(
+    mut,
     constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
   )]
   pub event_capacity: AccountInfo<'info>,
+
+  /// CHECK: The state of the ticker program sale
+  #[account(
+    constraint = ticket_sale_program_state.owner.key() == ticket_sale_program.key() @ ErrorCode::WrongTicketSaleProgramStateAccount
+  )]
+  pub ticket_sale_program_state: AccountInfo<'info>,
 
   /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(

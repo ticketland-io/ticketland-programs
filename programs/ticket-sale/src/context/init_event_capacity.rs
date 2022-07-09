@@ -10,7 +10,7 @@ use crate::{
 #[derive(Accounts)]
 #[instruction(cpi_authority_bump: u8)]
 pub struct InitEventCapacity<'info> {
-  #[account(mut)]
+  #[account()]
   pub state: Account<'info, State>,
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.

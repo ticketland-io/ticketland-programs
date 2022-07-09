@@ -24,6 +24,10 @@ use anchor_metaplex::{
 };
 use solana_program_test::{tokio};
 use common_test::{
+  ticket_sale::{
+    runner::Runner as TicketSaleRunner,
+    pda as ticket_sale_pda,
+  },
   event_registry::{
     pda,
     runner::Runner,
@@ -48,9 +52,24 @@ use ticket_sale::account_data::event_capacity::{
   SPACE_MARGIN as event_capacity_space_margin,
 };
 
+async fn initialize_ticket_sale(
+  ticket_sale_runner: &mut TicketSaleRunner,
+  event_registry_state: Pubkey
+) -> Pubkey {
+  let ticket_sale_state = Keypair::new();
+
+  ticket_sale_runner.initialize(
+    &ticket_sale_state,
+    event_registry_state,
+  ).await;
+
+  ticket_sale_state.pubkey()
+}
+
 async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
+  ticket_sale_runner: &mut TicketSaleRunner,
   state: &Keypair,
   event_capacity: Pubkey,
   event_id: u64,
@@ -64,6 +83,8 @@ async fn custom_create_event(
       1_000, // 10%
     ).await;
   }
+
+  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
 
   let deposit_token = runner.deposit_tokens[deposit_token_idx];
   let ticket_types = vec![
@@ -89,6 +110,7 @@ async fn custom_create_event(
   runner.create_event(
     state.pubkey(),
     event_capacity,
+    ticket_sale_program_state,
     event_id,
     deposit_token,
     &event_organizer,
@@ -107,6 +129,7 @@ async fn custom_create_event(
 #[tokio::test(flavor = "multi_thread")]
 async fn should_create_a_new_event(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -115,6 +138,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let result = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -194,6 +218,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
@@ -212,6 +237,7 @@ async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(c
   let result = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -227,6 +253,7 @@ async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(c
 async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let event_capacity = runner.create_event_capacity_account().await;
   
   runner.initialize(
@@ -253,9 +280,12 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
     )
   }
 
+  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
+
   let result = runner.create_event(
     state.pubkey(),
     event_capacity,
+    ticket_sale_program_state,
     event_id,
     deposit_token,
     &event_organizer,
@@ -275,6 +305,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
 #[tokio::test(flavor = "multi_thread")]
 async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -283,6 +314,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let _ = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -302,6 +334,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
 #[tokio::test(flavor = "multi_thread")]
 async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -310,6 +343,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
   let _ = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -323,7 +357,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
     let mut pt = runner.pt.lock().await;
     let account = pt.context.banks_client.get_account(fund_manager).await.unwrap().unwrap();
 
-    // Not 890880 is the lamports stored in the account balamce because of rent exception
+    // Not 890880 is the lamports stored in the account balance because of rent exception
     // when the account was create
     assert_eq!(account.lamports, sol_to_lamports(10_f64) + 890880);
   }
@@ -334,6 +368,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
 async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
@@ -341,6 +376,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let _ = custom_create_event(
     false,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -369,6 +405,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -391,6 +428,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
   let result = custom_create_event(
     true,
     runner,
+    ticket_sale_runner,
     &state,
     event_capacity,
     event_id,
@@ -405,6 +443,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 #[tokio::test(flavor = "multi_thread")]
 async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
   let event_id = 0;
@@ -455,9 +494,11 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
     1_000, // 10%
   ).await;
 
+  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
   let result = runner.create_event(
     state.pubkey(),
     event_capacity,
+    ticket_sale_program_state,
     event_id,
     mint_token.pubkey(),
     &event_organizer_clone,

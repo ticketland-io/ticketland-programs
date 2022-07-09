@@ -207,6 +207,7 @@ impl Runner {
     &self,
     state: Pubkey,
     event_capacity: Pubkey,
+    ticket_sale_program_state: Pubkey,
     event_id: u64,
     deposit_token: Pubkey,
     event_organizer: &Keypair,
@@ -222,11 +223,11 @@ impl Runner {
     let event_nft = pda::event_nft(&state, event_id).0;
     let event_nft_authority = pda::event_nft_authority(&state).0;
     let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
-
+    let cpi_authority = pda::cpi_authority(&state).0;
+    
     let accounts = event_registry::accounts::CreateEvent {
       state,
       event,
-      event_capacity,
       event_nft,
       event_nft_authority,
       organizer_event_nft_ata: pda::organizer_event_nft_ata(&event_organizer.pubkey(), &event_nft),
@@ -236,8 +237,11 @@ impl Runner {
       fund_manager,
       fund_manager_ata: pda::fund_manager_ata(&fund_manager, &deposit_token),
       event_organizer_ata: pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token),
+      event_capacity,
+      ticket_sale_program_state,
+      cpi_authority,
       event_organizer: event_organizer.pubkey(),
-
+      
       ticket_sale_program: ticket_sale_program_id(),
       metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
@@ -268,7 +272,6 @@ impl Runner {
   pub async fn create_ticket_sale(
     &self,
     state: Pubkey,
-    event_capacity: Pubkey,
     event_id: u64,
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
@@ -286,7 +289,6 @@ impl Runner {
     let accounts = event_registry::accounts::CreateTicketSale {
       state,
       event,
-      event_capacity,
       event_organizer: event_organizer.pubkey(),
       ticket_sale_program_state,
       ticket_sale_state,
