@@ -13,7 +13,7 @@ fn init_event_capacity(
   event_id: u64,
   n_tickets: u32,
 ) -> Result<()> {
-  let event_capacity = &mut ctx.accounts.event_capacity.load_mut()?;
+  let event_capacity = &mut ctx.accounts.event_capacity.load_init()?;
 
   if !event_capacity.is_initialized {
     event_capacity.event_id = event_id;

@@ -43,6 +43,9 @@ use common::{
     sale_type::SaleType,
   },
 };
+use ticket_sale::{
+  account_data::{event_capacity::MAX_VENUE_CAPACITY},
+};
 
 async fn custom_create_event(
   skip_init: bool,
@@ -65,13 +68,13 @@ async fn custom_create_event(
 
   let ticket_types = vec![
     TicketType {
-      n_tickets: 1000,
+      n_tickets: 50_000,
       sale_type: SaleType::FixedPrice(to_base(100, 6)),
       sale_start_time: 50,
       merkle_root: [0; 32],
     },
     TicketType {
-      n_tickets: 1000,
+      n_tickets: 50_000,
       sale_type: SaleType::DutchAuction {
         start_price: 150,
         end_price: 110,
@@ -143,6 +146,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   // Create a new ticket sale for the first ticket type
   let result = runner.create_ticket_sale(
     state.pubkey(),
+    event_capacity,
     event_id,
     &event_organizer,
     ticket_sale_program_state,
@@ -164,5 +168,35 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
     assert_eq!(sale_data.event_id, event_id);
     assert_eq!(sale_data.ticket_type_index, ticket_type_index);
     assert_eq!(sale_data.ticket_type, ticket_types[0].clone());
+  }
+
+  // Create a new ticket sale for the second ticket type
+  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+  let ticket_type_index = 1;
+
+  let result = runner.create_ticket_sale(
+    state.pubkey(),
+    event_capacity,
+    event_id,
+    &event_organizer,
+    ticket_sale_program_state,
+    ticket_type_index,
+    ticket_types[1].clone(),
+  ).await;
+
+  assert!(result.is_ok());
+
+  {
+    let mut pt = runner.pt.lock().await;
+    let ticket_sale_state = ticket_sale_pda::ticket_sale_state(
+      &ticket_sale_program_state,
+      ticket_type_index,
+      event_id,
+    ).0;
+    let sale_data = pt.get_account::<ticket_sale::account_data::sale::Sale>(ticket_sale_state).await;
+
+    assert_eq!(sale_data.event_id, event_id);
+    assert_eq!(sale_data.ticket_type_index, ticket_type_index);
+    assert_eq!(sale_data.ticket_type, ticket_types[1].clone());
   }
 }

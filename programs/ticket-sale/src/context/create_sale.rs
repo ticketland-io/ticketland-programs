@@ -33,7 +33,7 @@ pub struct CreateSale<'info> {
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
   #[account(
-    zero,
+    mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,

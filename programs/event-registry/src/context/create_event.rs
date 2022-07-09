@@ -43,7 +43,6 @@ pub struct CreateEvent<'info> {
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
   #[account(
-    zero,
     constraint = *event_capacity.owner == ticket_sale_program.key() @ ErrorCode::TicketSaleMustBeOwner,
   )]
   pub event_capacity: AccountInfo<'info>,

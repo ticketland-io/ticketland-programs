@@ -1,7 +1,5 @@
 #![cfg(feature = "test-bpf")]
 
-use std::println;
-
 use test_context::{test_context, futures};
 use anchor_lang::{
   prelude::*,

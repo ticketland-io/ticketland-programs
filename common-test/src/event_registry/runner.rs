@@ -268,6 +268,7 @@ impl Runner {
   pub async fn create_ticket_sale(
     &self,
     state: Pubkey,
+    event_capacity: Pubkey,
     event_id: u64,
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
@@ -285,6 +286,7 @@ impl Runner {
     let accounts = event_registry::accounts::CreateTicketSale {
       state,
       event,
+      event_capacity,
       event_organizer: event_organizer.pubkey(),
       ticket_sale_program_state,
       ticket_sale_state,
