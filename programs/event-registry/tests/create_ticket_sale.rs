@@ -48,6 +48,7 @@ async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
   state: &Keypair,
+  event_capacity: Pubkey,
   event_id: u64,
   event_organizer: &Keypair,
   deposit_token_idx: usize,
@@ -84,9 +85,11 @@ async fn custom_create_event(
 
   let _ = runner.create_event(
     state.pubkey(),
+    event_capacity,
     event_id,
     deposit_token,
     &event_organizer,
+    100_000,
     100,
 		1000,
 		ticket_types.clone(),
@@ -117,6 +120,7 @@ async fn initialize_ticket_sale(
 async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -124,6 +128,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
     false,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer,
     0,

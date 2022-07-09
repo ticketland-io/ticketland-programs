@@ -42,6 +42,10 @@ use common::{
 use event_registry::{
   account_data::state::*,
 };
+use ticket_sale::account_data::event_capacity::{
+  EventCapacity,
+  SPACE_MARGIN as event_capacity_space_margin,
+};
 use crate::{
   program_id::ticket_sale_program_id,
   ticket_sale::pda as ticket_sale_pda,
@@ -187,12 +191,21 @@ impl Runner {
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
   }
 
+  pub async fn create_event_capacity_account(&mut self, n_tickets: u32) -> Pubkey {
+    let mut pt_lock = self.pt.lock().await;
+    let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (n_tickets / 8) as usize + 8;
+    
+    pt_lock.create_account(sol_to_lamports(1000_f64), space as u64, &system_program::ID).await.pubkey()
+  }
+
   pub async fn create_event(
     &self,
     state: Pubkey,
+    event_capacity: Pubkey,
     event_id: u64,
     deposit_token: Pubkey,
     event_organizer: &Keypair,
+    n_tickets: u32,
     start_time: Slot,
 		end_time: Slot,
 		ticket_types: Vec<TicketType>,
@@ -208,6 +221,7 @@ impl Runner {
     let accounts = event_registry::accounts::CreateEvent {
       state,
       event,
+      event_capacity,
       event_nft,
       event_nft_authority,
       organizer_event_nft_ata: pda::organizer_event_nft_ata(&event_organizer.pubkey(), &event_nft),
@@ -227,6 +241,7 @@ impl Runner {
     }.to_account_metas(None);
 
     let data = event_registry::instruction::CreateEvent {
+      n_tickets,
       start_time,
       end_time,
       ticket_types,

@@ -45,11 +45,13 @@ use common::{
     sale_type::SaleType,
   },
 };
+use ticket_sale::account_data::event_capacity;
 
 async fn custom_create_event(
   skip_init: bool,
   runner: &mut Runner,
   state: &Keypair,
+  event_capacity: Pubkey,
   event_id: u64,
   event_organizer: &Keypair,
   deposit_token_idx: usize,
@@ -63,7 +65,6 @@ async fn custom_create_event(
   }
 
   let deposit_token = runner.deposit_tokens[deposit_token_idx];
-
   let ticket_types = vec![
     TicketType {
       n_tickets: 1000,
@@ -86,9 +87,11 @@ async fn custom_create_event(
 
   runner.create_event(
     state.pubkey(),
+    event_capacity,
     event_id,
     deposit_token,
     &event_organizer,
+    100_000,
     100,
 		1000,
 		ticket_types.clone(),
@@ -104,6 +107,7 @@ async fn custom_create_event(
 async fn should_create_a_new_event(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -111,6 +115,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     false,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer,
     0,
@@ -125,6 +130,8 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     let event_data = pt.get_account::<event_registry::account_data::event::Event>(event).await;
 
     assert_eq!(event_data.id, event_id);
+    assert_eq!(event_data.event_capacity, event_capacity);
+    assert_eq!(event_data.n_tickets, 100_000);
     assert_eq!(event_data.start_time, 100);
     assert_eq!(event_data.end_time, 1000);
     assert_eq!(event_data.event_organizer, event_organizer.pubkey());
@@ -187,6 +194,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
 async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
   let runner = &mut ctx.event_registry_runner;
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   
   runner.initialize(
     &state,
@@ -214,9 +222,11 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
 
   let result = runner.create_event(
     state.pubkey(),
+    event_capacity,
     event_id,
     deposit_token,
     &event_organizer,
+    100_000,
     100,
 		1000,
 		ticket_types.clone(),
@@ -233,6 +243,7 @@ async fn should_revert_if_max_ticket_types_violated(ctx: &mut TestContext) {
 async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -240,6 +251,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
     false,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer,
     0,
@@ -258,6 +270,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
 async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
 
@@ -265,6 +278,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
     false,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer,
     2, // native sol
@@ -287,6 +301,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
 async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   
@@ -294,6 +309,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
     false,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer,
     0,
@@ -321,6 +337,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
 async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = Keypair::new();
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
@@ -342,6 +359,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
     true,
     runner,
     &state,
+    event_capacity,
     event_id,
     &event_organizer_clone,
     0,
@@ -355,6 +373,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
+  let event_capacity = runner.create_event_capacity_account(100_000).await;
   let event_id = 0;
   let event_organizer = runner.get_participant(1);
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
@@ -405,9 +424,11 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
 
   let result = runner.create_event(
     state.pubkey(),
+    event_capacity,
     event_id,
     mint_token.pubkey(),
     &event_organizer_clone,
+    100_000,
     100,
 		1000,
 		ticket_types.clone(),
