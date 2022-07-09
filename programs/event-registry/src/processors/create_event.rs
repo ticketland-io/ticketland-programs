@@ -1,4 +1,8 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::{
+  program::invoke,
+  system_instruction::transfer,
+};
 use anchor_spl::token::{self, Transfer, MintTo};
 use anchor_safe_math::SafeMath;
 use anchor_metaplex::{
@@ -8,6 +12,7 @@ use anchor_metaplex::{
   create_master_edition,
 };
 use common::{
+  token::is_wrapped_sol,
   state::{
     alias::*,
     ticket_type::TicketType,
@@ -82,6 +87,28 @@ fn create_event_nft(
   )
 }
 
+// Transfers Sol to the fund manager
+fn lock_sol_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
+  let currency = &ctx.accounts.state.supported_currencies
+    .iter()
+    .find(|c| is_wrapped_sol(c.mint_account))
+    .unwrap();
+
+  let ix = transfer(
+    &ctx.accounts.event_organizer.key(),
+    &ctx.accounts.fund_manager.key(),
+    currency.deposit_amount,
+  );
+
+  invoke(
+    &ix,
+    &[
+      ctx.accounts.event_organizer.to_account_info(),
+      ctx.accounts.fund_manager.to_account_info()
+    ],
+  ).map_err(|err| err.into())
+}
+
 /// Transfer the deposit amount to the fund manager ata
 fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
   let cpi_accounts = Transfer {
@@ -111,7 +138,11 @@ pub fn exec(
 ) -> Result<()> {
   require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
 
-  lock_deposit(&ctx)?;
+  if is_wrapped_sol(ctx.accounts.deposit_token.key()) {
+    lock_sol_deposit(&ctx)?;
+  } else {
+    lock_deposit(&ctx)?;
+  }
 
   {
     let event = &mut ctx.accounts.event;

@@ -22,6 +22,7 @@ use solana_sdk::{
   pubkey::Pubkey,
   signature::{Keypair, Signer},
   instruction::Instruction,
+  native_token::sol_to_lamports,
 };
 use anchor_spl::token::{Token};
 use anchor_metaplex::{
@@ -105,7 +106,11 @@ impl Runner {
       deposit_token_authorities.push(authority);
     }
 
-    let mut supported_currencies = vec![];
+    // Wrapped Sol will be treated as the Native Sol. We do so to have consistent mint_accounts
+    let mut supported_currencies = vec![Currency {
+      mint_account: "So11111111111111111111111111111111111111112".try_into().unwrap(),
+      deposit_amount: sol_to_lamports(10_f64),
+    }];
 
     for mint_account in &deposit_tokens {
       supported_currencies.push(Currency {
