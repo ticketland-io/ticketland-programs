@@ -97,7 +97,6 @@ pub struct CreateEvent<'info> {
   )]
   pub deposit_token: Box<Account<'info, Mint>>,
 
-
   /// CHECK: The deposit token should be one of the supported currencies
   #[account(
     constraint = state.supported_currencies.iter().any(|c| c.mint_account == purchase_token.key()) @ ErrorCode::UnsupportedPurchaseToken

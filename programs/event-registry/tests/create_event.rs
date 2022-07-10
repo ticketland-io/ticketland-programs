@@ -3,7 +3,6 @@
 use test_context::{test_context, futures};
 use anchor_lang::{
   prelude::*,
-  solana_program::rent::Rent,
 };
 use solana_sdk::{
   system_program,
