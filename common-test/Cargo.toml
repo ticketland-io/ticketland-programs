@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 ticket-sale = { path = "../programs/ticket-sale" }
 event-registry = { path = "../programs/event-registry" }
+ticket-nft = { path = "../programs/ticket-nft" }
 anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 anchor-spl = "0.25.0"
 anchor-metaplex = { git = "https://github.com/Apocentre/anchor-metaplex", version = "0.4.1" }

@@ -724,6 +724,7 @@ dependencies = [
  "solana-sdk",
  "solana-test-utils",
  "test-context",
+ "ticket-nft",
  "ticket-sale",
 ]
 
@@ -1174,7 +1175,6 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
- "async-trait",
  "common",
  "common-test",
  "mpl-token-metadata",
@@ -4298,7 +4298,12 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
+ "common-test",
  "mpl-token-metadata",
+ "solana-program-test",
+ "solana-sdk",
+ "solana-test-utils",
+ "test-context",
 ]
 
 [[package]]
@@ -4309,7 +4314,6 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
- "async-trait",
  "common",
  "common-test",
  "mpl-token-metadata",

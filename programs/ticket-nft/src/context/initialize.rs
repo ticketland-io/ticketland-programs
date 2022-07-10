@@ -16,7 +16,7 @@ pub struct Initialize<'info> {
   )]
   pub state: Account<'info, State>,
   
-  /// CHECK: The authority of all NFTs
+  /// CHECK: The authority of all minted NFTs
   #[account(
     init,
     payer = deployer,

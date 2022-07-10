@@ -9,8 +9,7 @@ use anchor_lang::{
   Id,
 };
 use common_test::{
-  ticket_sale::pda,
-  test_context::TestContext, event_registry,
+  test_context::TestContext,
   program_id::event_registry_program_id,
 };
 
@@ -38,5 +37,5 @@ async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
 
   assert_eq!(state_data.event_registry_program, event_registry_program_id());
   assert_eq!(state_data.event_registry_state, event_registry_state.pubkey());
-  assert_eq!(state_data.deployer, runner.deployer.pubkey());
+  assert_eq!(state_data.deployer, ticket_sale_runner.deployer.pubkey());
 }
