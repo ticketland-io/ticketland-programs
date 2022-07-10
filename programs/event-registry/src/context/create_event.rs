@@ -11,6 +11,10 @@ use anchor_metaplex::{
   }
 };
 use common::{
+  account_data::event::{
+    SPACE_MARGIN,
+    MAX_TICKET_TYPES,
+  },
   state::ticket_type::TicketType,
 };
 use ticket_sale::{
@@ -22,7 +26,7 @@ use crate::{
   },
   account_data::{
     state::*,
-    event::{*, SPACE_MARGIN},
+    event::*,
   },
 };
 

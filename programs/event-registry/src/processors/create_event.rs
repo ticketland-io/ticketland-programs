@@ -13,6 +13,7 @@ use anchor_metaplex::{
 };
 use common::{
   token::is_wrapped_sol,
+  account_data::event::*,
   state::{
     alias::*,
     ticket_type::TicketType,
@@ -20,8 +21,7 @@ use common::{
 };
 use crate::{
   utils::program_error::ErrorCode,
-  context::create_event::CreateEvent, 
-  account_data::event::*,
+  context::create_event::CreateEvent,
 };
 
 fn mint_edition_token(ctx: &Context<CreateEvent>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
