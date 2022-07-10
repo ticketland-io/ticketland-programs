@@ -37,7 +37,8 @@ use common::{
   state::{
     ticket_type::TicketType,
     alias::*,
-  }
+    currency::*,
+  },
 };
 use event_registry::{
   account_data::state::*,
