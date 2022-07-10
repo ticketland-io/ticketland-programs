@@ -131,11 +131,11 @@ pub fn exec(
   // 5. Transfer funds
   transfer_funds(&ctx)?;
 
-  // 6. CPI to ticket NFT to mint the ticket
+  // 6. CPI to Ticket NFT program to mint the ticket
 
   // 7. Update state
   // - bitmap
-  // - total tickets sold
-  // - available_tickets
+  // - total tickets sold (Ticket Sale State account data)
+  // - decrease available_tickets
   Ok(())
 }
