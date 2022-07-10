@@ -19,7 +19,6 @@ async fn should_initialize(ctx: &mut TestContext) {
   
   runner.initialize(
     &state,
-    500, // 5%
 		1_000, // 10%
   ).await;
 
@@ -30,7 +29,6 @@ async fn should_initialize(ctx: &mut TestContext) {
   assert_eq!(state_data.deployer, runner.deployer.pubkey());
   assert_eq!(state_data.bumps.event_nft_authority, pda::event_nft_authority(&state.pubkey()).1);
   assert_eq!(state_data.bumps.cpi_authority, cpi_authority_bump);
-  assert_eq!(state_data.service_fee, 500);
   assert_eq!(state_data.seller_fee_basis_points, 1_000);
   assert_eq!(state_data.supported_currencies, runner.supported_currencies);
   assert_eq!(state_data.cpi_authority, cpi_authority);

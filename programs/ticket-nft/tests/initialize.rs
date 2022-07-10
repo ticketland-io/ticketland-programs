@@ -25,7 +25,6 @@ async fn should_initialize_ticket_nft(ctx: &mut TestContext) {
   
   event_registry_runner.initialize(
     &event_registry_state,
-    500, // 5%
 		1_000, // 10%
   ).await;
 

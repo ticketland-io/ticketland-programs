@@ -78,7 +78,6 @@ async fn custom_create_event(
   if !skip_init {
     runner.initialize(
       &state,
-      500, // 5%
       1_000, // 10%
     ).await;
   }
@@ -258,7 +257,6 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   
   runner.initialize(
     &state,
-    500, // 5%
 		1_000, // 10%
   ).await;
 
@@ -415,7 +413,6 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
 
   runner.initialize(
     &state,
-    500, // 5%
 		1_000, // 10%
   ).await;
 
@@ -491,7 +488,6 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
 
   runner.initialize(
     &state,
-    500, // 5%
     1_000, // 10%
   ).await;
 

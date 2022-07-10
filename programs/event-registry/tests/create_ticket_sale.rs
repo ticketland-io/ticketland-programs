@@ -57,7 +57,6 @@ async fn custom_create_event(
   if !skip_init {
     runner.initialize(
       &state,
-      500, // 5%
       1_000, // 10%
     ).await;
   }

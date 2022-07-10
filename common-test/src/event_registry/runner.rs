@@ -123,6 +123,7 @@ impl Runner {
         mint_account: *mint_account,
         treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &*mint_account),
         deposit_amount: to_base(1000, 6), // 1000 USDC for example
+        service_fee: 500, // 5%
       })
     }
 
@@ -154,6 +155,7 @@ impl Runner {
       mint_account: wrapped_sol,
       treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &wrapped_sol),
       deposit_amount: sol_to_lamports(10_f64),
+      service_fee: 500, // 5%
     });
 
     deposit_tokens.push(wrapped_sol);
@@ -174,7 +176,6 @@ impl Runner {
   pub async fn initialize(
     &mut self,
     state: &Keypair,
-		service_fee: u16,
 		seller_fee_basis_points: u16,
   ) {
     self.create_deposit_tokens().await;
@@ -190,7 +191,6 @@ impl Runner {
 
     let data = event_registry::instruction::Initialize {
       supported_currencies: self.supported_currencies.clone(),
-      service_fee,
       seller_fee_basis_points,
     }.data();
 
