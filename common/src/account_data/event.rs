@@ -31,5 +31,7 @@ pub struct Event {
   // but event organizers need to choose one per event. This will change in the future.
   pub currency: Currency,
   pub event_organizer_purchase_token_ata: Pubkey,
+  // THis is where Sol payments will be send. The above is for SPL tokens.
+  pub event_organizer_treasury: Pubkey,
   pub ticket_types: Vec<TicketType>,
 }

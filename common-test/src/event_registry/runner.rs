@@ -225,6 +225,7 @@ impl Runner {
     deposit_token: Pubkey,
     purchase_token: Pubkey,
     event_organizer: &Keypair,
+    event_organizer_treasury: Pubkey,
     n_tickets: u32,
     start_time: Slot,
 		end_time: Slot,
@@ -267,6 +268,7 @@ impl Runner {
     }.to_account_metas(None);
 
     let data = event_registry::instruction::CreateEvent {
+      event_organizer_treasury,
       n_tickets,
       start_time,
       end_time,

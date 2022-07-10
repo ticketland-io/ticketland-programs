@@ -159,6 +159,7 @@ fn init_event_capacity(ctx: &Context<CreateEvent>,) -> Result<()> {
 
 pub fn exec(
   ctx: Context<CreateEvent>,
+  event_organizer_treasury: Pubkey,
   n_tickets: u32,
   start_time: Slot,
   end_time: Slot,
@@ -185,6 +186,7 @@ pub fn exec(
     };
 
     event.id = state.n_events;
+    event.event_organizer_treasury = event_organizer_treasury;
     event.n_tickets = n_tickets;
     event.start_time = start_time;
     event.end_time = end_time;

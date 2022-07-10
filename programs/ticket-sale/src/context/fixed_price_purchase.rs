@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-  token::{Mint, TokenAccount},
+  token::{Mint, Token, TokenAccount},
 };
 use crate::{
   ID,
@@ -93,6 +93,16 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub treasury: AccountInfo<'info>,
 
+  /// The ticket buyer ATA from which funds will be sent
+  #[account(
+    mut,
+    associated_token::mint = purchase_token,
+    associated_token::authority = ticket_buyer,
+  )]
+  pub ticket_buyer_ata: Box<Account<'info, TokenAccount>>,
+
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
+
+  pub token_program: Program<'info, Token>,
 }
