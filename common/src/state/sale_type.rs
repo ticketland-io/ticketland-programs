@@ -10,3 +10,19 @@ pub enum SaleType {
     drop_interval: u16,
   }
 }
+
+impl SaleType {
+  pub fn is_fixed_price(&self) -> bool {
+    match self {
+      Self::FixedPrice(_) => true,
+      _ => false
+    }
+  }
+
+  pub fn is_dutch_auction(&self) -> bool {
+    match self {
+      Self::DutchAuction{..} => true,
+      _ => false
+    }
+  }
+}

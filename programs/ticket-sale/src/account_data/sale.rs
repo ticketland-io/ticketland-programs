@@ -10,6 +10,8 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[account]
 pub struct Sale {
+  pub bump: u8,
+
   /// The unique id of the event which this sale is part of
   pub event_id: u64,
 

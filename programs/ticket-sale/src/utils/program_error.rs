@@ -14,4 +14,8 @@ pub enum ErrorCode {
   InvalidProof,
   #[msg("Invalid sold out")]
   TicketSoldOut,
+  #[msg("Seat not available")]
+  SeatNotAvailable,
+  #[msg("Expected fixed price sale")]
+  ExpectedFixedPriceSaleAccount,
 }

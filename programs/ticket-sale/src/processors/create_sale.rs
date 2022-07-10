@@ -16,6 +16,7 @@ pub fn exec(
 ) -> Result<()> {
   let sale = &mut ctx.accounts.sale;
 
+  sale.bump = *ctx.bumps.get("sale").unwrap();
   sale.event_id = event_id;
   sale.ticket_type_index = ticket_type_index;
   sale.ticket_type = ticket_type;

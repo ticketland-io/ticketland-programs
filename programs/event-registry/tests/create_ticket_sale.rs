@@ -191,13 +191,14 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
 
   {
     let mut pt = runner.pt.lock().await;
-    let ticket_sale_state = ticket_sale_pda::ticket_sale_state(
+    let (ticket_sale_state, ticket_sale_state_bump) = ticket_sale_pda::ticket_sale_state(
       &ticket_sale_program_state,
       ticket_type_index,
       event_id,
-    ).0;
+    );
     let sale_data = pt.get_account::<ticket_sale::account_data::sale::Sale>(ticket_sale_state).await;
 
+    assert_eq!(sale_data.bump, ticket_sale_state_bump);
     assert_eq!(sale_data.event_id, event_id);
     assert_eq!(sale_data.ticket_type_index, ticket_type_index);
     assert_eq!(sale_data.ticket_type, ticket_types[1].clone());

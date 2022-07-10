@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct Purchase<'info> {
+pub struct FixedPricePurchase<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
 
@@ -35,7 +35,8 @@ pub struct Purchase<'info> {
       sale.ticket_type_index.to_string().as_ref(),
       sale.event_id.to_string().as_ref()
     ],
-    bump
+    bump = sale.bump,
+    constraint = !sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::ExpectedFixedPriceSaleAccount,
   )]
   pub sale: Account<'info, Sale>,
 

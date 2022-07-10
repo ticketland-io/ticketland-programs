@@ -15,7 +15,7 @@ use crate::{
     initialize::*,
 		init_event_capacity::*,
 		create_sale::*,
-		purchase::*,
+		fixed_price_purchase::*,
   },
 };
 
@@ -81,13 +81,13 @@ pub mod ticket_sale {
 		)
 	}
 
-	pub fn purchase(
-		ctx: Context<Purchase>,
+	pub fn fixed_price_purchase(
+		ctx: Context<FixedPricePurchase>,
 		seat_index: u32,
 		seat_name: String,
 		merkle_proof: Vec<[u8; 32]>,
 	) -> Result<()> {
-		processors::purchase::exec(
+		processors::fixed_price_purchase::exec(
 			ctx,
 			seat_index,
 			seat_name,
