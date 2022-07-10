@@ -188,7 +188,7 @@ pub fn exec(
     event.n_tickets = n_tickets;
     event.start_time = start_time;
     event.end_time = end_time;
-    event.purchase_token = ctx.accounts.purchase_token.key();
+    event.currency = *state.supported_currencies.iter().find(|c| c.mint_account == ctx.accounts.purchase_token.key()).unwrap();
     event.event_organizer_purchase_token_ata = ctx.accounts.event_organizer_purchase_token_ata.key();
     event.event_organizer = ctx.accounts.event_organizer.key();
     event.ticket_types = ticket_types;

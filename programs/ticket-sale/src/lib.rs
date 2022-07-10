@@ -57,7 +57,6 @@ pub mod ticket_sale {
     processors::init_event_capacity::exec(ctx, event_id, n_tickets)
 	}
 
-
 	/// Creates a new sale
 	/// 
 	/// # Arguments

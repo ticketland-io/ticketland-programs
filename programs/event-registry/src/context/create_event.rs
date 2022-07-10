@@ -111,7 +111,7 @@ pub struct CreateEvent<'info> {
   )]
   pub event_organizer_ata: Box<Account<'info, TokenAccount>>,
 
-  /// The deposit token ATA from which the event creation deposit will be transferred from
+  /// The ATA where the funds from selling the tickets will be transferred to
   #[account(
     mut,
     associated_token::mint = purchase_token,

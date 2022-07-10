@@ -12,6 +12,9 @@ pub const SPACE_MARGIN: usize = 1000;
 pub struct Sale {
   pub bump: u8,
 
+  /// The service fee for the currency that will be used for this sale
+  pub service_fee: u16,
+
   /// The unique id of the event which this sale is part of
   pub event_id: u64,
 

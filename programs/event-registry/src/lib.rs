@@ -7,13 +7,11 @@ use anchor_lang::prelude::*;
 use common::{
   state::{
     alias::*,
+		currency::*,
     ticket_type::TicketType,
   },
 };
 use crate::{
-	account_data::{
-		state::*,
-	},
 	context::{
 		initialize::*,
 		create_event::*,

@@ -1,8 +1,11 @@
 use anchor_lang::prelude::*;
+use common::{
+  state::currency::*,
+};
 use crate::{
   utils::program_error::ErrorCode,
   context::initialize::Initialize, 
-  account_data::state::{InitBumps, Currency, MAX_CURRENCY_SUPPORT},
+  account_data::state::{InitBumps, MAX_CURRENCY_SUPPORT},
 };
 
 pub fn exec(

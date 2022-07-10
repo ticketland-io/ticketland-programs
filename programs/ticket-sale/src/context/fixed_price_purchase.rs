@@ -61,7 +61,7 @@ pub struct FixedPricePurchase<'info> {
 
   /// CHECK: The deposit token should be one of the supported currencies
   #[account(
-    constraint = event.purchase_token == purchase_token.key() @ ErrorCode::UnsupportedPurchaseToken
+    constraint = event.currency.mint_account == purchase_token.key() @ ErrorCode::UnsupportedPurchaseToken
   )]
   pub purchase_token: Box<Account<'info, Mint>>,
 

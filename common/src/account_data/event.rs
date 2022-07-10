@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use crate::{
   state::{
     ticket_type::TicketType,
+    currency::*,
     alias::*,
   },
 };
@@ -28,7 +29,7 @@ pub struct Event {
   pub end_time: Slot,
   // The token that will be used to purchase the tickets. At the moment we support multiple currencies
   // but event organizers need to choose one per event. This will change in the future.
-  pub purchase_token: Pubkey,
+  pub currency: Currency,
   pub event_organizer_purchase_token_ata: Pubkey,
   pub ticket_types: Vec<TicketType>,
 }
