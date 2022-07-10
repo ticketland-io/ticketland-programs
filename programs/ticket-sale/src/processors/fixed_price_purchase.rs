@@ -67,22 +67,35 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>) -> Result<()> {
   if is_wrapped_sol(ctx.accounts.purchase_token.key()) {
     // send to event organizer
     transfer_sol(
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      ctx.accounts.event_organizer_purchase_sol_treasury.to_account_info().clone(),
       event_organizer_amount,
     )?;
 
     // send to treasury
     transfer_sol(
       ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.service_fee_ata.to_account_info().clone(),
+      ctx.accounts.treasury.to_account_info().clone(),
       service_fee_amount,
     )?;
   } else {
-    // transfer_token(
-    //   &ctx,
-    //   from: ctx.accounts.
-    // )?;
+    // send to event organizer
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      event_organizer_amount,
+    )?;
+
+    // send to treasury
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.service_fee_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      service_fee_amount,
+    )?;
   }
 
   Ok(())
@@ -119,5 +132,10 @@ pub fn exec(
   transfer_funds(&ctx)?;
 
   // 6. CPI to ticket NFT to mint the ticket
+
+  // 7. Update state
+  // - bitmap
+  // - total tickets sold
+  // - available_tickets
   Ok(())
 }

@@ -11,6 +11,7 @@ use solana_sdk::{
 };
 use solana_test_utils::{
   utils::{to_base},
+  spl::Spl,
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
@@ -153,6 +154,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     let mut pt = runner.pt.lock().await;
     let event = pda::event(&state.pubkey(), event_id).0;
     let event_data = pt.get_account::<event_registry::account_data::event::Event>(event).await;
+    let purchase_token = runner.deposit_tokens[0];
 
     assert_eq!(event_data.id, event_id);
     assert_eq!(event_data.event_capacity, event_capacity);
@@ -160,6 +162,28 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     assert_eq!(event_data.start_time, 100);
     assert_eq!(event_data.end_time, 1000);
     assert_eq!(event_data.event_organizer, event_organizer.pubkey());
+    assert_eq!(event_data.currency, runner.supported_currencies[0]);
+    assert_eq!(event_data.event_organizer_purchase_token_ata, Spl::get_associated_token_address(&event_organizer.pubkey(), &purchase_token),);
+    assert_eq!(event_data.event_organizer_treasury, event_organizer.pubkey());
+    assert_eq!(event_data.ticket_types,  vec![
+      TicketType {
+        n_tickets: 1000,
+        sale_type: SaleType::FixedPrice(to_base(100, 6)),
+        sale_start_time: 50,
+        merkle_root: [0; 32],
+      },
+      TicketType {
+        n_tickets: 1000,
+        sale_type: SaleType::DutchAuction {
+          start_price: 150,
+          end_price: 110,
+          curve_length: 200 * 60,
+          drop_interval: 20 * 60,
+        },
+        sale_start_time: 50,
+        merkle_root: [0; 32],
+      },
+    ]);
   }
 
   // Assert state

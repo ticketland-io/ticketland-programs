@@ -73,6 +73,13 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
+  /// CHECK: The Sol account that organizer will receive funds from the ticket sale  to
+  #[account(
+    mut,
+    constraint = event_organizer_purchase_sol_treasury.key() == event.event_organizer_treasury @ ErrorCode::WrongSolTreasury,
+  )]
+  pub event_organizer_purchase_sol_treasury: AccountInfo<'info>,
+
   /// CHECK: This is the event organizer of the event
   #[account(
     constraint = event_organizer.key() == event.event_organizer @ ErrorCode::WrongEventOrganizer,
