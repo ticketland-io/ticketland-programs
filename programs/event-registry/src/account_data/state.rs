@@ -14,6 +14,8 @@ pub struct InitBumps {
 #[derive(AnchorSerialize, AnchorDeserialize, Eq, PartialEq, Debug, Clone)]
 pub struct Currency {
   pub mint_account: Pubkey,
+  // The treasury ata that will be receiving the service fees
+  pub treasury_ata: Pubkey,
   pub deposit_amount: u64,
 }
 

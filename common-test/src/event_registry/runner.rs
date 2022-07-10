@@ -107,6 +107,11 @@ impl Runner {
         to_base(1_000_000, 6),
       ).await;
 
+      let _ = self.spl.create_associated_account(
+        &self.deployer.pubkey(), 
+        &mint_token.pubkey()
+      ).await;
+
       deposit_tokens.push(mint_token.pubkey());
       deposit_token_authorities.push(authority);
     }
@@ -116,6 +121,7 @@ impl Runner {
     for mint_account in &deposit_tokens {
       supported_currencies.push(Currency {
         mint_account: *mint_account,
+        treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &*mint_account),
         deposit_amount: to_base(1000, 6), // 1000 USDC for example
       })
     }
@@ -137,10 +143,16 @@ impl Runner {
       for participant in &self.test_account.participants {
         self.spl.create_associated_account(&participant.pubkey(), &wrapped_sol).await;
       }
+
+      let _ = self.spl.create_associated_account(
+        &self.deployer.pubkey(), 
+        &wrapped_sol
+      ).await;
     }
 
     supported_currencies.push(Currency {
       mint_account: wrapped_sol,
+      treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &wrapped_sol),
       deposit_amount: sol_to_lamports(10_f64),
     });
 
