@@ -97,6 +97,13 @@ pub struct CreateEvent<'info> {
   )]
   pub deposit_token: Box<Account<'info, Mint>>,
 
+
+  /// CHECK: The deposit token should be one of the supported currencies
+  #[account(
+    constraint = state.supported_currencies.iter().any(|c| c.mint_account == purchase_token.key()) @ ErrorCode::UnsupportedPurchaseToken
+  )]
+  pub purchase_token: Box<Account<'info, Mint>>,
+
   /// The deposit token ATA from which the event creation deposit will be transferred from
   #[account(
     mut,
@@ -104,6 +111,14 @@ pub struct CreateEvent<'info> {
     associated_token::authority = event_organizer,
   )]
   pub event_organizer_ata: Box<Account<'info, TokenAccount>>,
+
+  /// The deposit token ATA from which the event creation deposit will be transferred from
+  #[account(
+    mut,
+    associated_token::mint = purchase_token,
+    associated_token::authority = event_organizer,
+  )]
+  pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: The PDA that will be the authority to handle all deposits for the given event_organizer
   /// Each user will have his own PDA

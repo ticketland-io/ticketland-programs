@@ -162,21 +162,13 @@ pub fn exec(
   n_tickets: u32,
   start_time: Slot,
   end_time: Slot,
-  purchase_token: Pubkey,
   ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,
   uri: String,
 ) -> Result<()> {
   require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
-  require!(
-    &ctx.accounts.state.supported_currencies
-      .iter()
-      .find(|c| c.mint_account == purchase_token)
-      .is_some(),
-    ErrorCode::UnsupportedPurchaseToken,
-  );
-
+  
   if is_wrapped_sol(ctx.accounts.deposit_token.key()) {
     lock_sol_deposit(&ctx)?;
   } else {
@@ -196,7 +188,8 @@ pub fn exec(
     event.n_tickets = n_tickets;
     event.start_time = start_time;
     event.end_time = end_time;
-    event.purchase_token = purchase_token;
+    event.purchase_token = ctx.accounts.purchase_token.key();
+    event.event_organizer_purchase_token_ata = ctx.accounts.event_organizer_purchase_token_ata.key();
     event.event_organizer = ctx.accounts.event_organizer.key();
     event.ticket_types = ticket_types;
     event.event_capacity = ctx.accounts.event_capacity.key();
