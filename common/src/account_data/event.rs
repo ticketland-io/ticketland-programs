@@ -30,6 +30,5 @@ pub struct Event {
   // but event organizers need to choose one per event. This will change in the future.
   pub purchase_token: Pubkey,
   pub event_organizer_purchase_token_ata: Pubkey,
-  pub sale_start_time: Option<Vec<Slot>>,
   pub ticket_types: Vec<TicketType>,
 }

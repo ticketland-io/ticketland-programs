@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-  token::{Mint, Token, TokenAccount},
-  associated_token::AssociatedToken,
+  token::{Mint, TokenAccount},
 };
 use crate::{
   ID,

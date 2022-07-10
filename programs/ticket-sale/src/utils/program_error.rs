@@ -24,4 +24,6 @@ pub enum ErrorCode {
   WrongEventOrganizer,
   #[msg("Wrong treasury account")]
   WrongTreasuryAccount,
+  #[msg("Sale has not started")]
+  SaleNotStarted,
 }

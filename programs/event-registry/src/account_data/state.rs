@@ -17,6 +17,10 @@ pub struct Currency {
   // The treasury ata that will be receiving the service fees
   pub treasury_ata: Pubkey,
   pub deposit_amount: u64,
+
+  /// The service fee that will be charged for each ticket sale. This is in range [0, 10_000] or [0%, 100%]
+  /// This allows us to be flexible and assign different service fees for different currencies
+  pub service_fee: u16,
 }
 
 #[account]
@@ -24,7 +28,6 @@ pub struct Currency {
 pub struct State {
   pub bumps: InitBumps,
   pub n_events: u64,
-  pub service_fee: u16,
   pub seller_fee_basis_points: u16,
   pub cpi_authority: Pubkey,
   pub deployer: Pubkey,
