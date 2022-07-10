@@ -10,4 +10,6 @@ pub enum ErrorCode {
   WrongEventAccount,
   #[msg("Not event capacity account")]
   WrongEventCapacityAccount,
+  #[msg("Invalid Merkle proof")]
+  InvalidProof,
 }

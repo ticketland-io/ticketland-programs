@@ -1,7 +1,6 @@
 pub mod context;
 pub mod account_data;
 pub mod processors;
-pub mod acl;
 pub mod utils;
 
 use anchor_lang::prelude::*;
