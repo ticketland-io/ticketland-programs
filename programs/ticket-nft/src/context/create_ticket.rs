@@ -21,10 +21,10 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, event_id: u64)]
+#[instruction(cpi_authority_bump: u8, event_id: u64, event_registry_state: Pubkey)]
 pub struct CreateTicket<'info> {
   #[account()]
-  pub state: Account<'info, State>,
+  pub state: Box<Account<'info, State>>,
 
   /// The newly created Ticket Metadata 
   #[account(
@@ -38,7 +38,7 @@ pub struct CreateTicket<'info> {
     ],
     bump
   )]
-  pub ticket_metadata: Account<'info, TicketMetadata>,
+  pub ticket_metadata: Box<Account<'info, TicketMetadata>>,
 
   /// CHECK: The authority of all NFTs
   #[account(
@@ -61,7 +61,12 @@ pub struct CreateTicket<'info> {
     ],
     bump,
   )]
-  pub nft: Account<'info, TokenMint>,
+  pub nft: Box<Account<'info, TokenMint>>,
+
+  /// CHECK: The event nft metadata. We know it's gonna be the correct one because this instruction can only be called
+  /// from the Ticket sale program which knows all the seeds to re-create the Pubkey
+  #[account()]
+  pub event_nft_metadata: AccountInfo<'info>,
 
   /// CHECK: The metaplex metadata account that will be initialized in the processor
   #[account(
@@ -80,7 +85,7 @@ pub struct CreateTicket<'info> {
     associated_token::mint = nft,
     associated_token::authority = ticket_sale_cpi_authority,
   )]
-  pub ticket_nft_ata: Account<'info, TokenAccount>,
+  pub ticket_nft_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(
     mut,
