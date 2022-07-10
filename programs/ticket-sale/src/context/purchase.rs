@@ -39,10 +39,22 @@ pub struct Purchase<'info> {
   )]
   pub sale: Account<'info, Sale>,
 
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    mut,
+    seeds = [b"ticket_sale:cpi_authority", state.key().as_ref()],
+    bump = state.bumps.cpi_authority,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
+
   /// CHECK: The account that will hold the seats bitmap
   #[account(
     mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
+    constraint = event_capacity.key() == sale.event_capacity @ ErrorCode::WrongEventCapacityAccount,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,
+
+  #[account(mut)]
+  pub ticket_buyer: Signer<'info>,
 }

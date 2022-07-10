@@ -14,6 +14,7 @@ use crate::{
     initialize::*,
 		init_event_capacity::*,
 		create_sale::*,
+		purchase::*,
   },
 };
 
@@ -76,6 +77,18 @@ pub mod ticket_sale {
 			ticket_type_index,
 			event_id,
 			ticket_type,
+		)
+	}
+
+	pub fn purchase(
+		ctx: Context<Purchase>,
+		seat_index: u32,
+		seat_name: String,
+	) -> Result<()> {
+		processors::purchase::exec(
+			ctx,
+			seat_index,
+			seat_name,
 		)
 	}
 }

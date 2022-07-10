@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::{
-  context::initialize::Initialize, account_data::state::InitBumps,
+  context::initialize::Initialize,
+  account_data::state::InitBumps,
 };
 
 pub fn exec(

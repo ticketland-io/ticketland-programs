@@ -8,4 +8,6 @@ pub enum ErrorCode {
   NotOwnedByThisProgram,
   #[msg("Not event account")]
   WrongEventAccount,
+  #[msg("Not event capacity account")]
+  WrongEventCapacityAccount,
 }
