@@ -6,4 +6,6 @@ pub enum ErrorCode {
   OnlyDeployer,
   #[msg("Not owner by this program")]
   NotOwnedByThisProgram,
+  #[msg("Not event account")]
+  WrongEventAccount,
 }

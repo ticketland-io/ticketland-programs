@@ -24,6 +24,7 @@ use crate::program_id::{
   event_registry_program_id,
   ticket_sale_program_id
 };
+use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,
@@ -52,10 +53,13 @@ impl Runner {
     state: &Keypair,
     event_registry_state: Pubkey,
   ) {
+    let cpi_authority = pda::cpi_authority(&state.pubkey()).0;
+
     let accounts = ticket_sale::accounts::Initialize {
       state: state.pubkey(),
       event_registry_state,
       event_registry_program: event_registry_program_id(),
+      cpi_authority,
       deployer: self.deployer.pubkey(),
       system_program: system_program::ID,
       rent: Rent::id(),

@@ -5,11 +5,9 @@ use solana_sdk::{
   signature::{Signer, Keypair},
 };
 use solana_program_test::{tokio};
-use anchor_lang::{
-  Id,
-};
 use common_test::{
   test_context::TestContext,
+  ticket_sale::pda,
   program_id::event_registry_program_id,
 };
 
@@ -35,6 +33,10 @@ async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
   let mut pt = ticket_sale_runner.pt.lock().await;
   let state_data = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
 
+  let (cpi_authority, cpi_authority_bump) = pda::cpi_authority(&ticket_sale_state.pubkey());
+  
+  assert_eq!(state_data.bumps.cpi_authority, cpi_authority_bump);
+  assert_eq!(state_data.cpi_authority, cpi_authority);
   assert_eq!(state_data.event_registry_program, event_registry_program_id());
   assert_eq!(state_data.event_registry_state, event_registry_state.pubkey());
   assert_eq!(state_data.deployer, ticket_sale_runner.deployer.pubkey());

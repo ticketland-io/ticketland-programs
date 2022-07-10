@@ -17,6 +17,13 @@ pub fn ticket_sale_state(
       ticket_type_index.to_string().as_ref(),
       &event_id.to_string().as_ref()
     ],
-    &ticket_sale_program_id()
+    &ticket_sale_program_id(),
+  )
+}
+
+pub fn cpi_authority(state: &Pubkey) -> (Pubkey, u8) {
+  Pubkey::find_program_address(
+    &[b"ticket_sale:cpi_authority", state.as_ref()],
+    &ticket_sale_program_id(),
   )
 }

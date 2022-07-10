@@ -24,6 +24,16 @@ pub struct Initialize<'info> {
   #[account()]
   pub event_registry_program: AccountInfo<'info>,
 
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    init,
+    payer = deployer,
+    space = 0,
+    seeds = [b"ticket_sale:cpi_authority", state.key().as_ref()],
+    bump,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
+  
   #[account(mut)]
   pub deployer: Signer<'info>,
   
