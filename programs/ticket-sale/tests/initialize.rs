@@ -38,4 +38,5 @@ async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
 
   assert_eq!(state_data.event_registry_program, event_registry_program_id());
   assert_eq!(state_data.event_registry_state, event_registry_state.pubkey());
+  assert_eq!(state_data.deployer, runner.deployer.pubkey());
 }

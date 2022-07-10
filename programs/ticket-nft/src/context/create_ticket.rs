@@ -1,0 +1,109 @@
+use anchor_lang::prelude::*;
+use std::mem::size_of;
+use anchor_spl::{
+  token::{Mint as TokenMint, Token, TokenAccount},
+  associated_token::AssociatedToken,
+};
+use anchor_metaplex::{
+  mpl_token_metadata::{
+    ID as metadata_id,
+    state::{PREFIX},
+  }
+};
+use crate::{
+  utils::{
+    program_error::ErrorCode,
+  },
+  account_data::{
+    state::*,
+    ticket_metadata::{TicketMetadata, SPACE_MARGIN},
+  },
+};
+
+#[derive(Accounts)]
+#[instruction(cpi_authority_bump: u8, event_id: u64)]
+pub struct CreateTicket<'info> {
+  #[account()]
+  pub state: Account<'info, State>,
+
+  /// The newly created Ticket Metadata 
+  #[account(
+    init,
+    payer = ticket_buyer,
+    space = 8 + size_of::<TicketMetadata>() + SPACE_MARGIN,
+    seeds = [
+      b"ticket_metadata",
+      state.key().as_ref(),
+      nft.key().as_ref(),
+    ],
+    bump
+  )]
+  pub ticket_metadata: Account<'info, TicketMetadata>,
+
+  /// CHECK: The authority of all NFTs
+  #[account(
+    seeds = [b"nft_authority", state.key().as_ref()],
+    bump = state.bumps.nft_authority,
+  )]
+  pub nft_authority: AccountInfo<'info>,
+
+  /// The underlying Ticket NFT Mint account
+  #[account(
+    init,
+    payer = ticket_buyer,
+    mint::decimals = 0,
+    mint::authority = nft_authority,
+    seeds = [
+      b"ticket_nft",
+      state.key().as_ref(),
+      ticket_buyer.key().as_ref(),
+      &event_id.to_string().as_ref()
+    ],
+    bump,
+  )]
+  pub nft: Account<'info, TokenMint>,
+
+  /// CHECK: The metaplex metadata account that will be initialized in the processor
+  #[account(
+    mut,
+    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), nft.key().as_ref()],
+    seeds::program = metadata_id,
+    bump,
+  )]
+  pub metadata: AccountInfo<'info>,
+
+  /// The ATA that is a PDA controlled by the Ticket sale program and will be the owner of the Ticket NFT
+  /// until the end of the event.
+  #[account(
+    init,
+    payer = ticket_buyer,
+    associated_token::mint = nft,
+    associated_token::authority = ticket_sale_cpi_authority,
+  )]
+  pub ticket_nft_ata: Account<'info, TokenAccount>,
+
+  #[account(
+    mut,
+    seeds = [b"ticket_sale:cpi_authority", state.ticket_sale_state.as_ref()],
+    bump = cpi_authority_bump,
+    seeds::program = ticket_sale_program,
+  )]
+  pub ticket_sale_cpi_authority: Signer<'info>,
+
+  /// This is the user that buys the ticket
+  #[account(mut)]
+  pub ticket_buyer: Signer<'info>,
+
+  /// CHECK: This is the Event Registry Program account
+  #[account(
+    constraint = ticket_sale_program.key() == state.ticket_sale_program @ ErrorCode::NotTicketSaleProgram,
+  )]
+  pub ticket_sale_program: AccountInfo<'info>,
+
+  associated_token_program: Program<'info, AssociatedToken>,
+  pub token_program: Program<'info, Token>,
+  /// CHECK: The metadata program
+  pub metadata_program: AccountInfo<'info>,
+  pub system_program: Program<'info, System>,
+  pub rent: Sysvar<'info, Rent>,
+}

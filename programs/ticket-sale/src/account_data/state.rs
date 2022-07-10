@@ -11,4 +11,7 @@ pub struct State {
 
   /// A State account of the Event Registry Program
   pub event_registry_state: Pubkey,
+
+  /// The deployer of this instance
+  pub deployer: Pubkey,
 }

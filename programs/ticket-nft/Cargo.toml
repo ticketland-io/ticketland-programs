@@ -1,0 +1,23 @@
+[package]
+name = "ticket-nft"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "ticket_nft"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
+anchor-spl = "0.25.0"
+anchor-safe-math = "0.2.1"
+mpl-token-metadata = "1.2.10"
+anchor-metaplex = { git = "https://github.com/Apocentre/anchor-metaplex", version = "0.4.1" }

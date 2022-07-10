@@ -4291,6 +4291,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ticket-nft"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-metaplex",
+ "anchor-safe-math",
+ "anchor-spl",
+ "mpl-token-metadata",
+]
+
+[[package]]
 name = "ticket-sale"
 version = "0.1.0"
 dependencies = [

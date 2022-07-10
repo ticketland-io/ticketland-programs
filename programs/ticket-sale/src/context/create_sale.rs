@@ -10,7 +10,7 @@ use crate::{
 #[derive(Accounts)]
 #[instruction(cpi_authority_bump: u8, ticket_type_index: usize, event_id: u64)]
 pub struct CreateSale<'info> {
-  #[account(mut)]
+  #[account()]
   pub state: Account<'info, State>,
 
   /// The newly created Sale 
