@@ -18,6 +18,9 @@ pub struct State {
   /// A State account of the Event Registry Program
   pub event_registry_state: Pubkey,
 
+  /// This is ticketland.io treasury address
+  pub treasury: Pubkey,
+
   /// The deployer of this instance
   pub deployer: Pubkey,
 

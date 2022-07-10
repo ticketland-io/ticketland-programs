@@ -30,10 +30,12 @@ pub mod ticket_sale {
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
+	/// * `treasury` - The ticketland.io treasury address
 	pub fn initialize(
 		ctx: Context<Initialize>,
+		treasury: Pubkey,
 	) -> Result<()> {
-    processors::initialize::exec(ctx)
+    processors::initialize::exec(ctx, treasury)
 	}
 
 	/// Initializes the event capacity account for a single event. This account will be used by all the

@@ -18,4 +18,10 @@ pub enum ErrorCode {
   SeatNotAvailable,
   #[msg("Expected fixed price sale")]
   ExpectedFixedPriceSaleAccount,
+  #[msg("Purchase token is not supported")]
+  UnsupportedPurchaseToken,
+  #[msg("Wrong event organizer")]
+  WrongEventOrganizer,
+  #[msg("Wrong treasury account")]
+  WrongTreasuryAccount,
 }

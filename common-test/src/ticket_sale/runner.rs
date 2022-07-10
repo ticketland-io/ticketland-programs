@@ -31,12 +31,14 @@ pub struct Runner {
   pub test_account: TestAccount,
   pub spl: Spl,
   pub deployer: Keypair,
+  pub treasury: Keypair,
 }
 
 impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
     let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
+    let treasury = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
     let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let spl = Spl::new(Arc::clone(&pt));
 
@@ -45,6 +47,7 @@ impl Runner {
       test_account,
       spl,
       deployer,
+      treasury,
     }
   }
 
@@ -65,7 +68,9 @@ impl Runner {
       rent: Rent::id(),
     }.to_account_metas(None);
 
-    let data = ticket_sale::instruction::Initialize {}.data();
+    let data = ticket_sale::instruction::Initialize {
+      treasury: self.treasury.pubkey(),
+    }.data();
 
     let ix = Instruction {
       program_id: ticket_sale_program_id(),

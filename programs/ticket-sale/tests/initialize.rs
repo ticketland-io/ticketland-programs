@@ -37,6 +37,7 @@ async fn should_initialize_ticket_sale(ctx: &mut TestContext) {
   
   assert_eq!(state_data.bumps.cpi_authority, cpi_authority_bump);
   assert_eq!(state_data.cpi_authority, cpi_authority);
+  assert_eq!(state_data.treasury, ticket_sale_runner.treasury.pubkey());
   assert_eq!(state_data.event_registry_program, event_registry_program_id());
   assert_eq!(state_data.event_registry_state, event_registry_state.pubkey());
   assert_eq!(state_data.deployer, ticket_sale_runner.deployer.pubkey());

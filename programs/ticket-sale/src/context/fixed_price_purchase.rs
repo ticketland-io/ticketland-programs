@@ -1,4 +1,8 @@
 use anchor_lang::prelude::*;
+use anchor_spl::{
+  token::{Mint, Token, TokenAccount},
+  associated_token::AssociatedToken,
+};
 use crate::{
   ID,
   account_data::{
@@ -55,6 +59,40 @@ pub struct FixedPricePurchase<'info> {
     constraint = event_capacity.key() == sale.event_capacity @ ErrorCode::WrongEventCapacityAccount,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,
+
+  /// CHECK: The deposit token should be one of the supported currencies
+  #[account(
+    constraint = event.purchase_token == purchase_token.key() @ ErrorCode::UnsupportedPurchaseToken
+  )]
+  pub purchase_token: Box<Account<'info, Mint>>,
+
+  /// The deposit token ATA from which the event creation deposit will be transferred from
+  #[account(
+    mut,
+    associated_token::mint = purchase_token,
+    associated_token::authority = event_organizer,
+  )]
+  pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: This is the event organizer of the event
+  #[account(
+    constraint = event_organizer.key() == event.event_organizer @ ErrorCode::WrongEventOrganizer,
+  )]
+  pub event_organizer: AccountInfo<'info>,
+
+  /// The deposit token ATA from which the event creation deposit will be transferred from
+  #[account(
+    mut,
+    associated_token::mint = purchase_token,
+    associated_token::authority = treasury,
+  )]
+  pub service_fee_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: This is ticketland.io treasury address
+  #[account(
+    constraint = treasury.key() == state.treasury @ ErrorCode::WrongTreasuryAccount,
+  )]
+  pub treasury: AccountInfo<'info>,
 
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
