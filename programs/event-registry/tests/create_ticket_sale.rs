@@ -34,9 +34,6 @@ use common_test::{
 use anchor_lang::{
   prelude::Result as AnchorResult,
 };
-use anchor_spl::{
-  token::{Mint as TokenMint, TokenAccount},
-};
 use common::{
   state::{
     ticket_type::TicketType,
@@ -93,6 +90,7 @@ async fn custom_create_event(
     event_capacity,
     ticket_sale_program_state,
     event_id,
+    deposit_token,
     deposit_token,
     &event_organizer,
     100_000,

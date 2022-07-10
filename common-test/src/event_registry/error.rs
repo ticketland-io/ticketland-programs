@@ -30,13 +30,14 @@ impl TryFrom<u32> for Error {
       1 => Ok(Error(event_registry::utils::program_error::ErrorCode::TooManyCurrencies)),
       2 => Ok(Error(event_registry::utils::program_error::ErrorCode::TooManyTicketTypes)),
       3 => Ok(Error(event_registry::utils::program_error::ErrorCode::UnsupportedDepositToken)),
-      4 => Ok(Error(event_registry::utils::program_error::ErrorCode::NotEnoughDeposit)),
-      5 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidMerkleProof)),
-      6 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketSaleProgramStateAccount)),
-      7 => Ok(Error(event_registry::utils::program_error::ErrorCode::OnlyEventOrganizer)),
-      8 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
-      9 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketTypeForIndex)),
-      10 => Ok(Error(event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner)),
+      4 => Ok(Error(event_registry::utils::program_error::ErrorCode::UnsupportedPurchaseToken)),
+      5 => Ok(Error(event_registry::utils::program_error::ErrorCode::NotEnoughDeposit)),
+      6 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidMerkleProof)),
+      7 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketSaleProgramStateAccount)),
+      8 => Ok(Error(event_registry::utils::program_error::ErrorCode::OnlyEventOrganizer)),
+      9 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
+      10 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketTypeForIndex)),
+      11 => Ok(Error(event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner)),
       _ => Err(())
     }
   }

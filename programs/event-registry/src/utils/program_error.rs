@@ -10,6 +10,8 @@ pub enum ErrorCode {
   TooManyTicketTypes,
   #[msg("Deposit token is not supported")]
   UnsupportedDepositToken,
+  #[msg("Purchase token is not supported")]
+  UnsupportedPurchaseToken,
   #[msg("Not enough deposit")]
   NotEnoughDeposit,
   #[msg("Invalid Merkle proof")]
