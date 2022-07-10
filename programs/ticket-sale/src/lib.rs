@@ -85,11 +85,13 @@ pub mod ticket_sale {
 		ctx: Context<Purchase>,
 		seat_index: u32,
 		seat_name: String,
+		merkle_proof: Vec<[u8; 32]>,
 	) -> Result<()> {
 		processors::purchase::exec(
 			ctx,
 			seat_index,
 			seat_name,
+			merkle_proof,
 		)
 	}
 }

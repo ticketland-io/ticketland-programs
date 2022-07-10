@@ -12,4 +12,6 @@ pub enum ErrorCode {
   WrongEventCapacityAccount,
   #[msg("Invalid Merkle proof")]
   InvalidProof,
+  #[msg("Invalid sold out")]
+  TicketSoldOut,
 }
