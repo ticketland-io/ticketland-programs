@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
 use anchor_spl::{
-  token::{Mint as TokenMint, Token, TokenAccount},
+  token::{Mint, Token, TokenAccount},
   associated_token::AssociatedToken,
 };
 use anchor_metaplex::{
@@ -11,9 +11,6 @@ use anchor_metaplex::{
   }
 };
 use crate::{
-  utils::{
-    program_error::ErrorCode,
-  },
   account_data::{
     state::*,
     ticket_metadata::{TicketMetadata, SPACE_MARGIN},
@@ -21,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, event_id: u64, event_registry_state: Pubkey)]
+#[instruction(cpi_authority_bump: u8, event_id: u64, event_registry_state: Pubkey, ticket_sale_program: Pubkey)]
 pub struct CreateTicket<'info> {
   #[account()]
   pub state: Box<Account<'info, State>>,
@@ -61,7 +58,7 @@ pub struct CreateTicket<'info> {
     ],
     bump,
   )]
-  pub nft: Box<Account<'info, TokenMint>>,
+  pub nft: Box<Account<'info, Mint>>,
 
   /// CHECK: The event nft metadata. We know it's gonna be the correct one because this instruction can only be called
   /// from the Ticket sale program which knows all the seeds to re-create the Pubkey
@@ -91,19 +88,13 @@ pub struct CreateTicket<'info> {
     mut,
     seeds = [b"ticket_sale:cpi_authority", state.ticket_sale_state.as_ref()],
     bump = cpi_authority_bump,
-    seeds::program = ticket_sale_program,
+    seeds::program = state.ticket_sale_program,
   )]
   pub ticket_sale_cpi_authority: Signer<'info>,
 
   /// This is the user that buys the ticket
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
-
-  /// CHECK: This is the Event Registry Program account
-  #[account(
-    constraint = ticket_sale_program.key() == state.ticket_sale_program @ ErrorCode::NotTicketSaleProgram,
-  )]
-  pub ticket_sale_program: AccountInfo<'info>,
 
   associated_token_program: Program<'info, AssociatedToken>,
   pub token_program: Program<'info, Token>,

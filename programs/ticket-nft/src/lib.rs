@@ -42,6 +42,7 @@ pub mod ticket_nft {
 		_cpi_authority_bump: u8,
 		event_id: u64,
 		name: String,
+		_ticket_sale_program: Pubkey,
 	) -> Result<()> {
     processors::create_ticket::exec(ctx, event_id, name)
 	}

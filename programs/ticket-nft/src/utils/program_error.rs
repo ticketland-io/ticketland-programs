@@ -5,5 +5,5 @@ pub enum ErrorCode {
   #[msg("Only Deployer")]
   OnlyDeployer,
   #[msg("Not ticket sale program")]
-  NotTicketSaleProgram,
+  WrongTicketSaleProgram,
 }

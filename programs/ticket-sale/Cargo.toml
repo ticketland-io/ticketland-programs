@@ -23,6 +23,7 @@ anchor-safe-math = "0.2.1"
 mpl-token-metadata = "1.2.10"
 anchor-metaplex = { git = "https://github.com/Apocentre/anchor-metaplex", version = "0.4.1" }
 common = { path = "../../common" }
+ticket-nft = { path = "../ticket-nft", features = ["cpi"] }
 
 [dev-dependencies]
 solana-program-test = "1.8.0"

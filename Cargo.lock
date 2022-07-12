@@ -4322,6 +4322,7 @@ dependencies = [
  "solana-sdk",
  "solana-test-utils",
  "test-context",
+ "ticket-nft",
 ]
 
 [[package]]
