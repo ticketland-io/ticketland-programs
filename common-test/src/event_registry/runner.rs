@@ -40,9 +40,6 @@ use common::{
     currency::*,
   },
 };
-use event_registry::{
-  account_data::state::*,
-};
 use ticket_sale::account_data::event_capacity::{
   EventCapacity,
   SPACE_MARGIN as event_capacity_space_margin,

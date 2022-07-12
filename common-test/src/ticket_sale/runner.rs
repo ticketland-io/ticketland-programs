@@ -68,7 +68,7 @@ impl Runner {
       }
     }
     
-    MerkleTree::new(seats)
+    MerkleTree::new(seats.to_vec())
   }
 
   pub async fn initialize(

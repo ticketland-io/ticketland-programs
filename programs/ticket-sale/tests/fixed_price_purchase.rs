@@ -1,17 +1,24 @@
 #![cfg(feature = "test-bpf")]
-use std::{assert_eq};
+use anchor_lang::{prelude::*};
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
 use solana_program_test::{tokio};
+use common::{
+  state::{
+    ticket_type::TicketType,
+    sale_type::SaleType,
+  },
+};
+use solana_test_utils::{
+  utils::{to_base},
+};
 use common_test::{
   test_context::TestContext,
-  ticket_sale::pda,
   event_registry::{
-    runner::Runner as EventRegistryRunner,
+    runner::Runner as EventRegistryRunner, self,
   },
-  program_id::event_registry_program_id,
 };
 
 async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
@@ -44,17 +51,18 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
   )
 }
 
-async fn create_event(
-  runner: &mut EventRegistryRunner,
-  event_registry_state: &Keypair,
+async fn custom_create_event(
+  event_registry_runner: &mut EventRegistryRunner,
+  event_registry_state: Pubkey,
+  ticket_sale_program_state: Pubkey,
   event_capacity: Pubkey,
   event_id: u64,
   event_organizer: &Keypair,
   deposit_token: Pubkey,
-  ticket_types: Vec<TicketType>
+  ticket_types: &Vec<TicketType>
 ) {
-  let _ = runner.create_event(
-    state.pubkey(),
+  let _ = event_registry_runner.create_event(
+    event_registry_state,
     event_capacity,
     ticket_sale_program_state,
     event_id,
@@ -85,15 +93,20 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let event_capacity = event_registry_runner.create_event_capacity_account().await;
   let event_id = 0;
-  let event_organizer = runner.get_participant(1);
-  let deposit_token = runner.deposit_tokens[0];
+  let event_organizer = event_registry_runner.get_participant(1);
+  let deposit_token = event_registry_runner.deposit_tokens[0];
+
+  // ticket type 1 includes seats 0, 1, 2, 5, 6, 7
+  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)]);
+  // ticket type 3 includes seats 3, 4, 8, 9
+  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)]);
 
   let ticket_types = vec![
     TicketType {
       n_tickets: 50_000,
       sale_type: SaleType::FixedPrice(to_base(100, 6)),
       sale_start_time: 50,
-      merkle_root: [0; 32],
+      merkle_root: mt_type_1.root().unwrap(),
     },
     TicketType {
       n_tickets: 50_000,
@@ -104,18 +117,18 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
         drop_interval: 20 * 60,
       },
       sale_start_time: 50,
-      merkle_root: [0; 32],
+      merkle_root: mt_type_2.root().unwrap(),
     },
   ];
 
-  
   custom_create_event(
     event_registry_runner,
-    ticket_sale_runner,
-    &event_registry_state,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
     event_capacity,
     event_id,
     &event_organizer,
     deposit_token,
+    &ticket_types,
   ).await;
 }
