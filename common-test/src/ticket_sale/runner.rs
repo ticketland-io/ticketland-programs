@@ -5,6 +5,7 @@ use solana_test_utils::{
   program_test::ProgramTest,
   test_account::{TestAccount},
   spl::Spl,
+  merkle_tree::MerkleTree,
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -19,6 +20,12 @@ use solana_sdk::{
 use anchor_lang::{
   InstructionData,
   ToAccountMetas
+};
+use common::{
+  crypto::mt::{create_seat_leaf, get_null_leaf}
+};
+use ticket_sale::{
+  account_data::event_capacity::MAX_VENUE_CAPACITY,
 };
 use crate::program_id::{
   event_registry_program_id,
@@ -49,6 +56,19 @@ impl Runner {
       deployer,
       treasury,
     }
+  }
+
+  pub fn create_ticket_type_mt(&self, seat_indexes: Vec<(u32, u32)>,) -> MerkleTree {
+    let null_leaf = get_null_leaf();
+    let mut seats = [null_leaf; MAX_VENUE_CAPACITY];
+
+    for seat_range in seat_indexes {
+      for i in seat_range.0..seat_range.1 {
+        seats[i as usize] = create_seat_leaf(i, &format!("Seat-{}", i));
+      }
+    }
+    
+    MerkleTree::new(seats)
   }
 
   pub async fn initialize(
