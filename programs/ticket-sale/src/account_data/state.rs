@@ -12,6 +12,9 @@ pub struct InitBumps {
 pub struct State {
   pub bumps: InitBumps,
 
+  /// Total tickets sold for all events
+  pub total_sold: u64,
+
   /// The Event Registry Program
   pub event_registry_program: Pubkey,
 
@@ -25,5 +28,5 @@ pub struct State {
   pub deployer: Pubkey,
 
   /// The account that will be calling other programs
-  pub cpi_authority: Pubkey,
+  pub cpi_authority: Pubkey, 
 }

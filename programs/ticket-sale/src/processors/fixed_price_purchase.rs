@@ -4,6 +4,7 @@ use anchor_lang::solana_program::{
   system_instruction::transfer,
 };
 use anchor_spl::token::{self, Transfer};
+use anchor_safe_math::SafeMath;
 use common::{
   utils::bitmap,
   state::{
@@ -163,7 +164,7 @@ pub fn exec(
 
   // 4. Check that the seat_index is available
   require!(
-    bitmap::is_true::<u8, MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats),
+    bitmap::is_true::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats),
     ErrorCode::SeatNotAvailable,
   );
 
@@ -174,8 +175,14 @@ pub fn exec(
   mint_ticket(&ctx, seat_name)?;
 
   // 7. Update state
-  // - bitmap
+  bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);
+  
   // - total tickets sold (Ticket Sale State account data)
+  let state = &mut ctx.accounts.state;
+  state.total_sold = state.total_sold.safe_add(1)?;
+
   // - decrease available_tickets
+  event_capacity.available_tickets = event_capacity.available_tickets.safe_sub(1)?;
+
   Ok(())
 }

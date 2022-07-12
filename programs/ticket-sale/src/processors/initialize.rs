@@ -14,6 +14,7 @@ pub fn exec(
     cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
   };
 
+  state.total_sold = 0;
   state.event_registry_program = ctx.accounts.event_registry_program.key();
   state.event_registry_state = ctx.accounts.event_registry_state.key();
   state.treasury = treasury;
