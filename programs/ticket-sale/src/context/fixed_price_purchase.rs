@@ -19,7 +19,6 @@ use crate::{
     state::*,
     event_capacity::*,
     sale::*,
-    event::*,
   },
   utils::program_error::ErrorCode,
 };
@@ -34,13 +33,12 @@ pub struct FixedPricePurchase<'info> {
     seeds = [
       b"event",
       state.event_registry_state.key().as_ref(),
-      &event_capacity.load()?.event_id.to_string().as_ref()
+      &sale.event_id.to_string().as_ref()
     ],
     bump,
     seeds::program = state.event_registry_program,
-    constraint = event.id == sale.event_id @ ErrorCode::WrongEventAccount,
   )]
-  pub event: Box<Account<'info, Event>>,
+  pub event: AccountInfo<'info>,
 
   #[account(
     mut,
@@ -72,9 +70,7 @@ pub struct FixedPricePurchase<'info> {
   pub event_capacity: AccountLoader<'info, EventCapacity>,
 
   /// CHECK: The deposit token should be one of the supported currencies
-  #[account(
-    constraint = event.currency.mint_account == purchase_token.key() @ ErrorCode::UnsupportedPurchaseToken
-  )]
+  #[account()]
   pub purchase_token: Box<Account<'info, Mint>>,
 
   /// The deposit token ATA from which the event creation deposit will be transferred from
@@ -86,16 +82,11 @@ pub struct FixedPricePurchase<'info> {
   pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: The Sol account that organizer will receive funds from the ticket sale to
-  #[account(
-    mut,
-    constraint = event_organizer_purchase_sol_treasury.key() == event.event_organizer_treasury @ ErrorCode::WrongSolTreasury,
-  )]
+  #[account(mut)]
   pub event_organizer_purchase_sol_treasury: AccountInfo<'info>,
 
   /// CHECK: This is the event organizer of the event
-  #[account(
-    constraint = event_organizer.key() == event.event_organizer @ ErrorCode::WrongEventOrganizer,
-  )]
+  #[account()]
   pub event_organizer: AccountInfo<'info>,
 
   /// The token token account that will be receiving the service fee
@@ -138,7 +129,7 @@ pub struct FixedPricePurchase<'info> {
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
       ticket_buyer.key().as_ref(),
-      &event.id.to_string().as_ref()
+      &sale.event_id.to_string().as_ref()
     ],
     bump,
   )]
@@ -148,6 +139,7 @@ pub struct FixedPricePurchase<'info> {
   #[account(
     seeds = [b"nft_authority", ticket_nft_program_state.key().as_ref()],
     bump,
+    seeds::program = ticket_nft_program.key(),
   )]
   pub nft_authority: AccountInfo<'info>,
 
@@ -158,7 +150,8 @@ pub struct FixedPricePurchase<'info> {
       ticket_nft_program_state.key().as_ref(),
       ticket_nft.key().as_ref(),
     ],
-    bump
+    bump,
+    seeds::program = ticket_nft_program.key(),
   )]
   pub ticket_metadata: Box<Account<'info, TicketMetadata>>,
 
@@ -180,7 +173,7 @@ pub struct FixedPricePurchase<'info> {
   pub ticket_nft_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(
-    seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &event.id.to_string().as_ref()],
+    seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &sale.event_id.to_string().as_ref()],
     bump,
     seeds::program = state.event_registry_program,
   )]

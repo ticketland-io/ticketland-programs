@@ -7,6 +7,9 @@ use anchor_spl::token::{self, Transfer};
 use anchor_safe_math::SafeMath;
 use common::{
   utils::bitmap,
+  account_data::{
+    serialization::deser,
+  },
   state::{
     sale_type::*,
   },
@@ -14,7 +17,10 @@ use common::{
 };
 use crate::{
   context::fixed_price_purchase::*,
-  account_data::event_capacity::MAX_VENUE_CAPACITY,
+  account_data::{
+    event::Event,
+    event_capacity::MAX_VENUE_CAPACITY,
+  },
   acl::seat_validity,
   utils::program_error::ErrorCode,
 };
@@ -55,7 +61,7 @@ fn transfer_token<'info>(
 }
 
 /// Transfer the purchase funds to event organizer and our treasury
-fn transfer_funds(ctx: &Context<FixedPricePurchase>) -> Result<()> {
+fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()> {
   let ticket_type = &ctx.accounts.sale.ticket_type;
   let amount = if let SaleType::FixedPrice(amount) = ticket_type.sale_type {
     amount
@@ -63,7 +69,7 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>) -> Result<()> {
     // This should never happen since we already have the same check in the FixedPricePurchase context
     return Err(ErrorCode::ExpectedFixedPriceSaleAccount.into());
   };
-  let (event_organizer_amount, service_fee_amount) = ctx.accounts.event.currency.calc_fee(amount)?;
+  let (event_organizer_amount, service_fee_amount) = event.currency.calc_fee(amount)?;
 
   if is_wrapped_sol(ctx.accounts.purchase_token.key()) {
     // send to event organizer
@@ -134,11 +140,34 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_name: String) -> Result<(
   ticket_nft::cpi::create_ticket(
     cpi_ctx,
 		ctx.accounts.state.bumps.cpi_authority,
-		ctx.accounts.event.id,
+		ctx.accounts.sale.event_id,
 		seat_name,
   )?;
 
   todo!()
+}
+
+/// The main issue stems from the fact that we can't have the following account in the FixedPricePurchase context
+///  
+/// `pub event: Box<Account<'info, Event>>`
+/// 
+/// The reason is how Anchor does the account checks. For details check https://docs.rs/anchor-lang/0.25.0/anchor_lang/accounts/account/struct.Account.html
+/// In essence, anchor will try to check that `Account.info.owner == Event::owner()` is true.
+/// Event::owner is by default crate::ID that is the id of the ticket sale program. However, the account itself was created
+/// in the Event Registry Program and thus `Account.info.owner` will have that program's address.
+/// We could implement the `Owner` trait https://docs.rs/anchor-lang/0.25.0/anchor_lang/trait.Owner.html and return the 
+/// Event Registry program address, but that would mean we would have to hard code that address which is against the flexibility
+/// we've provided by storing the Event Registry program address in `state` account of this program.
+/// For this reason we will do a few manual checks that we did the declarative constraint macro in the Context.
+fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()>  {
+  let sale = &ctx.accounts.sale;
+
+  require!(event.id == sale.event_id, ErrorCode::WrongEventAccount);
+  require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
+  require!(event.event_organizer_treasury == ctx.accounts.event_organizer_purchase_sol_treasury.key(), ErrorCode::WrongSolTreasury);
+  require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
+
+  Ok(())
 }
 
 // 1. Make sure that the given params belong to the Sale's ticket_type sparse MT
@@ -154,6 +183,15 @@ pub fn exec(
   seat_name: String,
   merkle_proof: Vec<[u8; 32]>,
 ) -> Result<()> {
+  let event: Event = deser(
+    ctx.accounts.event.clone(),
+    // discriminator is essentially sha256("account:Event")[0:8]. To avoid consuming the computation budget
+    // we use this as a pre-computed hard-coded value
+    &[125, 192, 125, 158, 9, 115, 152, 233]
+  )?;
+
+  account_checks(&ctx, &event)?;
+
   // 2. Has sale started?
   let sale = &ctx.accounts.sale;
   require!(Clock::get().unwrap().slot >= sale.ticket_type.sale_start_time, ErrorCode::SaleNotStarted);
@@ -169,7 +207,7 @@ pub fn exec(
   );
 
   // 5. Transfer funds
-  transfer_funds(&ctx)?;
+  transfer_funds(&ctx, &event)?;
 
   // 6. CPI to Ticket NFT program to mint the ticket
   mint_ticket(&ctx, seat_name)?;

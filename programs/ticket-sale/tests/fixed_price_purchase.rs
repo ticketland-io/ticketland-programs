@@ -1,5 +1,5 @@
 #![cfg(feature = "test-bpf")]
-use anchor_lang::{Pubkey};
+use anchor_lang::{prelude::{Pubkey}};
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
