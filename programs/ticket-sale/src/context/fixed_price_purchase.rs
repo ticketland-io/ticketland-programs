@@ -26,7 +26,7 @@ use crate::{
 #[derive(Accounts)]
 pub struct FixedPricePurchase<'info> {
   #[account(mut)]
-  pub state: Account<'info, State>,
+  pub state: Box<Account<'info, State>>,
 
   // The newly created event
   #[account(
@@ -51,7 +51,7 @@ pub struct FixedPricePurchase<'info> {
     bump = sale.bump,
     constraint = !sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::ExpectedFixedPriceSaleAccount,
   )]
-  pub sale: Account<'info, Sale>,
+  pub sale: Box<Account<'info, Sale>>,
 
   /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(
