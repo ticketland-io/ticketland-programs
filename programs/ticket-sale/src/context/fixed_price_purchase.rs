@@ -170,7 +170,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub ticket_metaplex_metadata: AccountInfo<'info>,
 
-  /// The ATA that is a PDA controlled by the Ticket sale program and will be the owner of the Ticket NFT
+  /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.
   #[account(
     associated_token::mint = ticket_nft,
@@ -193,9 +193,13 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_nft_metadata: AccountInfo<'info>,
 
-  associated_token_program: Program<'info, AssociatedToken>,
   /// CHECK: This is the ticket sale program account
   pub ticket_nft_program: Program<'info, TicketNft>,
 
   pub token_program: Program<'info, Token>,
+  pub associated_token_program: Program<'info, AssociatedToken>,
+  /// CHECK: The metadata program
+  pub metadata_program: AccountInfo<'info>,
+  pub system_program: Program<'info, System>,
+  pub rent: Sysvar<'info, Rent>,
 }

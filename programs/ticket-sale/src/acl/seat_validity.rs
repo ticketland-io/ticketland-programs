@@ -9,7 +9,7 @@ pub fn verify<'info>(
   merkle_root: [u8; 32],
   merkle_proof: Vec<[u8; 32]>,
   seat_index: u32,
-  seat_name: String,
+  seat_name: &String,
 ) -> Result<()> {
   // Create the Leaf which is hashv(seat_index || "." || seat_name)
   let leaf = hashv(&[
