@@ -37,6 +37,7 @@ pub struct FixedPricePurchase<'info> {
       &event_capacity.load()?.event_id.to_string().as_ref()
     ],
     bump,
+    seeds::program = state.event_registry_program,
     constraint = event.id == sale.event_id @ ErrorCode::WrongEventAccount,
   )]
   pub event: Box<Account<'info, Event>>,
@@ -84,7 +85,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
-  /// CHECK: The Sol account that organizer will receive funds from the ticket sale  to
+  /// CHECK: The Sol account that organizer will receive funds from the ticket sale to
   #[account(
     mut,
     constraint = event_organizer_purchase_sol_treasury.key() == event.event_organizer_treasury @ ErrorCode::WrongSolTreasury,
@@ -97,7 +98,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_organizer: AccountInfo<'info>,
 
-  /// The deposit token ATA from which the event creation deposit will be transferred from
+  /// The token token account that will be receiving the service fee
   #[account(
     mut,
     associated_token::mint = purchase_token,
@@ -181,6 +182,7 @@ pub struct FixedPricePurchase<'info> {
   #[account(
     seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &event.id.to_string().as_ref()],
     bump,
+    seeds::program = state.event_registry_program,
   )]
   pub event_nft: Box<Account<'info, Mint>>,
 

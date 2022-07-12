@@ -11,3 +11,26 @@ pub fn nft_authority(state: &Pubkey) -> (Pubkey, u8) {
     &ticket_nft_program_id()
   )
 }
+
+pub fn ticket_nft(
+  state: &Pubkey,
+  ticket_buyer: &Pubkey,
+  event_id: u64,
+) -> (Pubkey, u8) {
+  Pubkey::find_program_address(
+    &[
+      b"ticket_nft",
+      state.as_ref(),
+      ticket_buyer.as_ref(),
+      event_id.to_string().as_ref()
+    ],
+    &ticket_nft_program_id()
+  )
+}
+
+pub fn ticket_metadata(state: &Pubkey, ticket_nft: &Pubkey) -> (Pubkey, u8) {
+  Pubkey::find_program_address(
+    &[b"ticket_metadata", state.as_ref(), ticket_nft.as_ref()],
+    &ticket_nft_program_id()
+  )
+}

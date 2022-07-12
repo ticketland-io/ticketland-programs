@@ -1,5 +1,5 @@
 #![cfg(feature = "test-bpf")]
-use anchor_lang::{prelude::*};
+use anchor_lang::{Pubkey};
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -17,7 +17,10 @@ use solana_test_utils::{
 use common_test::{
   test_context::TestContext,
   event_registry::{
-    runner::Runner as EventRegistryRunner, self,
+    runner::Runner as EventRegistryRunner,
+  },
+  ticket_sale::{
+    runner::Runner as TicketSaleRunner,
   },
 };
 
@@ -58,6 +61,7 @@ async fn custom_create_event(
   event_capacity: Pubkey,
   event_id: u64,
   event_organizer: &Keypair,
+  event_organizer_treasury: Pubkey,
   deposit_token: Pubkey,
   ticket_types: &Vec<TicketType>
 ) {
@@ -69,7 +73,7 @@ async fn custom_create_event(
     deposit_token,
     deposit_token,
     &event_organizer,
-    event_organizer.pubkey(),
+    event_organizer_treasury,
     10, // num of tickets
     100,
 		1000,
@@ -128,7 +132,29 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     event_capacity,
     event_id,
     &event_organizer,
+    event_organizer.pubkey(),
     deposit_token,
     &ticket_types,
   ).await;
+
+  let ticket_buyer = event_registry_runner.get_participant(2);
+  let purchase_token = event_registry_runner.deposit_tokens[0];
+
+  let result = ticket_sale_runner.fixed_price_purchase(
+    &ticket_buyer,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    event_capacity,
+    purchase_token,
+    event_organizer.pubkey(),
+    event_organizer.pubkey(),
+    ticket_nft_state.pubkey(),
+    event_id,
+    0, // ticket_type_index
+    0, // seat_index,
+		TicketSaleRunner::dummy_seat_name(0),
+		mt_type_1.proof(&[0]), // proof path for leaf 0
+  ).await;
+
+  assert!(result.is_ok());
 }
