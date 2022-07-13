@@ -1,11 +1,28 @@
 #![cfg(feature = "test-bpf")]
-use std::println;
-
-use anchor_lang::{prelude::{Pubkey}};
+use anchor_lang::{
+  prelude::{
+    Pubkey,
+  },
+  AccountDeserialize,
+};
 use test_context::{test_context, futures};
+use solana_test_utils::{
+  spl::Spl,
+};
 use solana_sdk::{
   signature::{Signer, Keypair},
   native_token::sol_to_lamports,
+};
+use anchor_spl::{
+  token::{Mint as TokenMint, TokenAccount},
+};
+use anchor_metaplex::{
+  mpl_token_metadata::{
+    deser::meta_deser,
+    pda::{
+      find_metadata_account,
+    },
+  },
 };
 use solana_program_test::{tokio};
 use common::{
@@ -24,6 +41,10 @@ use common_test::{
   },
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
+    pda as TickerSalePda,
+  },
+  ticket_nft::{
+    pda as TicketNftPda,
   },
 };
 
@@ -170,7 +191,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     event_organizer_funds_before = pt.context.banks_client.get_account(event_organizer.pubkey()).await.unwrap().unwrap();
     treasury_funds_before = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
   }
-  
+
   let result = ticket_sale_runner.fixed_price_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
@@ -200,5 +221,46 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     // 5% feeds go to treasury
     let treasury_funds_after = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
     assert_eq!(treasury_funds_after.lamports - treasury_funds_before.lamports, sol_to_lamports(0.05_f64));
+  }
+
+  // ticket nft Mint account and Metaplex metadata
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let nft_authority = TicketNftPda::nft_authority(&ticket_nft_state.pubkey()).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), event_id).0;
+    let ticket_nft_data = pt.context.banks_client.get_account(ticket_nft).await.unwrap().unwrap();
+    let ticket_nft_data = TokenMint::try_deserialize_unchecked(&mut &ticket_nft_data.data[..]).unwrap();
+    
+    // mint authority is transferred to the master edition when the latter is created
+    assert_eq!(ticket_nft_data.mint_authority.unwrap(), nft_authority);
+    assert_eq!(ticket_nft_data.supply, 1);
+
+    // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA
+    // controlled by the ticket sale program.
+    let ticket_sale_cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state.pubkey()).0;
+    let ticket_nft_ata = Spl::get_associated_token_address(&ticket_sale_cpi_authority, &ticket_nft);
+    let ticket_nft_ata_data = pt.context.banks_client.get_account(ticket_nft_ata).await.unwrap().unwrap();
+    let ticket_nft_ata_data = TokenAccount::try_deserialize_unchecked(&mut &ticket_nft_ata_data.data[..]).unwrap();
+
+    assert_eq!(ticket_nft_ata_data.mint, ticket_nft);
+    assert_eq!(ticket_nft_ata_data.owner, ticket_sale_cpi_authority);
+    assert_eq!(ticket_nft_ata_data.amount, 1);
+
+    // metaplex
+    let metadata = find_metadata_account(&ticket_nft).0;
+    let account = pt.context.banks_client.get_account(metadata).await.unwrap().unwrap();
+    let metadata = meta_deser(&mut &account.data[..]).unwrap();
+
+    assert_eq!(metadata.update_authority, nft_authority);
+    assert_eq!(metadata.mint, ticket_nft);
+    assert_eq!(metadata.collection, None);
+    assert_eq!(metadata.data.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
+    assert_eq!(metadata.data.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
+    assert_eq!(metadata.data.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
+    assert_eq!(metadata.data.seller_fee_basis_points, 0);
+  }
+
+  {
+
   }
 }
