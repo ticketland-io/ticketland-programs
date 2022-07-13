@@ -48,7 +48,7 @@ pub struct FixedPricePurchase<'info> {
       sale.event_id.to_string().as_ref()
     ],
     bump = sale.bump,
-    constraint = !sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::ExpectedFixedPriceSaleAccount,
+    constraint = sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::ExpectedFixedPriceSaleAccount,
   )]
   pub sale: Box<Account<'info, Sale>>,
 
@@ -64,7 +64,7 @@ pub struct FixedPricePurchase<'info> {
   #[account(
     mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
-    constraint = event_capacity.key() == sale.event_capacity @ ErrorCode::WrongEventCapacityAccount,
+    constraint = event_capacity.key() == event.event_capacity @ ErrorCode::WrongEventCapacityAccount,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,
 

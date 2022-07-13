@@ -20,7 +20,4 @@ pub struct Sale {
 
   /// The ticket type that decides the sale mechanism
   pub ticket_type: TicketType,
-
-  /// The public key of the event capacity. This makes it easy
-  pub event_capacity: Pubkey,
 }

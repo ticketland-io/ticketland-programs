@@ -8,7 +8,7 @@ pub enum ErrorCode {
   NotOwnedByThisProgram,
   #[msg("Not event account")]
   WrongEventAccount,
-  #[msg("Not event capacity account")]
+  #[msg("Wrong event capacity")]
   WrongEventCapacityAccount,
   #[msg("Invalid Merkle proof")]
   InvalidProof,
