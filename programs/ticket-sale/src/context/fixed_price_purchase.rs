@@ -5,7 +5,6 @@ use anchor_spl::{
 };
 use ticket_nft::{
   program::TicketNft,
-  account_data::ticket_metadata::TicketMetadata,
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
@@ -124,6 +123,9 @@ pub struct FixedPricePurchase<'info> {
   pub ticket_nft_program_state: AccountInfo<'info>,
 
   /// The underlying Ticket NFT Mint account
+  /// We use AccountInfo instead of Account<'info, Mint> because the latter will check if the 
+  /// account is initialized. However, this account will be initialized in the Ticket NFT program after
+  /// the CPI is done.
   #[account(
     seeds = [
       b"ticket_nft",
@@ -133,7 +135,7 @@ pub struct FixedPricePurchase<'info> {
     ],
     bump,
   )]
-  pub ticket_nft: Box<Account<'info, Mint>>,
+  pub ticket_nft: AccountInfo<'info>,
 
   /// CHECK: The authority of all NFTs
   #[account(
@@ -153,7 +155,7 @@ pub struct FixedPricePurchase<'info> {
     bump,
     seeds::program = ticket_nft_program.key(),
   )]
-  pub ticket_metadata: Box<Account<'info, TicketMetadata>>,
+  pub ticket_metadata: AccountInfo<'info>,
 
   /// CHECK: The metaplex metadata account that will be initialized in the processor
   #[account(
@@ -166,11 +168,17 @@ pub struct FixedPricePurchase<'info> {
 
   /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.
-  #[account(
-    associated_token::mint = ticket_nft,
-    associated_token::authority = cpi_authority,
-  )]
-  pub ticket_nft_ata: Box<Account<'info, TokenAccount>>,
+  /// We use AccountInfo for the reason explained above. Also we can add these constraints.
+  /// 
+  /// ```
+  /// associated_token::mint = ticket_nft,
+  /// associated_token::authority = cpi_authority,
+  /// ```
+  /// 
+  /// If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is
+  /// not account yet; it will be created in the Ticket NFT Program
+  #[account()]
+  pub ticket_nft_ata: AccountInfo<'info>,
 
   #[account(
     seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &sale.event_id.to_string().as_ref()],
