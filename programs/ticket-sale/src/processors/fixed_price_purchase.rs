@@ -166,7 +166,7 @@ fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
   require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
   require!(event.event_organizer_treasury == ctx.accounts.event_organizer_purchase_sol_treasury.key(), ErrorCode::WrongSolTreasury);
   require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
-
+  require!(event.event_capacity == ctx.accounts.event_capacity.key(), ErrorCode::WrongEventCapacityAccount);
   Ok(())
 }
 

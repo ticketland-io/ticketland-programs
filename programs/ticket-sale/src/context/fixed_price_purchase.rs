@@ -27,7 +27,7 @@ pub struct FixedPricePurchase<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
 
-  // The newly created event
+  /// CHECK: The Event account
   #[account(
     seeds = [
       b"event",
@@ -64,7 +64,6 @@ pub struct FixedPricePurchase<'info> {
   #[account(
     mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
-    constraint = event_capacity.key() == event.event_capacity @ ErrorCode::WrongEventCapacityAccount,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,
 
@@ -122,7 +121,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub ticket_nft_program_state: AccountInfo<'info>,
 
-  /// The underlying Ticket NFT Mint account
+  /// CHECK: The underlying Ticket NFT Mint account
   /// We use AccountInfo instead of Account<'info, Mint> because the latter will check if the 
   /// account is initialized. However, this account will be initialized in the Ticket NFT program after
   /// the CPI is done.
@@ -145,7 +144,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub nft_authority: AccountInfo<'info>,
 
-  /// The newly created Ticket Metadata 
+  /// CHECK: The newly created Ticket Metadata 
   #[account(
     seeds = [
       b"ticket_metadata",
@@ -166,6 +165,7 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub ticket_metaplex_metadata: AccountInfo<'info>,
 
+  /// CHECK:
   /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.
   /// We use AccountInfo for the reason explained above. Also we can add these constraints.
