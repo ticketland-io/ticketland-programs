@@ -81,7 +81,7 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
 
     // send to treasury
     transfer_sol(
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
       ctx.accounts.treasury.to_account_info().clone(),
       service_fee_amount,
     )?;

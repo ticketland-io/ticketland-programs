@@ -1,4 +1,6 @@
 #![cfg(feature = "test-bpf")]
+use std::println;
+
 use anchor_lang::{prelude::{Pubkey}};
 use test_context::{test_context, futures};
 use solana_sdk::{
@@ -101,7 +103,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   let event_capacity = event_registry_runner.create_event_capacity_account().await;
   let event_id = 0;
   let event_organizer = event_registry_runner.get_participant(1);
-  let deposit_token = event_registry_runner.deposit_tokens[0];
+  let deposit_token = event_registry_runner.deposit_tokens[2];
 
   // ticket type 1 includes seats 0, 1, 2, 5, 6, 7
   let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)]);
@@ -139,7 +141,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     deposit_token,
     &ticket_types,
   ).await;
-
+  
   // Create a new ticket sale for the first ticket type
   let _ = event_registry_runner.create_ticket_sale(
     event_registry_state.pubkey(),
@@ -151,7 +153,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   ).await;
 
   let ticket_buyer = event_registry_runner.get_participant(2);
-  let purchase_token = event_registry_runner.deposit_tokens[0];
+  let purchase_token = event_registry_runner.deposit_tokens[2];
 
   // move to the start of sale
   {
@@ -159,6 +161,16 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     pt.context.warp_to_slot(11).unwrap();
   }
 
+  let event_organizer_funds_before;
+  let treasury_funds_before;
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let treasury = ticket_sale_runner.treasury.pubkey();
+
+    event_organizer_funds_before = pt.context.banks_client.get_account(event_organizer.pubkey()).await.unwrap().unwrap();
+    treasury_funds_before = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
+  }
+  
   let result = ticket_sale_runner.fixed_price_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
@@ -176,4 +188,17 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   ).await;
 
   assert!(result.is_ok());
+
+  // funds are transferred
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let treasury = ticket_sale_runner.treasury.pubkey();
+    
+    let event_organizer_funds_after = pt.context.banks_client.get_account(event_organizer.pubkey()).await.unwrap().unwrap();
+    assert_eq!(event_organizer_funds_after.lamports - event_organizer_funds_before.lamports, sol_to_lamports(0.95_f64));
+
+    // 5% feeds go to treasury
+    let treasury_funds_after = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
+    assert_eq!(treasury_funds_after.lamports - treasury_funds_before.lamports, sol_to_lamports(0.05_f64));
+  }
 }

@@ -97,6 +97,7 @@ pub struct FixedPricePurchase<'info> {
 
   /// CHECK: This is ticketland.io treasury address
   #[account(
+    mut,
     constraint = treasury.key() == state.treasury @ ErrorCode::WrongTreasuryAccount,
   )]
   pub treasury: AccountInfo<'info>,

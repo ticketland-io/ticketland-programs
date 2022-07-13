@@ -21,6 +21,6 @@ impl Currency {
   
     let event_organizer_amount = amount.safe_sub(service_fee)?;
     
-    Ok((service_fee, event_organizer_amount))
+    Ok((event_organizer_amount, service_fee))
   }
 }

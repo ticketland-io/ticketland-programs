@@ -33,7 +33,7 @@ impl AsyncTestContext for TestContext {
     ProgramTest::add_program(&mut program_test, "ticket_nft", ticket_nft_program_id(), None);
     ProgramTest::add_program(&mut program_test, "mpl_token_metadata", metadata_id, None);
     
-    program_test.set_compute_max_units(250_000);
+    program_test.set_compute_max_units(500_000);
 
     let pt = ProgramTest::start_new(program_test).await;
     let pt = Arc::new(Mutex::new(pt));

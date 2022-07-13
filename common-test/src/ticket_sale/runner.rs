@@ -170,30 +170,6 @@ impl Runner {
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
 
-    println!("ticket_sale_state {:?}", ticket_sale_state);
-    println!("event {:?}", EventRegistryPda::event(&event_registry_state, event_id).0);
-    println!("sale {:?}", TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0);
-    println!("cpi_authority {:?}", cpi_authority);
-    println!("event_capacity {:?}", event_capacity);
-    println!("purchase_token {:?}", purchase_token);
-    println!("event_organizer_purchase_token_ata {:?}", Spl::get_associated_token_address(&event_organizer, &purchase_token));
-    println!("event_organizer_purchase_sol_treasury {:?}", event_organizer_treasury);
-    println!("event_organizer {:?}", event_organizer);
-    println!("service_fee_ata {:?}", Spl::get_associated_token_address(&self.treasury.pubkey(), &purchase_token));
-    println!("treasury {:?}", self.treasury.pubkey());
-    println!("ticket_buyer_ata {:?}", Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token));
-    println!("ticket_buyer {:?}", ticket_buyer.pubkey());
-    println!("ticket_nft_program_state {:?}", ticket_nft_program_state);
-    println!("ticket_nft {:?}", ticket_nft);
-    println!("nft_authority {:?}", TicketNftPda::nft_authority(&ticket_nft_program_state).0);
-    println!("ticket_metadata {:?}", TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0);
-    println!("ticket_metaplex_metadata {:?}", find_metadata_account(&ticket_nft).0);
-    println!("ticket_nft_ata {:?}", Spl::get_associated_token_address(&cpi_authority, &ticket_nft));
-    println!("event_nft {:?}", event_nft);
-    println!("event_nft_metadata {:?}", find_metadata_account(&event_nft).0);
-    println!("ticket_nft_program {:?}", ticket_nft_program_id());
-
-
     let accounts = ticket_sale::accounts::FixedPricePurchase {
       state: ticket_sale_state,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
