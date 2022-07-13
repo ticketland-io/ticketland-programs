@@ -174,10 +174,8 @@ pub struct FixedPricePurchase<'info> {
   /// until the end of the event.
   /// We use AccountInfo for the reason explained above. Also we can add these constraints.
   /// 
-  /// ```
   /// associated_token::mint = ticket_nft,
   /// associated_token::authority = cpi_authority,
-  /// ```
   /// 
   /// If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is
   /// not account yet; it will be created in the Ticket NFT Program
