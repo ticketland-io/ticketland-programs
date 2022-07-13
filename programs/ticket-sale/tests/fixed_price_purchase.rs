@@ -8,6 +8,7 @@ use anchor_lang::{
 use test_context::{test_context, futures};
 use solana_test_utils::{
   spl::Spl,
+  serialization::deser_zero_account,
 };
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -26,6 +27,7 @@ use anchor_metaplex::{
 };
 use solana_program_test::{tokio};
 use common::{
+  utils::bitmap,
   state::{
     ticket_type::TicketType,
     sale_type::SaleType,
@@ -46,6 +48,9 @@ use common_test::{
   ticket_nft::{
     pda as TicketNftPda,
   },
+};
+use ticket_sale::{
+  account_data::event_capacity::EventCapacity,
 };
 
 async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
@@ -192,6 +197,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     treasury_funds_before = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
   }
 
+  let seat_index = 0;
   let result = ticket_sale_runner.fixed_price_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
@@ -203,7 +209,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     ticket_nft_state.pubkey(),
     event_id,
     0, // ticket_type_index
-    0, // seat_index,
+    seat_index,
 		TicketSaleRunner::dummy_seat_name(0),
 		mt_type_1.proof(&[0]), // proof path for leaf 0
   ).await;
@@ -223,11 +229,12 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     assert_eq!(treasury_funds_after.lamports - treasury_funds_before.lamports, sol_to_lamports(0.05_f64));
   }
 
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), event_id).0;
+
   // ticket nft Mint account and Metaplex metadata
   {
     let mut pt = ticket_sale_runner.pt.lock().await;
     let nft_authority = TicketNftPda::nft_authority(&ticket_nft_state.pubkey()).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), event_id).0;
     let ticket_nft_data = pt.context.banks_client.get_account(ticket_nft).await.unwrap().unwrap();
     let ticket_nft_data = TokenMint::try_deserialize_unchecked(&mut &ticket_nft_data.data[..]).unwrap();
     
@@ -260,7 +267,36 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     assert_eq!(metadata.data.seller_fee_basis_points, 0);
   }
 
+  // Check out custom Ticket Metadata
   {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+    let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
+    let metaplex_metadata = find_metadata_account(&ticket_nft).0;
 
+    assert_eq!(ticket_metadata.event_id, event_id);
+    assert_eq!(ticket_metadata.metadata, metaplex_metadata);
+    assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
+    assert_eq!(ticket_metadata.attended, false);
+  }
+
+  // Ticket sale state is updated
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let ticket_metadata = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
+
+    assert_eq!(ticket_metadata.total_sold, 1);
+  }
+
+  // Event capacity is updated
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let event_capacity = pt.context.banks_client.get_account(event_capacity).await.unwrap().unwrap();
+    let event_capacity = deser_zero_account::<EventCapacity>(&event_capacity.data);
+
+    assert!(bitmap::is_set::<100_000>(seat_index, &event_capacity.seats));
+    assert_eq!(event_capacity.available_tickets, 9);
+    assert_eq!(event_capacity.is_initialized, true);
+    assert_eq!(event_capacity.event_id, event_id);
   }
 }

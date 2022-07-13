@@ -3823,13 +3823,14 @@ dependencies = [
 
 [[package]]
 name = "solana-test-utils"
-version = "0.2.10"
-source = "git+https://github.com/Apocentre/solana-test-utils#b564370ae1aa176e98e6b01fa3e2a3a8e89cf15c"
+version = "0.2.12"
+source = "git+https://github.com/Apocentre/solana-test-utils#982a9d0b325c2aa2a29d23176ebb043bf4526677"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "bincode",
  "borsh",
+ "bytemuck",
  "futures",
  "rs_merkle",
  "solana-program-runtime",
