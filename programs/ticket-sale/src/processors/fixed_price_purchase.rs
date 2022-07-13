@@ -183,12 +183,7 @@ pub fn exec(
   seat_name: String,
   merkle_proof: Vec<[u8; 32]>,
 ) -> Result<()> {
-  let event: Event = deser(
-    ctx.accounts.event.clone(),
-    // discriminator is essentially sha256("account:Event")[0:8]. To avoid consuming the computation budget
-    // we use this as a pre-computed hard-coded value
-    &[125, 192, 125, 158, 9, 115, 152, 233]
-  )?;
+  let event: Event = deser(ctx.accounts.event.clone())?;
 
   account_checks(&ctx, &event)?;
 
