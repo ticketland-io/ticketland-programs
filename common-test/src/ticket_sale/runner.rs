@@ -141,6 +141,15 @@ impl Runner {
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
   }
 
+  pub async fn create_treasury_atas(&mut self, tokens: &Vec<Pubkey>,) {
+    for token in tokens {
+      let _ = self.spl.create_associated_account(
+        &self.treasury.pubkey(), 
+        &token
+      ).await;
+    }
+  }
+
   pub async fn fixed_price_purchase(
     &mut self,
     ticket_buyer: &Keypair,

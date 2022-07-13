@@ -3,6 +3,7 @@ use anchor_lang::{prelude::{Pubkey}};
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
+  native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
 use common::{
@@ -11,9 +12,9 @@ use common::{
     sale_type::SaleType,
   },
 };
-use solana_test_utils::{
-  utils::{to_base},
-};
+// use solana_test_utils::{
+//   utils::{to_base},
+// };
 use common_test::{
   test_context::TestContext,
   event_registry::{
@@ -41,6 +42,8 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
     &ticket_sale_state,
     event_registry_state.pubkey(),
   ).await;
+
+  ticket_sale_runner.create_treasury_atas(&event_registry_runner.deposit_tokens.clone()).await;
 
   ticket_nft_runner.initialize(
     &ticket_nft_state,
@@ -107,13 +110,13 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
 
   let ticket_types = vec![
     TicketType {
-      n_tickets: 50_000,
-      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      n_tickets: 4,
+      sale_type: SaleType::FixedPrice(sol_to_lamports(1_f64)),
       sale_start_time: 50,
       merkle_root: mt_type_1.root().unwrap(),
     },
     TicketType {
-      n_tickets: 50_000,
+      n_tickets: 6,
       sale_type: SaleType::DutchAuction {
         start_price: 150,
         end_price: 110,
@@ -135,6 +138,16 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     event_organizer.pubkey(),
     deposit_token,
     &ticket_types,
+  ).await;
+
+  // Create a new ticket sale for the first ticket type
+  let _ = event_registry_runner.create_ticket_sale(
+    event_registry_state.pubkey(),
+    event_id,
+    &event_organizer,
+    ticket_sale_state.pubkey(),
+    0, // ticket_type_index
+    ticket_types[0].clone(),
   ).await;
 
   let ticket_buyer = event_registry_runner.get_participant(2);
