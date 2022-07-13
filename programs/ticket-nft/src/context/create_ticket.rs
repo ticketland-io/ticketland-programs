@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, event_id: u64, event_registry_state: Pubkey)]
+#[instruction(cpi_authority_bump: u8, event_id: u64)]
 pub struct CreateTicket<'info> {
   #[account()]
   pub state: Box<Account<'info, State>>,

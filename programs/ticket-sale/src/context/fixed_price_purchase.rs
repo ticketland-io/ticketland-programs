@@ -126,6 +126,7 @@ pub struct FixedPricePurchase<'info> {
   /// account is initialized. However, this account will be initialized in the Ticket NFT program after
   /// the CPI is done.
   #[account(
+    mut,
     seeds = [
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
@@ -147,6 +148,7 @@ pub struct FixedPricePurchase<'info> {
 
   /// CHECK: The newly created Ticket Metadata 
   #[account(
+    mut,
     seeds = [
       b"ticket_metadata",
       ticket_nft_program_state.key().as_ref(),
@@ -178,7 +180,7 @@ pub struct FixedPricePurchase<'info> {
   /// 
   /// If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is
   /// not account yet; it will be created in the Ticket NFT Program
-  #[account()]
+  #[account(mut)]
   pub ticket_nft_ata: AccountInfo<'info>,
 
   #[account(

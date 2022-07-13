@@ -112,7 +112,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     TicketType {
       n_tickets: 4,
       sale_type: SaleType::FixedPrice(sol_to_lamports(1_f64)),
-      sale_start_time: 50,
+      sale_start_time: 10,
       merkle_root: mt_type_1.root().unwrap(),
     },
     TicketType {
@@ -123,7 +123,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
         curve_length: 200 * 60,
         drop_interval: 20 * 60,
       },
-      sale_start_time: 50,
+      sale_start_time: 15,
       merkle_root: mt_type_2.root().unwrap(),
     },
   ];
@@ -152,6 +152,12 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
 
   let ticket_buyer = event_registry_runner.get_participant(2);
   let purchase_token = event_registry_runner.deposit_tokens[0];
+
+  // move to the start of sale
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.context.warp_to_slot(11).unwrap();
+  }
 
   let result = ticket_sale_runner.fixed_price_purchase(
     &ticket_buyer,

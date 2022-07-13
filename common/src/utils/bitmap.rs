@@ -7,7 +7,7 @@ fn index_to_byte_and_bit(index: u32) -> (usize, usize, usize) {
 }
 
 /// Checks if the value at the given index is true or false
-pub fn is_true<const COUNT: usize>(index: u32, bitmap: &[u8; COUNT]) -> bool {
+pub fn is_set<const COUNT: usize>(index: u32, bitmap: &[u8; COUNT]) -> bool {
   let (byte, bit, _) = index_to_byte_and_bit(index);
 
   (bitmap[byte] >> bit) % 2 == 1

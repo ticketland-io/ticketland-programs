@@ -75,7 +75,7 @@ pub fn exec(
   let state_key = state.key();
 
   let seeds: &[&[u8]] = &[
-    b"jnft_authority", state_key.as_ref(),
+    b"nft_authority", state_key.as_ref(),
     &[state.bumps.nft_authority]
   ];
   let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];

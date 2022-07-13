@@ -144,7 +144,7 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_name: String) -> Result<(
 		seat_name,
   )?;
 
-  todo!()
+  Ok(())
 }
 
 /// The main issue stems from the fact that we can't have the following account in the FixedPricePurchase context
@@ -191,13 +191,13 @@ pub fn exec(
   let sale = &ctx.accounts.sale;
   require!(Clock::get().unwrap().slot >= sale.ticket_type.sale_start_time, ErrorCode::SaleNotStarted);
 
-  let event_capacity = &mut ctx.accounts.event_capacity.load_mut()?;
   // 3. Are there any available seats for this type of ticket
+  let event_capacity = &mut ctx.accounts.event_capacity.load_mut()?;
   require!(event_capacity.available_tickets > 0, ErrorCode::TicketSoldOut);
 
   // 4. Check that the seat_index is available
   require!(
-    bitmap::is_true::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats),
+    !bitmap::is_set::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats),
     ErrorCode::SeatNotAvailable,
   );
 
