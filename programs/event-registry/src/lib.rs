@@ -5,11 +5,11 @@ pub mod utils;
 
 use anchor_lang::prelude::*;
 use common::{
-  state::{
-    alias::*,
+	state::{
+		alias::*,
 		currency::*,
-    ticket_type::TicketType,
-  },
+		ticket_type::TicketType,
+	},
 };
 use crate::{
 	context::{
@@ -41,7 +41,7 @@ use super::*;
 		supported_currencies: Vec<Currency>,
 		seller_fee_basis_points: u16,
 	) -> Result<()> {
-    processors::initialize::exec(
+		processors::initialize::exec(
 			ctx,
 			supported_currencies,
 			seller_fee_basis_points,
@@ -71,7 +71,7 @@ use super::*;
 		symbol: String,
 		uri: String,
 	) -> Result<()> {
-    processors::create_event::exec(
+		processors::create_event::exec(
 			ctx,
 			event_organizer_treasury,
 			n_tickets,
