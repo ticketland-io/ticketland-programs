@@ -16,6 +16,7 @@ use crate::{
 		initialize::*,
 		create_event::*,
 		create_ticket_sale::*,
+		update_supported_currencies::*,
 	},
 };
 
@@ -103,6 +104,24 @@ use super::*;
 			ctx,
 			ticket_type_index,
 			ticket_type,
+		)
+	}
+
+	/// Allows the deployer to update the supported currencies
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `supported_currencies` - The list of currencies the current instant will support. These are the
+	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to 
+	/// create a new event
+	pub fn update_supported_currencies(
+		ctx: Context<UpdateSupportedCurrencies>,
+		supported_currencies: Vec<Currency>,
+	) -> Result<()> {
+		processors::update_supported_currencies::exec(
+			ctx,
+			supported_currencies,
 		)
 	}
 }
