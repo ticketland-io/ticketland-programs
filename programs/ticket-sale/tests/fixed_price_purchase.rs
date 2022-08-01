@@ -33,9 +33,6 @@ use common::{
     sale_type::SaleType,
   },
 };
-// use solana_test_utils::{
-//   utils::{to_base},
-// };
 use common_test::{
   test_context::TestContext,
   event_registry::{
@@ -50,7 +47,7 @@ use common_test::{
   },
 };
 use ticket_sale::{
-  account_data::event_capacity::EventCapacity,
+  account_data::event_capacity::{EventCapacity, MAX_VENUE_CAPACITY},
 };
 
 async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
@@ -294,7 +291,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     let event_capacity = pt.context.banks_client.get_account(event_capacity).await.unwrap().unwrap();
     let event_capacity = deser_zero_account::<EventCapacity>(&event_capacity.data);
 
-    assert!(bitmap::is_set::<100_000>(seat_index, &event_capacity.seats));
+    assert!(bitmap::is_set::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats));
     assert_eq!(event_capacity.available_tickets, 9);
     assert_eq!(event_capacity.is_initialized, true);
     assert_eq!(event_capacity.event_id, event_id);
