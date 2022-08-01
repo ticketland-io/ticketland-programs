@@ -85,7 +85,7 @@ use super::*;
 	}
 
 	/// Allows the creator of the event that is part of the accounts of this instruction to create a new ticket sale
-	/// for one one of the ticket types defined when the event was created.
+	/// for one of the ticket types defined when the event was created.
 	/// Note that the creator will have to call this as many ticket types as are defined in the ticket types list stored in t
 	/// the event account.
 	/// 
