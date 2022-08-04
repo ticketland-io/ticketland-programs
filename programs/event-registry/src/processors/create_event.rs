@@ -15,7 +15,6 @@ use common::{
   token::is_wrapped_sol,
   account_data::event::*,
   state::{
-    alias::*,
     ticket_type::TicketType,
   },
 };
@@ -161,8 +160,8 @@ pub fn exec(
   ctx: Context<CreateEvent>,
   event_organizer_treasury: Pubkey,
   n_tickets: u32,
-  start_time: Slot,
-  end_time: Slot,
+  start_time: i64,
+  end_time: i64,
   ticket_types: Vec<TicketType>,
   name: String,
   symbol: String,

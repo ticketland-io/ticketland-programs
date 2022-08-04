@@ -3,7 +3,6 @@ use crate::{
   state::{
     ticket_type::TicketType,
     currency::*,
-    alias::*,
   },
 };
 
@@ -25,13 +24,13 @@ pub struct Event {
   pub event_capacity: Pubkey,
   pub n_tickets: u32,
   pub id: u64,
-  pub start_time: Slot,
-  pub end_time: Slot,
+  pub start_time: i64,
+  pub end_time: i64,
   // The token that will be used to purchase the tickets. At the moment we support multiple currencies
   // but event organizers need to choose one per event. This will change in the future.
   pub currency: Currency,
   pub event_organizer_purchase_token_ata: Pubkey,
-  // THis is where Sol payments will be send. The above is for SPL tokens.
+  // This is where Sol payments will be send. The above is for SPL tokens.
   pub event_organizer_treasury: Pubkey,
   pub ticket_types: Vec<TicketType>,
 }

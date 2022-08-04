@@ -6,7 +6,6 @@ pub mod utils;
 use anchor_lang::prelude::*;
 use common::{
 	state::{
-		alias::*,
 		currency::*,
 		ticket_type::TicketType,
 	},
@@ -54,8 +53,8 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `start_time` - The Solana slot that describes the start of the event
-	/// * `end_time` - The Solana slot that describes the end of the event
+	/// * `start_time` - The Solana time that describes the start of the event
+	/// * `end_time` - The Solana time that describes the end of the event
 	/// * `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices
 	/// * `name` - The name that will be used in the Event NFT metadata
 	/// * `symbol` - The symbol that will be used in the Event NFT metadata
@@ -64,8 +63,8 @@ use super::*;
 		ctx: Context<CreateEvent>,
 		event_organizer_treasury: Pubkey,
 		n_tickets: u32,
-		start_time: Slot,
-		end_time: Slot,
+		start_time: i64,
+		end_time: i64,
 		ticket_types: Vec<TicketType>,
 		name: String,
 		symbol: String,
