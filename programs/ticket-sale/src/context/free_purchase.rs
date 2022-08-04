@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-  token::{Mint, Token, TokenAccount},
+  token::{Mint, Token},
   associated_token::AssociatedToken,
 };
 use ticket_nft::{
@@ -66,18 +66,6 @@ pub struct FreePurchase<'info> {
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
   pub event_capacity: AccountLoader<'info, EventCapacity>,
-
-  /// CHECK: The deposit token should be one of the supported currencies
-  #[account()]
-  pub purchase_token: Box<Account<'info, Mint>>,
-
-  /// The deposit token ATA from which the event creation deposit will be transferred from
-  #[account(
-    mut,
-    associated_token::mint = purchase_token,
-    associated_token::authority = event_organizer,
-  )]
-  pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: This is the event organizer of the event
   #[account()]

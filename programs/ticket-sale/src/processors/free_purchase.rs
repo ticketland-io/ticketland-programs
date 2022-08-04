@@ -1,22 +1,13 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{
-  program::invoke,
-  system_instruction::transfer,
-};
-use anchor_spl::token::{self, Transfer};
 use anchor_safe_math::SafeMath;
 use common::{
   utils::bitmap,
   account_data::{
     serialization::deser,
   },
-  state::{
-    sale_type::*,
-  },
-  token::is_wrapped_sol,
 };
+use crate::context::free_purchase::FreePurchase;
 use crate::{
-  context::fixed_price_purchase::*,
   account_data::{
     event::Event,
     event_capacity::MAX_VENUE_CAPACITY,
@@ -25,90 +16,8 @@ use crate::{
   utils::program_error::ErrorCode,
 };
 
-fn transfer_sol<'info>(
-  from: AccountInfo<'info>,
-  to: AccountInfo<'info>,
-  amount: u64,
-) -> Result<()> {
-  if amount > 0 {
-    let ix = transfer(
-      &from.key(),
-      &to.key(),
-      amount
-    );
 
-    return invoke(
-      &ix,
-      &[from, to],
-    ).map_err(|err| err.into())
-  }
-
-  Ok(())
-}
-
-fn transfer_token<'info>(
-  ctx: &Context<FixedPricePurchase<'info>>,
-  from: AccountInfo<'info>,
-  to: AccountInfo<'info>,
-  authority: AccountInfo<'info>,
-  amount: u64,
-) -> Result<()> {
-  let cpi_accounts = Transfer::<'info> {from, to, authority};
-  let cpi_program = ctx.accounts.token_program.to_account_info();
-  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-
-  token::transfer(cpi_ctx, amount)
-}
-
-/// Transfer the purchase funds to event organizer and our treasury
-fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()> {
-  let ticket_type = &ctx.accounts.sale.ticket_type;
-  let amount = if let SaleType::FixedPrice(amount) = ticket_type.sale_type {
-    amount
-  } else {
-    // This should never happen since we already have the same check in the FixedPricePurchase context
-    return Err(ErrorCode::UnexpectedSaleAccount.into());
-  };
-  let (event_organizer_amount, service_fee_amount) = event.currency.calc_fee(amount)?;
-
-  if is_wrapped_sol(ctx.accounts.purchase_token.key()) {
-    // send to event organizer
-    transfer_sol(
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      ctx.accounts.event_organizer_purchase_sol_treasury.to_account_info().clone(),
-      event_organizer_amount,
-    )?;
-
-    // send to treasury
-    transfer_sol(
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      ctx.accounts.treasury.to_account_info().clone(),
-      service_fee_amount,
-    )?;
-  } else {
-    // send to event organizer
-    transfer_token(
-      &ctx,
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      event_organizer_amount,
-    )?;
-
-    // send to treasury
-    transfer_token(
-      &ctx,
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.service_fee_ata.to_account_info().clone(),
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      service_fee_amount,
-    )?;
-  }
-
-  Ok(())
-}
-
-fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_name: String) -> Result<()> {
+fn mint_ticket(ctx: &Context<FreePurchase>, seat_name: String) -> Result<()> {
   let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
   let cpi_accounts = ticket_nft::cpi::accounts::CreateTicket {
     state: ctx.accounts.ticket_nft_program_state.to_account_info(),
@@ -159,15 +68,13 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_name: String) -> Result<(
 /// Event Registry program address, but that would mean we would have to hard code that address which is against the flexibility
 /// we've provided by storing the Event Registry program address in `state` account of this program.
 /// For this reason we will do a few manual checks that we did the declarative constraint macro in the Context.
-fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()>  {
+fn account_checks(ctx: &Context<FreePurchase>, event: &Event) -> Result<()>  {
   let sale = &ctx.accounts.sale;
 
   require!(event.id == sale.event_id, ErrorCode::WrongEventAccount);
-  require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
-  require!(event.event_organizer_treasury == ctx.accounts.event_organizer_purchase_sol_treasury.key(), ErrorCode::WrongSolTreasury);
   require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
   require!(event.event_capacity == ctx.accounts.event_capacity.key(), ErrorCode::WrongEventCapacityAccount);
-  
+
   Ok(())
 }
 
@@ -179,7 +86,7 @@ fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
   &seat_name,
 ))]
 pub fn exec(
-  ctx: Context<FixedPricePurchase>,
+  ctx: Context<FreePurchase>,
   seat_index: u32,
   seat_name: String,
   merkle_proof: Vec<[u8; 32]>,
@@ -202,13 +109,10 @@ pub fn exec(
     ErrorCode::SeatNotAvailable,
   );
 
-  // 5. Transfer funds
-  transfer_funds(&ctx, &event)?;
-
-  // 6. CPI to Ticket NFT program to mint the ticket
+  // 5. CPI to Ticket NFT program to mint the ticket
   mint_ticket(&ctx, seat_name)?;
 
-  // 7. Update state
+  // 6. Update state
   bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);
   
   // - total tickets sold (Ticket Sale State account data)
