@@ -133,25 +133,31 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   // ticket type 3 includes seats 3, 4, 8, 9
   let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)]);
 
-  let ticket_types = vec![
-    TicketType {
-      n_tickets: 4,
-      sale_type: SaleType::FixedPrice(sol_to_lamports(1_f64)),
-      sale_start_time: 10,
-      merkle_root: mt_type_1.root().unwrap(),
-    },
-    TicketType {
-      n_tickets: 6,
-      sale_type: SaleType::DutchAuction {
-        start_price: 150,
-        end_price: 110,
-        curve_length: 200 * 60,
-        drop_interval: 20 * 60,
+  let ticket_types;
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    let now = pt.get_clock().await.unix_timestamp;
+
+    ticket_types = vec![
+      TicketType {
+        n_tickets: 4,
+        sale_type: SaleType::FixedPrice(sol_to_lamports(1_f64)),
+        sale_start_time: now + 10, // 10 seconds
+        merkle_root: mt_type_1.root().unwrap(),
       },
-      sale_start_time: 15,
-      merkle_root: mt_type_2.root().unwrap(),
-    },
-  ];
+      TicketType {
+        n_tickets: 6,
+        sale_type: SaleType::DutchAuction {
+          start_price: 150,
+          end_price: 110,
+          curve_length: 200 * 60,
+          drop_interval: 20 * 60,
+        },
+        sale_start_time: now + 15, // 10 seconds from now,
+        merkle_root: mt_type_2.root().unwrap(),
+      },
+    ];
+  }
 
   custom_create_event(
     event_registry_runner,
@@ -164,7 +170,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     deposit_token,
     &ticket_types,
   ).await;
-  
+
   // Create a new ticket sale for the first ticket type
   let _ = event_registry_runner.create_ticket_sale(
     event_registry_state.pubkey(),
@@ -181,7 +187,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   // move to the start of sale
   {
     let mut pt = ticket_sale_runner.pt.lock().await;
-    pt.context.warp_to_slot(11).unwrap();
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
   }
 
   let event_organizer_funds_before;

@@ -190,6 +190,7 @@ pub fn exec(
 
   // 2. Has sale started?
   let sale = &ctx.accounts.sale;
+  // TODO: Use an oracle to get the current time
   require!(Clock::get().unwrap().unix_timestamp >= sale.ticket_type.sale_start_time, ErrorCode::SaleNotStarted);
 
   // 3. Are there any available seats for this type of ticket

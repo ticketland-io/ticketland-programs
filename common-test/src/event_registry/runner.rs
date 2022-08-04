@@ -36,7 +36,6 @@ use anchor_metaplex::{
 use common::{
   state::{
     ticket_type::TicketType,
-    alias::*,
     currency::*,
   },
 };
