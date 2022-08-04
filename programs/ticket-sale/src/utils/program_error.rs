@@ -16,8 +16,8 @@ pub enum ErrorCode {
   TicketSoldOut,
   #[msg("Seat not available")]
   SeatNotAvailable,
-  #[msg("Expected fixed price sale")]
-  ExpectedFixedPriceSaleAccount,
+  #[msg("Expected different sale account")]
+  UnexpectedSaleAccount,
   #[msg("Purchase token is not supported")]
   UnsupportedPurchaseToken,
   #[msg("Wrong event organizer")]

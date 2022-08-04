@@ -2,7 +2,9 @@ use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Eq, PartialEq, Debug)]
 pub enum SaleType {
+  Free,
   FixedPrice(u64),
+  Refundable(u64),
   DutchAuction {
     start_price: u64,
     end_price: u64,
@@ -12,9 +14,23 @@ pub enum SaleType {
 }
 
 impl SaleType {
+  pub fn is_free(&self) -> bool {
+    match self {
+      Self::Free => true,
+      _ => false
+    }
+  }
+
   pub fn is_fixed_price(&self) -> bool {
     match self {
       Self::FixedPrice(_) => true,
+      _ => false
+    }
+  }
+
+  pub fn is_refundable(&self) -> bool {
+    match self {
+      Self::Refundable(_) => true,
       _ => false
     }
   }

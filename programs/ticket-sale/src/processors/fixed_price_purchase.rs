@@ -67,7 +67,7 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
     amount
   } else {
     // This should never happen since we already have the same check in the FixedPricePurchase context
-    return Err(ErrorCode::ExpectedFixedPriceSaleAccount.into());
+    return Err(ErrorCode::UnexpectedSaleAccount.into());
   };
   let (event_organizer_amount, service_fee_amount) = event.currency.calc_fee(amount)?;
 

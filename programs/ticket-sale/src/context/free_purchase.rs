@@ -23,7 +23,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct FixedPricePurchase<'info> {
+pub struct FreePurchase<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
 
@@ -48,11 +48,11 @@ pub struct FixedPricePurchase<'info> {
       sale.event_id.to_string().as_ref()
     ],
     bump = sale.bump,
-    constraint = sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::UnexpectedSaleAccount,
+    constraint = sale.ticket_type.sale_type.is_free() @ ErrorCode::UnexpectedSaleAccount,
   )]
   pub sale: Box<Account<'info, Sale>>,
 
-  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. Ticket NFT Program
   #[account(
     mut,
     seeds = [b"ticket_sale:cpi_authority", state.key().as_ref()],
@@ -79,36 +79,9 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
-  /// CHECK: The Sol account that organizer will receive funds from the ticket sale to
-  #[account(mut)]
-  pub event_organizer_purchase_sol_treasury: AccountInfo<'info>,
-
   /// CHECK: This is the event organizer of the event
   #[account()]
   pub event_organizer: AccountInfo<'info>,
-
-  /// The token token account that will be receiving the service fee
-  #[account(
-    mut,
-    associated_token::mint = purchase_token,
-    associated_token::authority = treasury,
-  )]
-  pub service_fee_ata: Box<Account<'info, TokenAccount>>,
-
-  /// CHECK: This is ticketland.io treasury address
-  #[account(
-    mut,
-    constraint = treasury.key() == state.treasury @ ErrorCode::WrongTreasuryAccount,
-  )]
-  pub treasury: AccountInfo<'info>,
-
-  /// The ticket buyer ATA from which funds will be sent
-  #[account(
-    mut,
-    associated_token::mint = purchase_token,
-    associated_token::authority = ticket_buyer,
-  )]
-  pub ticket_buyer_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
