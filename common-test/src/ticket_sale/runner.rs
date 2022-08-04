@@ -210,4 +210,57 @@ impl Runner {
 
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
+
+  pub async fn free_purchase(
+    &mut self,
+    ticket_buyer: &Keypair,
+    event_registry_state: Pubkey,
+    ticket_sale_state: Pubkey,
+    event_capacity: Pubkey,
+    event_organizer: Pubkey,
+    ticket_nft_program_state: Pubkey,
+    event_id: u64,
+    ticket_type_index: usize,
+    seat_index: u32,
+		seat_name: String,
+		merkle_proof: Vec<[u8; 32]>,
+  ) -> AnchorResult<()> {
+    let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), event_id).0;
+    let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
+
+    let accounts = ticket_sale::accounts::FreePurchase {
+      state: ticket_sale_state,
+      event: EventRegistryPda::event(&event_registry_state, event_id).0,
+      sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
+      cpi_authority,
+      event_capacity,
+      event_organizer,
+      ticket_buyer: ticket_buyer.pubkey(),
+      ticket_nft_program_state,
+      ticket_nft,
+      nft_authority: TicketNftPda::nft_authority(&ticket_nft_program_state).0,
+      ticket_metadata: TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0,
+      ticket_metaplex_metadata: find_metadata_account(&ticket_nft).0,
+      ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
+      event_nft,
+      event_nft_metadata: find_metadata_account(&event_nft).0,
+      ticket_nft_program: ticket_nft_program_id(),
+      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = ticket_sale::instruction::FreePurchase {seat_index, seat_name, merkle_proof}.data();
+
+    let ix = Instruction {
+      program_id: ticket_sale_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
 }
