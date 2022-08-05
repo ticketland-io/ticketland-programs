@@ -71,7 +71,7 @@ async fn custom_create_event(
   ticket_sale_runner: &mut TicketSaleRunner,
   state: &Keypair,
   event_capacity: Pubkey,
-  event_id: u64,
+  event_id: [u8; 32],
   event_organizer: &Keypair,
   deposit_token_idx: usize,
 ) -> AnchorResult<()> {
@@ -132,7 +132,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
   let result = custom_create_event(
@@ -243,7 +243,7 @@ async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(c
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
   let event_capacity;
@@ -284,7 +284,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
 		1_000, // 10%
   ).await;
 
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   let deposit_token = runner.deposit_tokens[0];
 
@@ -332,7 +332,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
   let _ = custom_create_event(
@@ -361,7 +361,7 @@ async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
 
   let _ = custom_create_event(
@@ -394,7 +394,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let state = Keypair::new();
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
   let _ = custom_create_event(
@@ -432,7 +432,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = Keypair::new();
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
 
@@ -469,7 +469,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
 

@@ -74,7 +74,12 @@
         },
         {
           "name": "eventId",
-          "type": "u64"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "nTickets",
@@ -127,7 +132,12 @@
         },
         {
           "name": "eventId",
-          "type": "u64"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "ticketType",
@@ -438,7 +448,12 @@
         "fields": [
           {
             "name": "eventId",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "isInitialized",
@@ -471,7 +486,12 @@
           },
           {
             "name": "eventId",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "ticketTypeIndex",

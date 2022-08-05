@@ -216,7 +216,7 @@ impl Runner {
     state: Pubkey,
     event_capacity: Pubkey,
     ticket_sale_program_state: Pubkey,
-    event_id: u64,
+    event_id: [u8; 32],
     deposit_token: Pubkey,
     purchase_token: Pubkey,
     event_organizer: &Keypair,
@@ -235,6 +235,9 @@ impl Runner {
     let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
     let cpi_authority = pda::cpi_authority(&state).0;
     
+    println!("event {:?}", event);
+    println!("event_nft {:?}", event_nft);
+
     let accounts = event_registry::accounts::CreateEvent {
       state,
       event,
@@ -263,6 +266,7 @@ impl Runner {
     }.to_account_metas(None);
 
     let data = event_registry::instruction::CreateEvent {
+      event_id,
       event_organizer_treasury,
       n_tickets,
       start_time,
@@ -285,7 +289,7 @@ impl Runner {
   pub async fn create_ticket_sale(
     &self,
     state: Pubkey,
-    event_id: u64,
+    event_id: [u8; 32],
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
     ticket_type_index: u8,

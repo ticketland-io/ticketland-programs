@@ -32,7 +32,7 @@ async fn custom_create_event(
   ticket_sale_runner: &mut TicketSaleRunner,
   state: &Keypair,
   event_capacity: Pubkey,
-  event_id: u64,
+  event_id: [u8; 32],
   event_organizer: &Keypair,
   deposit_token_idx: usize,
 ) -> Vec<TicketType> {
@@ -108,7 +108,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
   let event_capacity = runner.create_event_capacity_account().await;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
   let ticket_types = custom_create_event(
@@ -126,7 +126,7 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
   let ticket_type_index = 0;
-  let event_id = 0;
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
 
   // Create a new ticket sale for the first ticket type
   let result = runner.create_ticket_sale(

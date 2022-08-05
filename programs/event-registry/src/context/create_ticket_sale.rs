@@ -13,14 +13,14 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_type_index: u8, event_id: u64,)]
+#[instruction(ticket_type_index: u8, event_id: [u8; 32],)]
 pub struct CreateTicketSale<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
 
   // The newly created event 
   #[account(
-    seeds = [b"event", state.key().as_ref(), &event_id.to_string().as_ref()],
+    seeds = [b"event", state.key().as_ref(), event_id.as_ref()],
     bump = event.bumps.event,
   )]
   pub event: Account<'info, Event>,

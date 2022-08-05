@@ -265,7 +265,12 @@
         },
         {
           "name": "eventId",
-          "type": "u64"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "ticketType",
