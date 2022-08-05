@@ -13,7 +13,6 @@ use common::{
   state::{
     sale_type::*,
   },
-  token::is_wrapped_sol,
 };
 use crate::{
   context::fixed_price_purchase::*,
@@ -71,39 +70,23 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
   };
   let (event_organizer_amount, service_fee_amount) = event.currency.calc_fee(amount)?;
 
-  if is_wrapped_sol(ctx.accounts.purchase_token.key()) {
-    // send to event organizer
-    transfer_sol(
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      ctx.accounts.event_organizer_purchase_sol_treasury.to_account_info().clone(),
-      event_organizer_amount,
-    )?;
+  // send to event organizer
+  transfer_token(
+    &ctx,
+    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+    ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
+    ctx.accounts.ticket_buyer.to_account_info().clone(),
+    event_organizer_amount,
+  )?;
 
-    // send to treasury
-    transfer_sol(
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      ctx.accounts.treasury.to_account_info().clone(),
-      service_fee_amount,
-    )?;
-  } else {
-    // send to event organizer
-    transfer_token(
-      &ctx,
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      event_organizer_amount,
-    )?;
-
-    // send to treasury
-    transfer_token(
-      &ctx,
-      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-      ctx.accounts.service_fee_ata.to_account_info().clone(),
-      ctx.accounts.ticket_buyer.to_account_info().clone(),
-      service_fee_amount,
-    )?;
-  }
+  // send to treasury
+  transfer_token(
+    &ctx,
+    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+    ctx.accounts.service_fee_ata.to_account_info().clone(),
+    ctx.accounts.ticket_buyer.to_account_info().clone(),
+    service_fee_amount,
+  )?;
 
   Ok(())
 }

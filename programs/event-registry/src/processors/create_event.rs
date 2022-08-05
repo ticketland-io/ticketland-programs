@@ -12,7 +12,6 @@ use anchor_metaplex::{
   create_master_edition,
 };
 use common::{
-  token::is_wrapped_sol,
   account_data::event::*,
   state::{
     ticket_type::TicketType,
@@ -86,32 +85,6 @@ fn create_event_nft(
   )
 }
 
-// Transfers Sol to the fund manager
-fn lock_sol_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
-  let currency = &ctx.accounts.state.supported_currencies
-    .iter()
-    .find(|c| is_wrapped_sol(c.mint_account))
-    .unwrap();
-
-  if currency.deposit_amount > 0 {
-    let ix = transfer(
-      &ctx.accounts.event_organizer.key(),
-      &ctx.accounts.fund_manager.key(),
-      currency.deposit_amount,
-    );
-
-    return invoke(
-      &ix,
-      &[
-        ctx.accounts.event_organizer.to_account_info(),
-        ctx.accounts.fund_manager.to_account_info()
-      ],
-    ).map_err(|err| err.into())
-  }
-
-  Ok(())
-}
-
 /// Transfer the deposit amount to the fund manager ata
 fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
   let cpi_accounts = Transfer {
@@ -174,11 +147,7 @@ pub fn exec(
 ) -> Result<()> {
   require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
   
-  if is_wrapped_sol(ctx.accounts.deposit_token.key()) {
-    lock_sol_deposit(&ctx)?;
-  } else {
-    lock_deposit(&ctx)?;
-  }
+  lock_deposit(&ctx)?;
 
   {
     let event = &mut ctx.accounts.event;
