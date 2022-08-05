@@ -5,7 +5,7 @@ use crate::{
 
 pub fn exec(
   ctx: Context<InitEventCapacity>,
-  event_id: u64,
+  event_id: [u8; 32],
   n_tickets: u32,
 ) -> Result<()> {
   let event_capacity = &mut ctx.accounts.event_capacity.load_init()?;

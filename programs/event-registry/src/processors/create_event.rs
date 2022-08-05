@@ -162,6 +162,7 @@ fn init_event_capacity(ctx: &Context<CreateEvent>,) -> Result<()> {
 
 pub fn exec(
   ctx: Context<CreateEvent>,
+  event_id: [u8; 32],
   event_organizer_treasury: Pubkey,
   n_tickets: u32,
   start_time: i64,
@@ -188,7 +189,7 @@ pub fn exec(
       event_nft: *ctx.bumps.get("event_nft").unwrap(),
     };
 
-    event.id = state.n_events;
+    event.id = event_id;
     event.event_organizer_treasury = event_organizer_treasury;
     event.n_tickets = n_tickets;
     event.start_time = start_time;

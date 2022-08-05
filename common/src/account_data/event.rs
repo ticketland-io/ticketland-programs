@@ -19,11 +19,11 @@ pub struct EventBumps {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct Event {
+  pub id: [u8; 32],
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
   pub event_capacity: Pubkey,
   pub n_tickets: u32,
-  pub id: u64,
   pub start_time: i64,
   pub end_time: i64,
   // The token that will be used to purchase the tickets. At the moment we support multiple currencies

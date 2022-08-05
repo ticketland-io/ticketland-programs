@@ -32,7 +32,7 @@ pub struct FixedPricePurchase<'info> {
     seeds = [
       b"event",
       state.event_registry_state.key().as_ref(),
-      &sale.event_id.to_string().as_ref()
+      &sale.event_id.as_ref()
     ],
     bump,
     seeds::program = state.event_registry_program,
@@ -45,7 +45,7 @@ pub struct FixedPricePurchase<'info> {
       b"sale",
       state.key().as_ref(),
       sale.ticket_type_index.to_string().as_ref(),
-      sale.event_id.to_string().as_ref()
+      sale.event_id.as_ref()
     ],
     bump = sale.bump,
     constraint = sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::UnexpectedSaleAccount,
@@ -132,7 +132,7 @@ pub struct FixedPricePurchase<'info> {
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
       ticket_buyer.key().as_ref(),
-      &sale.event_id.to_string().as_ref()
+      &sale.event_id.as_ref()
     ],
     bump,
     seeds::program = ticket_nft_program.key(),
@@ -183,7 +183,7 @@ pub struct FixedPricePurchase<'info> {
   pub ticket_nft_ata: AccountInfo<'info>,
 
   #[account(
-    seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &sale.event_id.to_string().as_ref()],
+    seeds = [b"event_nft", state.event_registry_state.key().as_ref(), &sale.event_id.as_ref()],
     bump,
     seeds::program = state.event_registry_program,
   )]

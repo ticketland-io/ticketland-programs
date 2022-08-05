@@ -8,7 +8,7 @@ pub const MAX_VENUE_CAPACITY: usize = 12_500;
 
 #[account(zero_copy)]
 pub struct EventCapacity {
-  pub event_id: u64,
+  pub event_id: [u8; 32],
   pub is_initialized: bool,
   pub available_tickets: u32,
 

@@ -52,7 +52,7 @@ pub mod ticket_sale {
 	pub fn init_event_capacity(
 		ctx: Context<InitEventCapacity>,
 		_cpi_authority_bump: u8,
-		event_id: u64,
+		event_id: [u8; 32],
 		n_tickets: u32,
 	) -> Result<()> {
     processors::init_event_capacity::exec(ctx, event_id, n_tickets)
@@ -72,7 +72,7 @@ pub mod ticket_sale {
 		ctx: Context<CreateSale>,
 		_cpi_authority_bump: u8,
 		ticket_type_index: u8,
-		event_id: u64,
+		event_id: [u8; 32],
 		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_sale::exec(

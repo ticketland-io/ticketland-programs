@@ -40,7 +40,7 @@ pub mod ticket_nft {
 	pub fn create_ticket(
 		ctx: Context<CreateTicket>,
 		_cpi_authority_bump: u8,
-		event_id: u64,
+		event_id: [u8; 32],
 		name: String,
 	) -> Result<()> {
     processors::create_ticket::exec(ctx, event_id, name)

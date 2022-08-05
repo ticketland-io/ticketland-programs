@@ -61,6 +61,7 @@ use super::*;
 	/// * `uri` - The uti that will be used in the Event NFT metadata
 	pub fn create_event(
 		ctx: Context<CreateEvent>,
+		event_id: [u8; 32],
 		event_organizer_treasury: Pubkey,
 		n_tickets: u32,
 		start_time: i64,
@@ -72,6 +73,7 @@ use super::*;
 	) -> Result<()> {
 		processors::create_event::exec(
 			ctx,
+			event_id,
 			event_organizer_treasury,
 			n_tickets,
 			start_time,

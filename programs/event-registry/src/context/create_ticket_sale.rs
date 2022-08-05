@@ -42,7 +42,7 @@ pub struct CreateTicketSale<'info> {
       b"sale",
       ticket_sale_program_state.key().as_ref(),
       ticket_type_index.to_string().as_ref(),
-      &event.id.to_string().as_ref()
+      &event.id.as_ref()
     ],
     bump,
     seeds::program = ticket_sale_program.key(),

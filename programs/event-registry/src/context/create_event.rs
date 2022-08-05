@@ -31,6 +31,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
+#[instruction(event_id: [u8; 32])]
 pub struct CreateEvent<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -40,7 +41,7 @@ pub struct CreateEvent<'info> {
     init,
     payer = event_organizer,
     space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES) + SPACE_MARGIN,
-    seeds = [b"event", state.key().as_ref(), &state.n_events.to_string().as_ref()],
+    seeds = [b"event", state.key().as_ref(), &event_id.as_ref()],
     bump
   )]
   pub event: Box<Account<'info, Event>>,

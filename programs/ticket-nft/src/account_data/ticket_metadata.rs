@@ -12,7 +12,7 @@ pub struct TicketMetadata {
   pub attended: bool,
   
   /// The id of the event which this ticket belongs to
-  pub event_id: u64,
+  pub event_id: [u8; 32],
 
   /// The original owner of the Ticket NFT
   pub owner: Pubkey,
