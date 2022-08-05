@@ -24,11 +24,11 @@ const provider = anchor.AnchorProvider.local(
 
 anchor.setProvider(provider)
 
-const main = async () => {
+const initializeEventRegistry = async () => {
   const state = Keypair.generate()
+  const treasury = new PublicKey('')
   const program = anchor.workspace.EventRegistry
   const deployer = provider.wallet.publicKey
-  const treasury = new PublicKey('')
 
   const supportedCurrencies = deploymentConfig.supportedMintAccounts.reduce((acc, curr) => {
     [...acc, {
@@ -58,10 +58,41 @@ const main = async () => {
     }
   )
 
+  return state.publicKey
+}
+
+const initializeTicketSale = async (eventRegistryState) => {
+  const state = Keypair.generate()
+  const treasury = new PublicKey('')
+  const program = anchor.workspace.TicketSale
+  const deployer = provider.wallet.publicKey
+
+  await program.rpc.initialize(
+    treasury,
+    {
+      accounts: {
+        state: state.publicKey,
+        eventRegistryState,
+        event_registry_program: anchor.workspace.EventRegistry.programId,
+        cpi_authority: (await pda.ticketSaleCpiAuthority(state, program.programId))[0],
+        deployer,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+      signers: [state, provider.wallet.payer]
+    }
+  )
+}
+
+const main = async () => {
+  const eventRegistryState = await initializeEventRegistry()
+  const ticketSaleState = await initializeTicketSale(eventRegistryState)
+
   await writeFile(
     `./deployments/event-registry-${process.env.ENV}.json`,
     JSON.stringify({
-      state: state.publicKey.toBase58(),
+      eventRegistryState: eventRegistryState.publicKey.toBase58(),
+      ticketSaleState: ticketSaleState.publicKey.toBase58(),
     }, null, 2)
   )
 }

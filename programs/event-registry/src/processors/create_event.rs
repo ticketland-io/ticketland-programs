@@ -93,19 +93,23 @@ fn lock_sol_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
     .find(|c| is_wrapped_sol(c.mint_account))
     .unwrap();
 
-  let ix = transfer(
-    &ctx.accounts.event_organizer.key(),
-    &ctx.accounts.fund_manager.key(),
-    currency.deposit_amount,
-  );
+  if currency.deposit_amount > 0 {
+    let ix = transfer(
+      &ctx.accounts.event_organizer.key(),
+      &ctx.accounts.fund_manager.key(),
+      currency.deposit_amount,
+    );
 
-  invoke(
-    &ix,
-    &[
-      ctx.accounts.event_organizer.to_account_info(),
-      ctx.accounts.fund_manager.to_account_info()
-    ],
-  ).map_err(|err| err.into())
+    return invoke(
+      &ix,
+      &[
+        ctx.accounts.event_organizer.to_account_info(),
+        ctx.accounts.fund_manager.to_account_info()
+      ],
+    ).map_err(|err| err.into())
+  }
+
+  Ok(())
 }
 
 /// Transfer the deposit amount to the fund manager ata
