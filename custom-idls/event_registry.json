@@ -261,9 +261,7 @@
       "args": [
         {
           "name": "ticketTypeIndex",
-          "type": {
-            "defined": "usize"
-          }
+          "type": "u8"
         },
         {
           "name": "eventId",

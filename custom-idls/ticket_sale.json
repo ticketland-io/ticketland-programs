@@ -1,0 +1,700 @@
+{
+  "version": "0.1.0",
+  "name": "ticket_sale",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "eventRegistryState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventRegistryProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "treasury",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "initEventCapacity",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventRegistryCpiAuthority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiAuthorityBump",
+          "type": "u8"
+        },
+        {
+          "name": "eventId",
+          "type": "u64"
+        },
+        {
+          "name": "nTickets",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "createSale",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventRegistryCpiAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiAuthorityBump",
+          "type": "u8"
+        },
+        {
+          "name": "ticketTypeIndex",
+          "type": "u8"
+        },
+        {
+          "name": "eventId",
+          "type": "u64"
+        },
+        {
+          "name": "ticketType",
+          "type": {
+            "defined": "TicketType"
+          }
+        }
+      ]
+    },
+    {
+      "name": "fixedPricePurchase",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerPurchaseSolTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serviceFeeAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetaplexMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "merkleProof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "freePurchase",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetaplexMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "merkleProof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EventCapacity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventId",
+            "type": "u64"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "availableTickets",
+            "type": "u32"
+          },
+          {
+            "name": "seats",
+            "type": {
+              "array": [
+                "u8",
+                12500
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sale",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "eventId",
+            "type": "u64"
+          },
+          {
+            "name": "ticketTypeIndex",
+            "type": "u8"
+          },
+          {
+            "name": "ticketType",
+            "type": {
+              "defined": "TicketType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          },
+          {
+            "name": "totalSold",
+            "type": "u64"
+          },
+          {
+            "name": "eventRegistryProgram",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventRegistryState",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployer",
+            "type": "publicKey"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "SaleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "FixedPrice",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Refundable",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DutchAuction",
+            "fields": [
+              {
+                "name": "start_price",
+                "type": "u64"
+              },
+              {
+                "name": "end_price",
+                "type": "u64"
+              },
+              {
+                "name": "curve_length",
+                "type": "u16"
+              },
+              {
+                "name": "drop_interval",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TicketType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "n_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "sale_type",
+            "type": {
+              "defined": "SaleType"
+            }
+          },
+          {
+            "name": "sale_start_time",
+            "type": "i64"
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyDeployer",
+      "msg": "Only Deployer"
+    },
+    {
+      "code": 6001,
+      "name": "NotOwnedByThisProgram",
+      "msg": "Not owner by this program"
+    },
+    {
+      "code": 6002,
+      "name": "WrongEventAccount",
+      "msg": "Not event account"
+    },
+    {
+      "code": 6003,
+      "name": "WrongEventCapacityAccount",
+      "msg": "Wrong event capacity"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidProof",
+      "msg": "Invalid Merkle proof"
+    },
+    {
+      "code": 6005,
+      "name": "TicketSoldOut",
+      "msg": "Invalid sold out"
+    },
+    {
+      "code": 6006,
+      "name": "SeatNotAvailable",
+      "msg": "Seat not available"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedSaleAccount",
+      "msg": "Expected different sale account"
+    },
+    {
+      "code": 6008,
+      "name": "UnsupportedPurchaseToken",
+      "msg": "Purchase token is not supported"
+    },
+    {
+      "code": 6009,
+      "name": "WrongEventOrganizer",
+      "msg": "Wrong event organizer"
+    },
+    {
+      "code": 6010,
+      "name": "WrongTreasuryAccount",
+      "msg": "Wrong treasury account"
+    },
+    {
+      "code": 6011,
+      "name": "SaleNotStarted",
+      "msg": "Sale has not started"
+    },
+    {
+      "code": 6012,
+      "name": "WrongSolTreasury",
+      "msg": "Wrong event organizer Sol treasury"
+    },
+    {
+      "code": 6013,
+      "name": "WrongTicketNftProgram",
+      "msg": "Wrong Ticket NFT program"
+    },
+    {
+      "code": 6014,
+      "name": "WrongTicketNftProgramStateAccount",
+      "msg": "Wrong Ticket NFT program state account"
+    }
+  ]
+}

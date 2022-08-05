@@ -4,7 +4,7 @@ import {writeFile} from 'fs/promises'
 import * as pda from './helpers/pda.js'
 import deploymentConfig from './.config.json' assert { type: 'json' }
 
-const {SystemProgram, SYSVAR_RENT_PUBKEY, Keypair, PublicKey, BN} = anchor.web3
+const {SystemProgram, SYSVAR_RENT_PUBKEY, Keypair, PublicKey} = anchor.web3
 const utf8 = anchor.utils.bytes.utf8
 
 const getClusterUrl = () => {
@@ -31,28 +31,26 @@ const initializeEventRegistry = async () => {
   const program = anchor.workspace.EventRegistry
   const deployer = provider.wallet.publicKey
 
-  const supportedCurrencies = deploymentConfig.supportedMintAccounts.reduce(async (prom, curr) => {
+  const supportedCurrencies = await deploymentConfig.supportedMintAccounts.reduce(async (prom, curr) => {
     const acc = await prom
+    const mintAccount = new PublicKey(curr.mintAccount)
 
     return [...acc, {
-      mintAccount: new PublicKey(curr.mintAccount),
+      mintAccount,
       treasuryAta: await getAssociatedTokenAddress(mintAccount, treasury, true),
-      depositAmount: BN(curr.depositAmount),
-      serviceFee: BN(curr.serviceFee),
+      depositAmount: new anchor.BN(curr.depositAmount),
+      serviceFee: new anchor.BN(curr.serviceFee),
     }]
   }, [])
 
   await program.rpc.initialize(
     supportedCurrencies,
-    BN(deploymentConfig.sellerFeeBasisPoint),
+    new anchor.BN(deploymentConfig.sellerFeeBasisPoint),
     {
       accounts: {
         state: state.publicKey,
         eventNftAuthority: (await pda.eventNftAuthority(state.publicKey, program.programId))[0],
         cpiAuthority: (await pda.cpiAuthority(state.publicKey, program.programId))[0],
-        masterEdition,
-        collectionAuthority,
-        collectionAuthorityAta,
         deployer,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
