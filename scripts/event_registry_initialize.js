@@ -26,7 +26,7 @@ anchor.setProvider(provider)
 
 const initializeEventRegistry = async () => {
   const state = Keypair.generate()
-  const treasury = new PublicKey('')
+  const treasury = new PublicKey(deploymentConfig.depositTreasury)
   const program = anchor.workspace.EventRegistry
   const deployer = provider.wallet.publicKey
 
@@ -63,7 +63,7 @@ const initializeEventRegistry = async () => {
 
 const initializeTicketSale = async (eventRegistryState) => {
   const state = Keypair.generate()
-  const treasury = new PublicKey('')
+  const treasury = new PublicKey(deploymentConfig.serviceFeeTreasury)
   const program = anchor.workspace.TicketSale
   const deployer = provider.wallet.publicKey
 
@@ -88,12 +88,10 @@ const initializeTicketSale = async (eventRegistryState) => {
 
 const initializeTicketNft = async (ticketSaleState) => {
   const state = Keypair.generate()
-  const treasury = new PublicKey('')
   const program = anchor.workspace.TicketNft
   const deployer = provider.wallet.publicKey
 
   await program.rpc.initialize(
-    treasury,
     {
       accounts: {
         state: state.publicKey,
