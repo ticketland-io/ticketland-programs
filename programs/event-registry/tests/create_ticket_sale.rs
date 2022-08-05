@@ -74,7 +74,6 @@ async fn custom_create_event(
     deposit_token,
     deposit_token,
     &event_organizer,
-    event_organizer.pubkey(),
     100_000,
     100,
 		1000,

@@ -1,8 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{
-  program::invoke,
-  system_instruction::transfer,
-};
 use anchor_spl::token::{self, Transfer};
 use anchor_safe_math::SafeMath;
 use common::{
@@ -23,27 +19,6 @@ use crate::{
   acl::seat_validity,
   utils::program_error::ErrorCode,
 };
-
-fn transfer_sol<'info>(
-  from: AccountInfo<'info>,
-  to: AccountInfo<'info>,
-  amount: u64,
-) -> Result<()> {
-  if amount > 0 {
-    let ix = transfer(
-      &from.key(),
-      &to.key(),
-      amount
-    );
-
-    return invoke(
-      &ix,
-      &[from, to],
-    ).map_err(|err| err.into())
-  }
-
-  Ok(())
-}
 
 fn transfer_token<'info>(
   ctx: &Context<FixedPricePurchase<'info>>,
@@ -147,7 +122,6 @@ fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
 
   require!(event.id == sale.event_id, ErrorCode::WrongEventAccount);
   require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
-  require!(event.event_organizer_treasury == ctx.accounts.event_organizer_purchase_sol_treasury.key(), ErrorCode::WrongSolTreasury);
   require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
   require!(event.event_capacity == ctx.accounts.event_capacity.key(), ErrorCode::WrongEventCapacityAccount);
   

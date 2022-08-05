@@ -88,7 +88,6 @@ async fn custom_create_event(
   event_capacity: Pubkey,
   event_id: [u8; 32],
   event_organizer: &Keypair,
-  event_organizer_treasury: Pubkey,
   deposit_token: Pubkey,
   ticket_types: &Vec<TicketType>
 ) {
@@ -100,7 +99,6 @@ async fn custom_create_event(
     deposit_token,
     deposit_token,
     &event_organizer,
-    event_organizer_treasury,
     10, // num of tickets
     100,
 		1000,
@@ -166,7 +164,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     event_capacity,
     event_id,
     &event_organizer,
-    event_organizer.pubkey(),
     deposit_token,
     &ticket_types,
   ).await;

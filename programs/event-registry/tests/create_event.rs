@@ -113,7 +113,6 @@ async fn custom_create_event(
     deposit_token,
     deposit_token,
     &event_organizer,
-    event_organizer.pubkey(),
     100_000,
     100,
 		1000,
@@ -163,7 +162,6 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     assert_eq!(event_data.event_organizer, event_organizer.pubkey());
     assert_eq!(event_data.currency, runner.supported_currencies[0]);
     assert_eq!(event_data.event_organizer_purchase_token_ata, Spl::get_associated_token_address(&event_organizer.pubkey(), &purchase_token),);
-    assert_eq!(event_data.event_organizer_treasury, event_organizer.pubkey());
     assert_eq!(event_data.ticket_types,  vec![
       TicketType {
         n_tickets: 1000,
@@ -312,7 +310,6 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
     deposit_token,
     deposit_token,
     &event_organizer,
-    event_organizer.pubkey(),
     100_000,
     100,
 		1000,
@@ -352,39 +349,6 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
 
   assert_eq!(runner.spl.get_token_account(fund_manager_ata).await.amount, to_base(1000, 6));
-}
-
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_accept_native_sol_as_deposit(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account().await;
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
-
-  let _ = custom_create_event(
-    false,
-    runner,
-    ticket_sale_runner,
-    &state,
-    event_capacity,
-    event_id,
-    &event_organizer,
-    2, // native sol
-  ).await;
-
-  {
-    let event = pda::event(&state.pubkey(), event_id).0;
-    let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
-    let mut pt = runner.pt.lock().await;
-    let account = pt.context.banks_client.get_account(fund_manager).await.unwrap().unwrap();
-
-    // Not 890880 is the lamports stored in the account balance because of rent exception
-    // when the account was create
-    assert_eq!(account.lamports, sol_to_lamports(10_f64) + 890880);
-  }
 }
 
 #[test_context(TestContext)]
@@ -525,7 +489,6 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
     mint_token.pubkey(),
     mint_token.pubkey(),
     &event_organizer_clone,
-    event_organizer_clone.pubkey(),
     100_000,
     100,
 		1000,

@@ -53,6 +53,7 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
+	/// * `event_id` - The event if
 	/// * `start_time` - The Solana time that describes the start of the event
 	/// * `end_time` - The Solana time that describes the end of the event
 	/// * `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices
@@ -62,7 +63,6 @@ use super::*;
 	pub fn create_event(
 		ctx: Context<CreateEvent>,
 		event_id: [u8; 32],
-		event_organizer_treasury: Pubkey,
 		n_tickets: u32,
 		start_time: i64,
 		end_time: i64,
@@ -74,7 +74,6 @@ use super::*;
 		processors::create_event::exec(
 			ctx,
 			event_id,
-			event_organizer_treasury,
 			n_tickets,
 			start_time,
 			end_time,

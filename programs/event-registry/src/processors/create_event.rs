@@ -1,8 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{
-  program::invoke,
-  system_instruction::transfer,
-};
 use anchor_spl::token::{self, Transfer, MintTo};
 use anchor_safe_math::SafeMath;
 use anchor_metaplex::{
@@ -136,7 +132,6 @@ fn init_event_capacity(ctx: &Context<CreateEvent>,) -> Result<()> {
 pub fn exec(
   ctx: Context<CreateEvent>,
   event_id: [u8; 32],
-  event_organizer_treasury: Pubkey,
   n_tickets: u32,
   start_time: i64,
   end_time: i64,
@@ -159,7 +154,6 @@ pub fn exec(
     };
 
     event.id = event_id;
-    event.event_organizer_treasury = event_organizer_treasury;
     event.n_tickets = n_tickets;
     event.start_time = start_time;
     event.end_time = end_time;

@@ -79,10 +79,6 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
-  /// CHECK: The Sol account that organizer will receive funds from the ticket sale to in case the purchase token is SOL
-  #[account(mut)]
-  pub event_organizer_purchase_sol_treasury: AccountInfo<'info>,
-
   /// CHECK: This is the event organizer of the event
   #[account()]
   pub event_organizer: AccountInfo<'info>,

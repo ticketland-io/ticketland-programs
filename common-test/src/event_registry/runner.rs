@@ -124,7 +124,7 @@ impl Runner {
     }
 
     // Wrapped Sol will be treated as the Native Sol. We do so to have consistent mint_accounts
-    // We should create the wraped sol mint account in test since it doesn't exist
+    // We should create the wrapped sol mint account in test since it doesn't exist
     let wrapped_sol = "So11111111111111111111111111111111111111112".try_into().unwrap();
     
     // make sure the account is available in the test environment
@@ -220,7 +220,6 @@ impl Runner {
     deposit_token: Pubkey,
     purchase_token: Pubkey,
     event_organizer: &Keypair,
-    event_organizer_treasury: Pubkey,
     n_tickets: u32,
     start_time: i64,
 		end_time: i64,
@@ -234,9 +233,6 @@ impl Runner {
     let event_nft_authority = pda::event_nft_authority(&state).0;
     let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
     let cpi_authority = pda::cpi_authority(&state).0;
-    
-    println!("event {:?}", event);
-    println!("event_nft {:?}", event_nft);
 
     let accounts = event_registry::accounts::CreateEvent {
       state,
@@ -267,7 +263,6 @@ impl Runner {
 
     let data = event_registry::instruction::CreateEvent {
       event_id,
-      event_organizer_treasury,
       n_tickets,
       start_time,
       end_time,
