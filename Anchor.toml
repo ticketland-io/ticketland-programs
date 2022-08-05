@@ -2,19 +2,19 @@
 seeds = false
 
 [programs.mainnet]
-event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
-ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
-ticket-nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
+ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
 
 [programs.testnet]
-event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
-ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
-ticket-nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
+ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
 
 [programs.localnet]
-event-registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
-ticket-sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
-ticket-nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
+ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
+ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
 
 [registry]
 url = "https://github.com/Apocentre/ticket-land-programs"

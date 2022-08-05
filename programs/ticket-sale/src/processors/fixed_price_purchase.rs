@@ -63,7 +63,7 @@ fn transfer_token<'info>(
 /// Transfer the purchase funds to event organizer and our treasury
 fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()> {
   let ticket_type = &ctx.accounts.sale.ticket_type;
-  let amount = if let SaleType::FixedPrice(amount) = ticket_type.sale_type {
+  let amount = if let SaleType::FixedPrice {amount} = ticket_type.sale_type {
     amount
   } else {
     // This should never happen since we already have the same check in the FixedPricePurchase context

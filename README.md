@@ -39,3 +39,134 @@ members = [
 + edition = "2021"
 + resolver = "2"
 ```
+
+Imported Custom Types IDL issue
+===
+
+https://github.com/coral-xyz/anchor/issues/1566#issuecomment-1105423938
+
+We need to manually add the type definitions into the degenerated IDL files. These custom types are defined in the `common` crate.
+
+More specifically we need to add the following types to the event_registry.json IDL file
+
+```
+ [
+    {
+      "name": "SaleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "FixedPrice",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Refundable",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DutchAuction",
+            "fields": [
+              {
+                "name": "start_price",
+                "type": "u64"
+              },
+              {
+                "name": "end_price",
+                "type": "u64"
+              },
+              {
+                "name": "curve_length",
+                "type": "u16"
+              },
+              {
+                "name": "drop_interval",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TicketType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "n_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "sale_type",
+            "type": {
+              "defined": "SaleType"
+            }
+          },
+          {
+            "name": "sale_start_time",
+            "type": "i64"
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Currency",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_account",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury_ata",
+            "type": "publicKey"
+          },
+          {
+            "name": "service_fee",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventNftAuthority",
+            "type": "u8"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+	```

@@ -1,0 +1,527 @@
+{
+  "version": "0.1.0",
+  "name": "event_registry",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "eventNftAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "supportedCurrencies",
+          "type": {
+            "vec": {
+              "defined": "Currency"
+            }
+          }
+        },
+        {
+          "name": "sellerFeeBasisPoints",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "createEvent",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "organizerEventNftAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "masterEdition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fundManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "fundManagerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleProgramState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketSaleProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventOrganizerTreasury",
+          "type": "publicKey"
+        },
+        {
+          "name": "nTickets",
+          "type": "u32"
+        },
+        {
+          "name": "startTime",
+          "type": "i64"
+        },
+        {
+          "name": "endTime",
+          "type": "i64"
+        },
+        {
+          "name": "ticketTypes",
+          "type": {
+            "vec": {
+              "defined": "TicketType"
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createTicketSale",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketSaleProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ticketTypeIndex",
+          "type": {
+            "defined": "usize"
+          }
+        },
+        {
+          "name": "eventId",
+          "type": "u64"
+        },
+        {
+          "name": "ticketType",
+          "type": {
+            "defined": "TicketType"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateSupportedCurrencies",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "supportedCurrencies",
+          "type": {
+            "vec": {
+              "defined": "Currency"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          },
+          {
+            "name": "nEvents",
+            "type": "u64"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployer",
+            "type": "publicKey"
+          },
+          {
+            "name": "supportedCurrencies",
+            "type": {
+              "vec": {
+                "defined": "Currency"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "SaleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "FixedPrice",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Refundable",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DutchAuction",
+            "fields": [
+              {
+                "name": "start_price",
+                "type": "u64"
+              },
+              {
+                "name": "end_price",
+                "type": "u64"
+              },
+              {
+                "name": "curve_length",
+                "type": "u16"
+              },
+              {
+                "name": "drop_interval",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TicketType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "n_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "sale_type",
+            "type": {
+              "defined": "SaleType"
+            }
+          },
+          {
+            "name": "sale_start_time",
+            "type": "i64"
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Currency",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_account",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury_ata",
+            "type": "publicKey"
+          },
+          {
+            "name": "service_fee",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventNftAuthority",
+            "type": "u8"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyDeployer",
+      "msg": "Only deployer"
+    },
+    {
+      "code": 6001,
+      "name": "TooManyCurrencies",
+      "msg": "Too many currencies"
+    },
+    {
+      "code": 6002,
+      "name": "TooManyTicketTypes",
+      "msg": "Too many ticket types"
+    },
+    {
+      "code": 6003,
+      "name": "UnsupportedDepositToken",
+      "msg": "Deposit token is not supported"
+    },
+    {
+      "code": 6004,
+      "name": "UnsupportedPurchaseToken",
+      "msg": "Purchase token is not supported"
+    },
+    {
+      "code": 6005,
+      "name": "NotEnoughDeposit",
+      "msg": "Not enough deposit"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMerkleProof",
+      "msg": "Invalid Merkle proof"
+    },
+    {
+      "code": 6007,
+      "name": "WrongTicketSaleProgramStateAccount",
+      "msg": "Wrong ticket sale program state account"
+    },
+    {
+      "code": 6008,
+      "name": "OnlyEventOrganizer",
+      "msg": "Only event organizer"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidTicketTypeIndex",
+      "msg": "Invalid ticket type index"
+    },
+    {
+      "code": 6010,
+      "name": "WrongTicketTypeForIndex",
+      "msg": "Wrong ticket type for index"
+    },
+    {
+      "code": 6011,
+      "name": "TicketSaleMustBeOwner",
+      "msg": "Ticket sale must the the owner"
+    }
+  ]
+}

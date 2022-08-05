@@ -8,21 +8,10 @@ use solana_sdk::{
 use solana_test_utils::{
   utils::{to_base},
 };
-use anchor_metaplex::{
-  mpl_token_metadata::{
-    deser::meta_deser,
-    pda::{
-      find_metadata_account,
-      find_master_edition_account,
-    },
-  },
-};
 use solana_program_test::{tokio};
 use common_test::{
   event_registry::{
-    pda,
     runner::Runner,
-    error::Error,
   },
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
@@ -30,18 +19,11 @@ use common_test::{
   },
   test_context::TestContext,
 };
-
-use anchor_lang::{
-  prelude::Result as AnchorResult,
-};
 use common::{
   state::{
     ticket_type::TicketType,
     sale_type::SaleType,
   },
-};
-use ticket_sale::{
-  account_data::{event_capacity::MAX_VENUE_CAPACITY},
 };
 
 async fn custom_create_event(
@@ -67,7 +49,7 @@ async fn custom_create_event(
   let ticket_types = vec![
     TicketType {
       n_tickets: 50_000,
-      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
     },
@@ -173,7 +155,6 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
   }
 
   // Create a new ticket sale for the second ticket type
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let ticket_type_index = 1;
 
   let result = runner.create_ticket_sale(

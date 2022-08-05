@@ -141,7 +141,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
     ticket_types = vec![
       TicketType {
         n_tickets: 4,
-        sale_type: SaleType::FixedPrice(sol_to_lamports(1_f64)),
+        sale_type: SaleType::FixedPrice {amount: sol_to_lamports(1_f64)},
         sale_start_time: now + 10, // 10 seconds
         merkle_root: mt_type_1.root().unwrap(),
       },

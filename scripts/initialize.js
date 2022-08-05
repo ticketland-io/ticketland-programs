@@ -1,7 +1,8 @@
+import anchor from '@project-serum/anchor'
 import {getAssociatedTokenAddress} from '@solana/spl-token'
 import {writeFile} from 'fs/promises'
 import * as pda from './helpers/pda.js'
-import deploymentConfig from '../config.json'
+import deploymentConfig from './.config.json' assert { type: 'json' }
 
 const {SystemProgram, SYSVAR_RENT_PUBKEY, Keypair, PublicKey, BN} = anchor.web3
 const utf8 = anchor.utils.bytes.utf8
@@ -30,8 +31,10 @@ const initializeEventRegistry = async () => {
   const program = anchor.workspace.EventRegistry
   const deployer = provider.wallet.publicKey
 
-  const supportedCurrencies = deploymentConfig.supportedMintAccounts.reduce((acc, curr) => {
-    [...acc, {
+  const supportedCurrencies = deploymentConfig.supportedMintAccounts.reduce(async (prom, curr) => {
+    const acc = await prom
+
+    return [...acc, {
       mintAccount: new PublicKey(curr.mintAccount),
       treasuryAta: await getAssociatedTokenAddress(mintAccount, treasury, true),
       depositAmount: BN(curr.depositAmount),

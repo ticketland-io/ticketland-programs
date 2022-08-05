@@ -4,9 +4,13 @@
 		"test-validator": "./scripts/test-validator.sh",
 		"airdrop": "./scripts/airdrop.sh",
 		"setup:dev": "ENV=dev ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js",
-		"deploy:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
-		"deploy:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
-		"setup:testnet": "ENV=testnet ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js"
+		"setup:testnet": "ENV=testnet ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js",
+		"deploy-event_registry:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/event-registry.json target/deploy/event_registry.so",
+		"deploy-event_registry:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/event-registry.json target/deploy/event_registry.so",
+		"deploy-ticket_sale:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
+		"deploy-ticket_sale:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-sale.json target/deploy/ticket_sale.so",
+		"deploy-ticket_nft:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-nft.json target/deploy/ticket_nft.so",
+		"deploy-ticket_nft:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/ticket-nft.json target/deploy/ticket_nft.so"
 	},
 	"dependencies": {
 		"@metaplex-foundation/amman": "^0.10.0",

@@ -26,7 +26,6 @@ use solana_program_test::{tokio};
 use common_test::{
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
-    pda as ticket_sale_pda,
   },
   event_registry::{
     pda,
@@ -89,7 +88,7 @@ async fn custom_create_event(
   let ticket_types = vec![
     TicketType {
       n_tickets: 1000,
-      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
     },
@@ -168,7 +167,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     assert_eq!(event_data.ticket_types,  vec![
       TicketType {
         n_tickets: 1000,
-        sale_type: SaleType::FixedPrice(to_base(100, 6)),
+        sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
         merkle_root: [0; 32],
       },
@@ -296,7 +295,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
     ticket_types.push(
       TicketType {
         n_tickets: 1000,
-        sale_type: SaleType::FixedPrice(to_base(100, 6)),
+        sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
         merkle_root: [0; 32],
       }
@@ -495,7 +494,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let ticket_types = vec![
     TicketType {
       n_tickets: 1000,
-      sale_type: SaleType::FixedPrice(to_base(100, 6)),
+      sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
     },
