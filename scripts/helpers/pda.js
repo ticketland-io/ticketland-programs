@@ -17,3 +17,8 @@ export const ticketSaleCpiAuthority = async (ticketSaleSate, ticketSaleProgramId
   [utf8.encode('ticket_sale:cpi_authority'), ticketSaleSate.toBuffer()],
   ticketSaleProgramId
 )
+
+export const nftAuthority = async (ticketNftState, ticketNftProgramId) => await PublicKey.findProgramAddress(
+  [utf8.encode('nft_authority'), ticketNftState.toBuffer()],
+  ticketNftProgramId
+)

@@ -82,17 +82,46 @@ const initializeTicketSale = async (eventRegistryState) => {
       signers: [state, provider.wallet.payer]
     }
   )
+
+  return state.publicKey
+}
+
+const initializeTicketNft = async (ticketSaleState) => {
+  const state = Keypair.generate()
+  const treasury = new PublicKey('')
+  const program = anchor.workspace.TicketNft
+  const deployer = provider.wallet.publicKey
+
+  await program.rpc.initialize(
+    treasury,
+    {
+      accounts: {
+        state: state.publicKey,
+        nftAuthority: (await pda.nftAuthority(state, program.programId))[0],
+        ticketSaleState,
+        ticket_sale_program: anchor.workspace.TicketSale.programId,
+        deployer,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+      signers: [state, provider.wallet.payer]
+    }
+  )
+
+  return state.publicKey
 }
 
 const main = async () => {
   const eventRegistryState = await initializeEventRegistry()
   const ticketSaleState = await initializeTicketSale(eventRegistryState)
+  const ticketNftState = await initializeTicketNft(ticketSaleState)
 
   await writeFile(
     `./deployments/event-registry-${process.env.ENV}.json`,
     JSON.stringify({
       eventRegistryState: eventRegistryState.publicKey.toBase58(),
       ticketSaleState: ticketSaleState.publicKey.toBase58(),
+      ticketNftState: ticketNftState.publicKey.toBase58(),
     }, null, 2)
   )
 }
