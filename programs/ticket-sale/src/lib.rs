@@ -71,7 +71,7 @@ pub mod ticket_sale {
 	pub fn create_sale(
 		ctx: Context<CreateSale>,
 		_cpi_authority_bump: u8,
-		ticket_type_index: usize,
+		ticket_type_index: u8,
 		event_id: u64,
 		ticket_type: TicketType,
 	) -> Result<()> {

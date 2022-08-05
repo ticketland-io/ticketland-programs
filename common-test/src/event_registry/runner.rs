@@ -288,7 +288,7 @@ impl Runner {
     event_id: u64,
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
-    ticket_type_index: usize,
+    ticket_type_index: u8,
     ticket_type: TicketType,
   ) -> AnchorResult<()> {
     let event = pda::event(&state, event_id).0;

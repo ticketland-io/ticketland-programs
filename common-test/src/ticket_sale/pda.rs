@@ -7,7 +7,7 @@ use crate::{
 
 pub fn ticket_sale_state(
   state: &Pubkey,
-  ticket_type_index: usize,
+  ticket_type_index: u8,
   event_id: u64,
 ) -> (Pubkey, u8) {
   Pubkey::find_program_address(

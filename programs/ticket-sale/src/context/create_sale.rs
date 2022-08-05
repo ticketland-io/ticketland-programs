@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, ticket_type_index: usize, event_id: u64)]
+#[instruction(cpi_authority_bump: u8, ticket_type_index: u8, event_id: u64)]
 pub struct CreateSale<'info> {
   #[account()]
   pub state: Account<'info, State>,

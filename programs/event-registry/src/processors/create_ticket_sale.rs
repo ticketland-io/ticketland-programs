@@ -11,7 +11,7 @@ use crate::{
 
 pub fn exec(
   ctx: Context<CreateTicketSale>,
-  ticket_type_index: usize,
+  ticket_type_index: u8,
   ticket_type: TicketType,
 ) -> Result<()> {
   {
