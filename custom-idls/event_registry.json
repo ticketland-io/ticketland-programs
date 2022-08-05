@@ -437,6 +437,10 @@
             "type": "publicKey"
           },
           {
+            "name": "deposit_amount",
+            "type": "u64"
+          },
+          {
             "name": "service_fee",
             "type": "u16"
           }

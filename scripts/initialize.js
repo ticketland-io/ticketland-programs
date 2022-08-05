@@ -74,8 +74,8 @@ const initializeTicketSale = async (eventRegistryState) => {
       accounts: {
         state: state.publicKey,
         eventRegistryState,
-        event_registry_program: anchor.workspace.EventRegistry.programId,
-        cpi_authority: (await pda.ticketSaleCpiAuthority(state, program.programId))[0],
+        eventRegistryProgram: anchor.workspace.EventRegistry.programId,
+        cpiAuthority: (await pda.ticketSaleCpiAuthority(state.publicKey, program.programId))[0],
         deployer,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
@@ -96,9 +96,9 @@ const initializeTicketNft = async (ticketSaleState) => {
     {
       accounts: {
         state: state.publicKey,
-        nftAuthority: (await pda.nftAuthority(state, program.programId))[0],
+        nftAuthority: (await pda.nftAuthority(state.publicKey, program.programId))[0],
         ticketSaleState,
-        ticket_sale_program: anchor.workspace.TicketSale.programId,
+        ticketSaleProgram: anchor.workspace.TicketSale.programId,
         deployer,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
@@ -118,9 +118,9 @@ const main = async () => {
   await writeFile(
     `./deployments/event-registry-${process.env.ENV}.json`,
     JSON.stringify({
-      eventRegistryState: eventRegistryState.publicKey.toBase58(),
-      ticketSaleState: ticketSaleState.publicKey.toBase58(),
-      ticketNftState: ticketNftState.publicKey.toBase58(),
+      eventRegistryState: eventRegistryState.toBase58(),
+      ticketSaleState: ticketSaleState.toBase58(),
+      ticketNftState: ticketNftState.toBase58(),
     }, null, 2)
   )
 }

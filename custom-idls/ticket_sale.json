@@ -577,18 +577,6 @@
       }
     },
     {
-      "name": "InitBumps",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "cpiAuthority",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
       "name": "TicketType",
       "type": {
         "kind": "struct",
@@ -615,6 +603,18 @@
                 32
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
           }
         ]
       }
