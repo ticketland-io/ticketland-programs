@@ -9,6 +9,7 @@ use test_context::{test_context, futures};
 use solana_test_utils::{
   spl::Spl,
   serialization::deser_zero_account,
+  spl_token,
 };
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -112,7 +113,7 @@ async fn custom_create_event(
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(ctx: &mut TestContext) {
+async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapped_sol(ctx: &mut TestContext) {
   let (
     event_registry_state,
     ticket_sale_state,
@@ -190,11 +191,16 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
   let event_organizer_funds_before;
   let treasury_funds_before;
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
     let treasury = ticket_sale_runner.treasury.pubkey();
 
-    event_organizer_funds_before = pt.context.banks_client.get_account(event_organizer.pubkey()).await.unwrap().unwrap();
-    treasury_funds_before = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
+    event_organizer_funds_before = event_registry_runner.get_event_organizer_ata_balance(
+      &event_organizer.pubkey(),
+      &spl_token::native_mint::id(),
+    ).await;
+    treasury_funds_before = event_registry_runner.get_treasury_ata_balance(
+      &treasury,
+      &spl_token::native_mint::id(),
+    ).await;
   }
 
   let seat_index = 0;
@@ -217,15 +223,21 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_sol(c
 
   // funds are transferred
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
     let treasury = ticket_sale_runner.treasury.pubkey();
     
-    let event_organizer_funds_after = pt.context.banks_client.get_account(event_organizer.pubkey()).await.unwrap().unwrap();
-    assert_eq!(event_organizer_funds_after.lamports - event_organizer_funds_before.lamports, sol_to_lamports(0.95_f64));
+    let event_organizer_funds_after = event_registry_runner.get_event_organizer_ata_balance(
+      &event_organizer.pubkey(),
+      &spl_token::native_mint::id(),
+    ).await;
+
+    assert_eq!(event_organizer_funds_after - event_organizer_funds_before, sol_to_lamports(0.95_f64));
 
     // 5% feeds go to treasury
-    let treasury_funds_after = pt.context.banks_client.get_account(treasury).await.unwrap().unwrap();
-    assert_eq!(treasury_funds_after.lamports - treasury_funds_before.lamports, sol_to_lamports(0.05_f64));
+    let treasury_funds_after = event_registry_runner.get_treasury_ata_balance(
+      &treasury,
+      &spl_token::native_mint::id(),
+    ).await;
+    assert_eq!(treasury_funds_after - treasury_funds_before, sol_to_lamports(0.05_f64));
   }
 
   let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), event_id).0;
