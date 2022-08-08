@@ -232,6 +232,15 @@ impl Runner {
 		uri: String,
   ) -> AnchorResult<()> {
     let event = pda::event(&state, event_id).0;
+
+    // use std::str::FromStr;
+    // let state = Pubkey::from_str("FSsYKWiEgupret7Z9whygLS8Q3gv84UZN886VVDR9NZR").unwrap();
+    // let event_id = "5614002281924846be89975df31530ec".as_bytes()[0..32].try_into().unwrap();
+
+    // println!(">>>>>>>>>>>>>>>>>>> {:?}", state);
+    // println!(">>>>>>>>>>>>>>>>>>> {:?}", event_id);
+    // println!(">>>>>>>>>>>>>>>>>>> {:?}", pda::event(&state, event_id).0);
+
     let event_nft = pda::event_nft(&state, event_id).0;
     let event_nft_authority = pda::event_nft_authority(&state).0;
     let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
