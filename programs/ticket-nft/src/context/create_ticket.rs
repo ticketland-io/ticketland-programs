@@ -54,7 +54,7 @@ pub struct CreateTicket<'info> {
       b"ticket_nft",
       state.key().as_ref(),
       ticket_buyer.key().as_ref(),
-      event_id.as_ref()
+      &event_id
     ],
     bump,
   )]

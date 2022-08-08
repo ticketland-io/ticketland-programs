@@ -22,7 +22,7 @@ pub struct CreateSale<'info> {
       b"sale",
       state.key().as_ref(),
       ticket_type_index.to_string().as_ref(),
-      event_id.as_ref()
+      &event_id
     ],
     bump
   )]

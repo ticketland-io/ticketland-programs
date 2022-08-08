@@ -41,7 +41,7 @@ pub struct CreateEvent<'info> {
     init,
     payer = event_organizer,
     space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES) + SPACE_MARGIN,
-    seeds = [b"event", state.key().as_ref(), event_id.as_ref()],
+    seeds = [b"event", state.key().as_ref(), &event_id],
     bump
   )]
   pub event: Box<Account<'info, Event>>,
@@ -59,7 +59,7 @@ pub struct CreateEvent<'info> {
     payer = event_organizer,
     mint::decimals = 0,
     mint::authority = event_nft_authority,
-    seeds = [b"event_nft", state.key().as_ref(), event_id.as_ref()],
+    seeds = [b"event_nft", state.key().as_ref(), &event_id],
     bump,
   )]
   pub event_nft: Box<Account<'info, Mint>>,

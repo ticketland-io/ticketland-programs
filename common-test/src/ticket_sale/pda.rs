@@ -15,7 +15,7 @@ pub fn ticket_sale_state(
       b"sale",
       state.as_ref(),
       ticket_type_index.to_string().as_ref(),
-      event_id.as_ref()
+      &event_id
     ],
     &ticket_sale_program_id(),
   )

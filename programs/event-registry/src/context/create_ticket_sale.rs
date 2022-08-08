@@ -20,7 +20,7 @@ pub struct CreateTicketSale<'info> {
 
   // The newly created event 
   #[account(
-    seeds = [b"event", state.key().as_ref(), event_id.as_ref()],
+    seeds = [b"event", state.key().as_ref(), &event_id],
     bump = event.bumps.event,
   )]
   pub event: Account<'info, Event>,

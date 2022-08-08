@@ -22,7 +22,7 @@ pub fn ticket_nft(
       b"ticket_nft",
       state.as_ref(),
       ticket_buyer.as_ref(),
-      event_id.as_ref()
+      &event_id
     ],
     &ticket_nft_program_id()
   )
