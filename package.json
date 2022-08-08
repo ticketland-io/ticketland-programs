@@ -3,7 +3,7 @@
 	"scripts": {
 		"test-validator": "./scripts/test-validator.sh",
 		"airdrop": "./scripts/airdrop.sh",
-		"setup:dev": "ENV=dev ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js",
+		"setup:dev": "ENV=dev ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/setup-dev.js",
 		"setup:testnet": "ENV=testnet ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/initialize.js",
 		"deploy-event_registry:dev": "solana program deploy --url http://127.0.0.1:8899 --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/event-registry.json target/deploy/event_registry.so",
 		"deploy-event_registry:testnet": "solana program deploy --url https://api.testnet.solana.com --keypair ./wallets-dev/deployer.json --program-id ./wallets-dev/event-registry.json target/deploy/event_registry.so",

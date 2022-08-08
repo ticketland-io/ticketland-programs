@@ -5,7 +5,6 @@ import * as pda from './helpers/pda.js'
 import deploymentConfig from './.config.json' assert { type: 'json' }
 
 const {SystemProgram, SYSVAR_RENT_PUBKEY, Keypair, PublicKey} = anchor.web3
-const utf8 = anchor.utils.bytes.utf8
 
 const getClusterUrl = () => {
   switch(process.env.ENV) {
@@ -110,7 +109,7 @@ const initializeTicketNft = async (ticketSaleState) => {
   return state.publicKey
 }
 
-const main = async () => {
+export const main = async () => {
   const eventRegistryState = await initializeEventRegistry()
   const ticketSaleState = await initializeTicketSale(eventRegistryState)
   const ticketNftState = await initializeTicketNft(ticketSaleState)
