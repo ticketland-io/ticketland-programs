@@ -2,10 +2,9 @@
 // We can't unfortunately use the So11111111111111111111111111111111111111112 account because it's not available in the test validator
 // and we can't create it either since we don't possess the private key.
 import anchor from '@project-serum/anchor'
-import {writeFile} from 'fs/promises'
+import {writeFile, readFile} from 'fs/promises'
 import * as spl from '@solana/spl-token'
 import {main as initMain} from './initialize.js'
-import deployment from '.././deployments/event-registry-dev.json' assert { type: 'json' }
 
 const getClusterUrl = () => {
   switch(process.env.ENV) {
@@ -33,6 +32,8 @@ const createWrappedSol = async () => {
     9
   )
   
+  const deployment = JSON.parse(await readFile('./deployments/event-registry-dev.json'))
+
   await writeFile(
     './deployments/event-registry-dev.json',
     JSON.stringify({
