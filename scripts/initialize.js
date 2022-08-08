@@ -24,7 +24,7 @@ const provider = anchor.AnchorProvider.local(
 
 anchor.setProvider(provider)
 
-const initializeEventRegistry = async () => {
+const initializeEventRegistry = async (deploymentConfig) => {
   const state = Keypair.generate()
   const treasury = new PublicKey(deploymentConfig.depositTreasury)
   const program = anchor.workspace.EventRegistry
@@ -61,7 +61,7 @@ const initializeEventRegistry = async () => {
   return state.publicKey
 }
 
-const initializeTicketSale = async (eventRegistryState) => {
+const initializeTicketSale = async (deploymentConfig, eventRegistryState) => {
   const state = Keypair.generate()
   const treasury = new PublicKey(deploymentConfig.serviceFeeTreasury)
   const program = anchor.workspace.TicketSale
@@ -109,9 +109,9 @@ const initializeTicketNft = async (ticketSaleState) => {
   return state.publicKey
 }
 
-export const main = async () => {
-  const eventRegistryState = await initializeEventRegistry()
-  const ticketSaleState = await initializeTicketSale(eventRegistryState)
+export const main = async (deploymentConfig) => {
+  const eventRegistryState = await initializeEventRegistry(deploymentConfig)
+  const ticketSaleState = await initializeTicketSale(deploymentConfig, eventRegistryState)
   const ticketNftState = await initializeTicketNft(ticketSaleState)
 
   await writeFile(
@@ -124,6 +124,6 @@ export const main = async () => {
   )
 }
 
-main()
+main(deploymentConfig)
 .then(() => console.log('Success'))
 .catch(error => console.log('Error: ', error))
