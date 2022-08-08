@@ -1,6 +1,4 @@
-// We need to create new Mint account that will be the Wrapped SOL mint we'll be using in the test validator for dev purposes
-// We can't unfortunately use the So11111111111111111111111111111111111111112 account because it's not available in the test validator
-// and we can't create it either since we don't possess the private key.
+// Create a test USDC mint account to test multiple currencies
 import anchor from '@project-serum/anchor'
 import {readFile} from 'fs/promises'
 import * as spl from '@solana/spl-token'
@@ -22,7 +20,7 @@ const provider = anchor.AnchorProvider.local(
   {preflightCommitment: 'confirmed'}
 )
 
-const createWrappedSol = async () => {
+const createMintAccount = async () => {
   // Create the Wrapped SOL Mint account
   const wrappedSol = await spl.createMint(
     provider.connection,
@@ -36,12 +34,12 @@ const createWrappedSol = async () => {
 }
 
 const main = async () => {
-  const wrappedSol = await createWrappedSol()
-  console.log('wrappedSol ', wrappedSol)
+  const usdc = await createMintAccount()
+  console.log('usdc ', usdc)
   
   const config = JSON.parse(await readFile('./scripts/.config.json'))
   config.supportedMintAccounts.push({
-    mintAccount: wrappedSol,
+    mintAccount: usdc,
     depositAmount: 1000000000,
     serviceFee: 1000
   })
