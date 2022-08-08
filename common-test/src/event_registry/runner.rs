@@ -6,6 +6,7 @@ use anchor_lang::{
   Id,
   InstructionData,
   ToAccountMetas,
+  solana_program::program_option::COption,
 };
 use solana_test_utils::{
   program_test::ProgramTest,
@@ -13,6 +14,7 @@ use solana_test_utils::{
   spl_associated_token_account,
   spl::Spl,
   utils::{to_base},
+  spl_token,
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -123,38 +125,39 @@ impl Runner {
       })
     }
 
-    // Wrapped Sol will be treated as the Native Sol. We do so to have consistent mint_accounts
-    // We should create the wrapped sol mint account in test since it doesn't exist
-    let wrapped_sol = "So11111111111111111111111111111111111111112".try_into().unwrap();
-    
     // make sure the account is available in the test environment
     {
+      let authority = Keypair::new();
+      
       self.spl.set_mint_account(
-        &wrapped_sol,
+        &spl_token::native_mint::id(),
         sol_to_lamports(1_f64),
-        to_base(1000, 9),
+        COption::None,
+        to_base(1000000, 9),
         9,
       ).await;
 
       // Create an ATA for each participant
       for participant in &self.test_account.participants {
-        self.spl.create_associated_account(&participant.pubkey(), &wrapped_sol).await;
+        self.spl.wrap_sol(&spl_token::native_mint::id(), &participant, to_base(100, 9)).await;
       }
 
       let _ = self.spl.create_associated_account(
         &self.deployer.pubkey(), 
-        &wrapped_sol
+        &spl_token::native_mint::id()
       ).await;
+
+      deposit_token_authorities.push(authority);
     }
 
     supported_currencies.push(Currency {
-      mint_account: wrapped_sol,
-      treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &wrapped_sol),
+      mint_account: spl_token::native_mint::id(),
+      treasury_ata: Spl::get_associated_token_address(&self.deployer.pubkey(), &spl_token::native_mint::id()),
       deposit_amount: sol_to_lamports(10_f64),
       service_fee: 500, // 5%
     });
 
-    deposit_tokens.push(wrapped_sol);
+    deposit_tokens.push(spl_token::native_mint::id());
     self.deposit_tokens = deposit_tokens;
     self.deposit_token_authorities = deposit_token_authorities;
     self.supported_currencies = supported_currencies;
@@ -323,5 +326,23 @@ impl Runner {
     };
 
     self.process_transaction(&[ix], Some(&[&event_organizer])).await
+  }
+
+  pub async fn get_event_organizer_ata_balance(
+    &mut self, 
+    event_organizer: &Pubkey,
+    mint_account: &Pubkey,
+  ) -> u64 {
+    let event_organizer_ata = pda::event_organizer_ata(&event_organizer, &mint_account);
+    self.spl.get_token_account(event_organizer_ata).await.amount
+  }
+
+  pub async fn get_treasury_ata_balance(
+    &mut self, 
+    treasury: &Pubkey,
+    mint_account: &Pubkey,
+  ) -> u64 {
+    let treasury_ata = Spl::get_associated_token_address(&treasury, &mint_account);
+    self.spl.get_token_account(treasury_ata).await.amount
   }
 }
