@@ -53,7 +53,7 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `event_id` - The event if
+	/// * `event_id` - The event id
 	/// * `start_time` - The Solana time that describes the start of the event
 	/// * `end_time` - The Solana time that describes the end of the event
 	/// * `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices

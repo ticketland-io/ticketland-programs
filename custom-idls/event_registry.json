@@ -172,8 +172,13 @@
       ],
       "args": [
         {
-          "name": "eventOrganizerTreasury",
-          "type": "publicKey"
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "nTickets",
