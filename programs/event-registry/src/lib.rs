@@ -14,6 +14,7 @@ use crate::{
 	context::{
 		initialize::*,
 		create_event::*,
+		create_event_nft::*,
 		create_ticket_sale::*,
 		update_supported_currencies::*,
 	},
@@ -57,9 +58,6 @@ use super::*;
 	/// * `start_time` - The Solana time that describes the start of the event
 	/// * `end_time` - The Solana time that describes the end of the event
 	/// * `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices
-	/// * `name` - The name that will be used in the Event NFT metadata
-	/// * `symbol` - The symbol that will be used in the Event NFT metadata
-	/// * `uri` - The uti that will be used in the Event NFT metadata
 	pub fn create_event(
 		ctx: Context<CreateEvent>,
 		event_id: [u8; 32],
@@ -67,9 +65,6 @@ use super::*;
 		start_time: i64,
 		end_time: i64,
 		ticket_types: Vec<TicketType>,
-		name: String,
-		symbol: String,
-		uri: String,
 	) -> Result<()> {
 		processors::create_event::exec(
 			ctx,
@@ -78,6 +73,26 @@ use super::*;
 			start_time,
 			end_time,
 			ticket_types,
+		)
+	}
+
+	/// This will create the Event NFT for the given event id.
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `event_id` - The event id
+	/// * `symbol` - The symbol that will be used in the Event NFT metadata
+	/// * `uri` - The uti that will be used in the Event NFT metadata
+	pub fn create_event_nft(
+		ctx: Context<CreateEventNft>,
+		_event_id: [u8; 32],
+		name: String,
+		symbol: String,
+		uri: String,
+	) -> Result<()> {
+		processors::create_event_nft::exec(
+			ctx,
 			name,
 			symbol,
 			uri,
