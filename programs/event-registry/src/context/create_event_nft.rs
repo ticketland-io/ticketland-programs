@@ -28,6 +28,7 @@ pub struct CreateEventNft<'info> {
 
   // The event that was previously created
   #[account(
+    mut,
     seeds = [b"event", state.key().as_ref(), &event_id],
     bump = event.bumps.event,
   )]
