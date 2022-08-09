@@ -105,7 +105,7 @@ async fn custom_create_event(
     },
   ];
 
-  runner.create_event(
+  let result = runner.create_event(
     state.pubkey(),
     event_capacity,
     ticket_sale_program_state,
@@ -117,11 +117,21 @@ async fn custom_create_event(
     100,
 		1000,
 		ticket_types.clone(),
-		"Ticket Land Coolest Event".to_owned(),
-		"TICKT".to_owned(),
-		"https://ticketland.io".to_owned(),
-  ).await
+  ).await;
 
+  if result.is_ok() {
+    // Create the NFT as well
+    return runner.create_event_nft(
+      state.pubkey(),
+      event_id,
+      &event_organizer,
+      "Ticket Land Coolest Event".to_owned(),
+      "TICKT".to_owned(),
+      "https://ticketland.io".to_owned(),
+    ).await
+  }
+
+  result
 }
 
 #[test_context(TestContext)]
@@ -314,9 +324,6 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
     100,
 		1000,
 		ticket_types.clone(),
-		"Ticket Land Coolest Event".to_owned(),
-		"TICKT".to_owned(),
-		"https://ticketland.io".to_owned(),
   ).await;
 
   Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TooManyTicketTypes);
@@ -493,9 +500,6 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
     100,
 		1000,
 		ticket_types.clone(),
-		"Ticket Land Coolest Event".to_owned(),
-		"TICKT".to_owned(),
-		"https://ticketland.io".to_owned(),
   ).await;
 
   Error::assert_err(result, event_registry::utils::program_error::ErrorCode::UnsupportedDepositToken);

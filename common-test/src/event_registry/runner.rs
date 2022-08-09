@@ -227,24 +227,14 @@ impl Runner {
     start_time: i64,
 		end_time: i64,
 		ticket_types: Vec<TicketType>,
-		name: String,
-		symbol: String,
-		uri: String,
   ) -> AnchorResult<()> {
     let event = pda::event(&state, event_id).0;
-    let event_nft = pda::event_nft(&state, event_id).0;
-    let event_nft_authority = pda::event_nft_authority(&state).0;
     let fund_manager = pda::fund_manager(&state, &event, &event_organizer.pubkey()).0;
     let cpi_authority = pda::cpi_authority(&state).0;
 
     let accounts = event_registry::accounts::CreateEvent {
       state,
       event,
-      event_nft,
-      event_nft_authority,
-      organizer_event_nft_ata: pda::organizer_event_nft_ata(&event_organizer.pubkey(), &event_nft),
-      metadata: find_metadata_account(&event_nft).0,
-      master_edition: find_master_edition_account(&event_nft).0,
       deposit_token,
       purchase_token,
       fund_manager,
@@ -257,7 +247,6 @@ impl Runner {
       event_organizer: event_organizer.pubkey(),
       
       ticket_sale_program: ticket_sale_program_id(),
-      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
       system_program: system_program::ID,
@@ -270,6 +259,48 @@ impl Runner {
       start_time,
       end_time,
       ticket_types,
+    }.data();
+    
+    let ix = Instruction {
+      program_id: event_registry::id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&event_organizer])).await
+  }
+
+  pub async fn create_event_nft(
+    &self,
+    state: Pubkey,
+    event_id: [u8; 32],
+    event_organizer: &Keypair,
+		name: String,
+		symbol: String,
+		uri: String,
+  ) -> AnchorResult<()> {
+    let event = pda::event(&state, event_id).0;
+    let event_nft = pda::event_nft(&state, event_id).0;
+    let event_nft_authority = pda::event_nft_authority(&state).0;
+
+    let accounts = event_registry::accounts::CreateEventNft {
+      state,
+      event,
+      event_nft,
+      event_nft_authority,
+      organizer_event_nft_ata: pda::organizer_event_nft_ata(&event_organizer.pubkey(), &event_nft),
+      metadata: find_metadata_account(&event_nft).0,
+      master_edition: find_master_edition_account(&event_nft).0,
+      event_organizer: event_organizer.pubkey(),
+      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = event_registry::instruction::CreateEventNft {
+      _event_id: event_id,
       name,
       symbol,
       uri,

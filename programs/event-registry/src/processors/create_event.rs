@@ -78,7 +78,7 @@ pub fn exec(
 
     event.bumps = EventBumps {
       event: *ctx.bumps.get("event").unwrap(),
-      event_nft: *ctx.bumps.get("event_nft").unwrap(),
+      event_nft: 0, // this will be set in a subsequent create_event_nft IX
     };
 
     event.id = event_id;

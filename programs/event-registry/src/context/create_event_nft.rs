@@ -12,6 +12,7 @@ use anchor_metaplex::{
 use crate::{
   account_data::{
     state::*,
+    event::*,
   },
 };
 
@@ -24,6 +25,13 @@ use crate::{
 pub struct CreateEventNft<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
+
+  // The event that was previously created
+  #[account(
+    seeds = [b"event", state.key().as_ref(), &event_id],
+    bump = event.bumps.event,
+  )]
+  pub event: Box<Account<'info, Event>>,
 
   /// CHECK: The authority of the event nfts
   #[account(

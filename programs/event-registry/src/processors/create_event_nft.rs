@@ -79,6 +79,9 @@ pub fn exec(
   symbol: String,
   uri: String,
 ) -> Result<()> {
+  let event = &mut ctx.accounts.event;
+  event.bumps.event_nft = *ctx.bumps.get("event_nft").unwrap();
+  
   let state = &ctx.accounts.state;
   let state_key = state.key();
 
