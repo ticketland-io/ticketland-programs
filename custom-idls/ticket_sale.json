@@ -694,6 +694,22 @@
 					}
 				]
 			}
+		},
+		{
+			"name": "EventBumps",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "event",
+						"type": "u8"
+					},
+					{
+						"name": "event_nft",
+						"type": "u8"
+					}
+				]
+			}
 		}
 	],
 	"errors": [
