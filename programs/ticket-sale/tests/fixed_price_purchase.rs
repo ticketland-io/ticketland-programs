@@ -105,9 +105,16 @@ async fn custom_create_event(
     100,
 		1000,
 		ticket_types.clone(),
-		"Ticket Land Coolest Event".to_owned(),
-		"TICKT".to_owned(),
-		"https://ticketland.io".to_owned(),
+  ).await;
+
+  // Create the NFT as well
+  let _ = event_registry_runner.create_event_nft(
+    event_registry_state,
+    event_id,
+    &event_organizer,
+    "Ticket Land Coolest Event".to_owned(),
+    "TICKT".to_owned(),
+    "https://ticketland.io".to_owned(),
   ).await;
 }
 
