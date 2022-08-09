@@ -12,6 +12,8 @@ pub struct EventCapacity {
   pub is_initialized: bool,
   pub available_tickets: u32,
 
-  // A bitmap which has n_tickets bits that represent each seat e.g bit at position 0
+  // A bitmap which has n_tickets bits that represent each seat
+  // By default all bits are 0. When a ticket at ticket index N (Nth bit) is purchased
+  // then the bit is flipped to 1 indicating that the seat is not available
   pub seats: [u8; MAX_VENUE_CAPACITY],
 }
