@@ -107,18 +107,15 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the
-	/// ticket sale program to create unique PDAs
-	/// * `ticket_type` - The ticket type of the given ticket for which we want to create a sale
+	/// ticket sale program to create unique PDAs as well as access to ticket_type data.
 	pub fn create_ticket_sale(
 		ctx: Context<CreateTicketSale>,
 		ticket_type_index: u8,
 		_event_id: [u8; 32],
-		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_ticket_sale::exec(
 			ctx,
 			ticket_type_index,
-			ticket_type,
 		)
 	}
 

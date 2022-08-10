@@ -36,7 +36,6 @@ impl TryFrom<u32> for Error {
       7 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketSaleProgramStateAccount)),
       8 => Ok(Error(event_registry::utils::program_error::ErrorCode::OnlyEventOrganizer)),
       9 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
-      10 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketTypeForIndex)),
       11 => Ok(Error(event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner)),
       _ => Err(())
     }

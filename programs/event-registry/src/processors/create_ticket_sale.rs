@@ -1,9 +1,4 @@
 use anchor_lang::prelude::*;
-use common::{
-  state::{
-    ticket_type::TicketType,
-  },
-};
 use crate::{
   utils::program_error::ErrorCode,
   context::create_ticket_sale::CreateTicketSale, 
@@ -12,12 +7,8 @@ use crate::{
 pub fn exec(
   ctx: Context<CreateTicketSale>,
   ticket_type_index: u8,
-  ticket_type: TicketType,
 ) -> Result<()> {
-  {
-    let ticket_type_at_index = &ctx.accounts.event.ticket_types[ticket_type_index as usize];
-    require!(*ticket_type_at_index == ticket_type,  ErrorCode::WrongTicketTypeForIndex);
-  }
+  require!(ticket_type_index <= ctx.accounts.event.ticket_types.len() as u8,  ErrorCode::WrongTicketTypeForIndex);
 
   let cpi_program = ctx.accounts.ticket_sale_program.to_account_info();
   let cpi_accounts = ticket_sale::cpi::accounts::CreateSale {
@@ -40,7 +31,8 @@ pub fn exec(
 
   let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
   let event = &ctx.accounts.event;
-
+  let ticket_type = ctx.accounts.event.ticket_types[ticket_type_index as usize];
+  
   ticket_sale::cpi::create_sale(
     cpi_ctx,
 		state.bumps.cpi_authority,

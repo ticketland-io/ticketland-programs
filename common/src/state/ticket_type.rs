@@ -10,7 +10,7 @@ pub struct SeatRange {
   pub r: u32,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Eq, PartialEq, Debug)]
+#[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone, Eq, PartialEq, Debug)]
 pub struct TicketType {
   pub n_tickets: u32,
   pub sale_type: SaleType,
