@@ -10,6 +10,7 @@ use crate::{
 pub const SPACE_MARGIN: usize = 1000;
 
 pub const MAX_TICKET_TYPES: usize = 10;
+pub const MAX_SEAT_RANGES: usize = 10;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct EventBumps {

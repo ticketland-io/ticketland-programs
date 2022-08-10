@@ -710,7 +710,23 @@
 					}
 				]
 			}
-		}
+		},
+		{
+      "name": "SeatRange",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "l",
+            "type": "u32"
+          },
+          {
+            "name": "r",
+            "type": "u32"
+          }
+        ]
+      }
+    }
 	],
 	"errors": [
 		{
