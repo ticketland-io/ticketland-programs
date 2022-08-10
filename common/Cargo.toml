@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 thiserror = "1.0.31"
-anyhow = "1.0.0"
+anyhow = "1.0.60"
 anchor-safe-math = "0.2.1"
