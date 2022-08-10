@@ -655,6 +655,12 @@
 						"type": {
 							"array": ["u8", 32]
 						}
+					},
+					{
+						"name": "seat_range",
+						"type": {
+							"defined": "SeatRange"
+						}
 					}
 				]
 			}

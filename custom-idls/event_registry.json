@@ -384,12 +384,6 @@
 					"type": {
 						"array": ["u8", 32]
 					}
-				},
-				{
-					"name": "ticketType",
-					"type": {
-						"defined": "TicketType"
-					}
 				}
 			]
 		},
@@ -604,6 +598,12 @@
 						"name": "merkle_root",
 						"type": {
 							"array": ["u8", 32]
+						}
+					},
+					{
+						"name": "seat_range",
+						"type": {
+							"defined": "SeatRange"
 						}
 					}
 				]
