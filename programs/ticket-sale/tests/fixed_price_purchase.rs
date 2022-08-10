@@ -30,7 +30,7 @@ use solana_program_test::{tokio};
 use common::{
   utils::bitmap,
   state::{
-    ticket_type::TicketType,
+    ticket_type::{TicketType, SeatRange},
     sale_type::SaleType,
   },
 };
@@ -150,6 +150,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
         sale_type: SaleType::FixedPrice {amount: sol_to_lamports(1_f64)},
         sale_start_time: now + 10, // 10 seconds
         merkle_root: mt_type_1.root().unwrap(),
+        seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
         n_tickets: 6,
@@ -161,6 +162,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
         },
         sale_start_time: now + 15, // 10 seconds from now,
         merkle_root: mt_type_2.root().unwrap(),
+        seat_range: SeatRange {l: 10_001, r: 20_000},
       },
     ];
   }
@@ -183,7 +185,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     &event_organizer,
     ticket_sale_state.pubkey(),
     0, // ticket_type_index
-    ticket_types[0].clone(),
   ).await;
 
   let ticket_buyer = event_registry_runner.get_participant(2);

@@ -21,7 +21,7 @@ use common_test::{
 };
 use common::{
   state::{
-    ticket_type::TicketType,
+    ticket_type::{TicketType, SeatRange},
     sale_type::SaleType,
   },
 };
@@ -52,6 +52,7 @@ async fn custom_create_event(
       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 0, r: 10_000},
     },
     TicketType {
       n_tickets: 50_000,
@@ -63,6 +64,7 @@ async fn custom_create_event(
       },
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 10_001, r: 20_000},
     },
   ];
 
@@ -141,7 +143,6 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
     &event_organizer,
     ticket_sale_program_state,
     ticket_type_index,
-    ticket_types[0].clone(),
   ).await;
 
   assert!(result.is_ok());
@@ -169,7 +170,6 @@ async fn should_create_a_new_sale_by_calling_the_ticket_sale_program(ctx: &mut T
     &event_organizer,
     ticket_sale_program_state,
     ticket_type_index,
-    ticket_types[1].clone(),
   ).await;
 
   assert!(result.is_ok());

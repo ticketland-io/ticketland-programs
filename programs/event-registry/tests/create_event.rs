@@ -42,7 +42,7 @@ use anchor_spl::{
 };
 use common::{
   state::{
-    ticket_type::TicketType,
+    ticket_type::{TicketType, SeatRange},
     sale_type::SaleType,
   },
 };
@@ -91,6 +91,7 @@ async fn custom_create_event(
       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 0, r: 10_000},
     },
     TicketType {
       n_tickets: 1000,
@@ -102,6 +103,7 @@ async fn custom_create_event(
       },
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 10_001, r: 20_000},
     },
   ];
 
@@ -178,6 +180,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
         sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
         merkle_root: [0; 32],
+        seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
         n_tickets: 1000,
@@ -189,6 +192,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
         },
         sale_start_time: 50,
         merkle_root: [0; 32],
+        seat_range: SeatRange {l: 10_001, r: 20_000},
       },
     ]);
   }
@@ -299,13 +303,14 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   // Create more that 10 ticket types which is the current limit
   let mut ticket_types = vec![];
 
-  for _ in 0..11 {
+  for i in 0..11 {
     ticket_types.push(
       TicketType {
         n_tickets: 1000,
         sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
         merkle_root: [0; 32],
+        seat_range: SeatRange {l: i * 10_000, r: i * 10_000 + 9999},
       }
     )
   }
@@ -468,6 +473,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 0, r: 10_000},
     },
     TicketType {
       n_tickets: 1000,
@@ -479,6 +485,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
       },
       sale_start_time: 50,
       merkle_root: [0; 32],
+      seat_range: SeatRange {l: 10_001, r: 20_000},
     },
   ];
 

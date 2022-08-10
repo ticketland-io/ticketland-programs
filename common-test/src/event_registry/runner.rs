@@ -322,7 +322,6 @@ impl Runner {
     event_organizer: &Keypair,
     ticket_sale_program_state: Pubkey,
     ticket_type_index: u8,
-    ticket_type: TicketType,
   ) -> AnchorResult<()> {
     let event = pda::event(&state, event_id).0;
     let cpi_authority = pda::cpi_authority(&state).0;
@@ -347,7 +346,6 @@ impl Runner {
     let data = event_registry::instruction::CreateTicketSale {
       ticket_type_index,
       _event_id: event_id,
-      ticket_type,
     }.data();
 
     let ix = Instruction {
