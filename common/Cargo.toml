@@ -10,3 +10,4 @@ anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 thiserror = "1.0.31"
 anyhow = "1.0.60"
 anchor-safe-math = "0.2.1"
+spl-math = { version = "0.1.0", features = ["no-entrypoint"] }
