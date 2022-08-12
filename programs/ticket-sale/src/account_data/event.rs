@@ -3,9 +3,9 @@ use std::ops::{
   DerefMut,
 };
 use anchor_lang::prelude::*;
-use common::{
-  account_data::event::{Event as CommonEvent},
-};
+use common::impl_common_event;
+
+impl_common_event!();
 
 #[account]
 pub struct Event(pub CommonEvent);

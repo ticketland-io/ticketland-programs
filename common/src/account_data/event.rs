@@ -19,7 +19,7 @@ pub struct EventBumps {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct Event {
+pub struct CommonEvent {
   pub id: [u8; 32],
   pub bumps: EventBumps,
   pub event_organizer: Pubkey,
@@ -32,4 +32,11 @@ pub struct Event {
   pub currency: Currency,
   pub event_organizer_purchase_token_ata: Pubkey,
   pub ticket_types: Vec<TicketType>,
+}
+
+#[macro_export]
+macro_rules! impl_common_event {
+  () => {
+    pub use common::account_data::event::CommonEvent;
+  }
 }

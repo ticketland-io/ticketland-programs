@@ -42,3 +42,10 @@ impl SaleType {
     }
   }
 }
+
+#[macro_export]
+macro_rules! impl_sale_type {
+  () => {
+    pub use super::SaleType;
+  }
+}

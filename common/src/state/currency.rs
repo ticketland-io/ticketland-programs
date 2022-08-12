@@ -24,3 +24,10 @@ impl Currency {
     Ok((event_organizer_amount, service_fee))
   }
 }
+
+#[macro_export]
+macro_rules! impl_currency {
+  () => {
+    pub use common::state::currency::Currency;
+  }
+}

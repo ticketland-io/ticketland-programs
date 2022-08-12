@@ -1,15 +1,28 @@
+pub mod imports {
+	use common::{
+		impl_currency,
+		impl_common_event,
+		impl_ticket_type,
+	};
+	
+	impl_currency!();
+	impl_common_event!();
+	impl_ticket_type!();
+}
+
+
 pub mod context;
 pub mod account_data;
 pub mod processors;
 pub mod utils;
 
 use anchor_lang::prelude::*;
-use common::{
-	state::{
-		currency::*,
-		ticket_type::TicketType,
-	},
-};
+// use common::{
+// 	state::{
+// 		currency::*,
+// 		ticket_type::TicketType,
+// 	},
+// };
 use crate::{
 	context::{
 		initialize::*,
@@ -24,7 +37,8 @@ declare_id!("TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE");
 
 #[program]
 pub mod event_registry {
-use super::*;
+	use super::*;
+	
 	/// Initializes the state i.e. instance of a given program
 	/// 
 	/// # Arguments
@@ -38,7 +52,7 @@ use super::*;
 	/// to want to sell Event NFTs in the future for charity purposes for example.
 	pub fn initialize(
 		ctx: Context<Initialize>,
-		supported_currencies: Vec<Currency>,
+		supported_currencies: Vec<imports::Currency>,
 		seller_fee_basis_points: u16,
 	) -> Result<()> {
 		processors::initialize::exec(
@@ -64,7 +78,7 @@ use super::*;
 		n_tickets: u32,
 		start_time: i64,
 		end_time: i64,
-		ticket_types: Vec<TicketType>,
+		ticket_types: Vec<imports::TicketType>,
 	) -> Result<()> {
 		processors::create_event::exec(
 			ctx,
@@ -129,7 +143,7 @@ use super::*;
 	/// create a new event
 	pub fn update_supported_currencies(
 		ctx: Context<UpdateSupportedCurrencies>,
-		supported_currencies: Vec<Currency>,
+		supported_currencies: Vec<imports::Currency>,
 	) -> Result<()> {
 		processors::update_supported_currencies::exec(
 			ctx,
