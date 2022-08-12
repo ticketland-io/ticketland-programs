@@ -75,6 +75,7 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_name: String) -> Result<(
     nft: ctx.accounts.ticket_nft.to_account_info(),
     event_nft_metadata: ctx.accounts.event_nft_metadata.to_account_info(),
     metadata: ctx.accounts.ticket_metaplex_metadata.to_account_info(),
+    master_edition: ctx.accounts.master_edition.to_account_info(),
     ticket_nft_ata: ctx.accounts.ticket_nft_ata.to_account_info(),
     ticket_sale_cpi_authority: ctx.accounts.cpi_authority.to_account_info(),
     ticket_buyer: ctx.accounts.ticket_buyer.to_account_info(),

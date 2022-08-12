@@ -74,6 +74,15 @@ pub struct CreateTicket<'info> {
   )]
   pub metadata: AccountInfo<'info>,
 
+  /// CHECK: The NFT master edition account
+  #[account(
+    mut,
+    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), nft.key().as_ref(), "edition".as_bytes()],
+    seeds::program = metadata_id,
+    bump,
+  )]
+  pub master_edition: AccountInfo<'info>,
+
   /// The ATA that is a PDA controlled by the Ticket sale program and will be the owner of the Ticket NFT
   /// until the end of the event.
   #[account(

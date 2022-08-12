@@ -29,6 +29,7 @@ use anchor_metaplex::{
   mpl_token_metadata::{
     pda::{
       find_metadata_account,
+      find_master_edition_account,
     },
   },
 };
@@ -186,6 +187,7 @@ impl Runner {
       ticket_nft,
       nft_authority: TicketNftPda::nft_authority(&ticket_nft_program_state).0,
       ticket_metadata: TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0,
+      master_edition: find_master_edition_account(&ticket_nft).0,
       ticket_metaplex_metadata: find_metadata_account(&ticket_nft).0,
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
@@ -239,6 +241,7 @@ impl Runner {
       ticket_nft,
       nft_authority: TicketNftPda::nft_authority(&ticket_nft_program_state).0,
       ticket_metadata: TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0,
+      master_edition: find_master_edition_account(&ticket_nft).0,
       ticket_metaplex_metadata: find_metadata_account(&ticket_nft).0,
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,

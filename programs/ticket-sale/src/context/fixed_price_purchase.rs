@@ -165,6 +165,15 @@ pub struct FixedPricePurchase<'info> {
   )]
   pub ticket_metaplex_metadata: AccountInfo<'info>,
 
+  /// CHECK: The NFT master edition account
+  #[account(
+    mut,
+    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), ticket_nft.key().as_ref(), "edition".as_bytes()],
+    seeds::program = metadata_id,
+    bump,
+  )]
+  pub master_edition: AccountInfo<'info>,
+
   /// CHECK:
   /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.

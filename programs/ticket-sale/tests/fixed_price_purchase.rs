@@ -23,6 +23,7 @@ use anchor_metaplex::{
     deser::meta_deser,
     pda::{
       find_metadata_account,
+      find_master_edition_account,
     },
   },
 };
@@ -258,7 +259,8 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     let ticket_nft_data = TokenMint::try_deserialize_unchecked(&mut &ticket_nft_data.data[..]).unwrap();
     
     // mint authority is transferred to the master edition when the latter is created
-    assert_eq!(ticket_nft_data.mint_authority.unwrap(), nft_authority);
+    let master_edition = find_master_edition_account(&ticket_nft).0;
+    assert_eq!(ticket_nft_data.mint_authority.unwrap(), master_edition);
     assert_eq!(ticket_nft_data.supply, 1);
 
     // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA

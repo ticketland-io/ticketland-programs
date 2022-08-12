@@ -2,7 +2,9 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, MintTo};
 use anchor_metaplex::{
   CreateMetadata,
+  CreateMasterEdition,
   create_metadata,
+  create_master_edition,
   mpl_token_metadata::state::{Metadata},
 };
 use crate::{
@@ -11,7 +13,7 @@ use crate::{
 
 /// Will mint a new NFT token and transfer it to the ticket_nft_ata controlled by the PDA ticket_sale_cpi_authority
 /// owned by the Ticket sale program
-fn mint_token(ctx: &Context<CreateTicket>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
+fn mint_edition_token(ctx: &Context<CreateTicket>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
   let cpi_accounts = MintTo {
     mint: ctx.accounts.nft.to_account_info(),
     to: ctx.accounts.ticket_nft_ata.to_account_info(),
@@ -56,6 +58,23 @@ fn create_nft_metadata(
     None,
   )?;
 
+  let cpi_accounts = CreateMasterEdition {
+    edition: ctx.accounts.master_edition.clone(),
+    mint: *ctx.accounts.nft.clone(),
+    mint_authority: ctx.accounts.nft_authority.clone(),
+    metadata_account: ctx.accounts.metadata.clone(),
+    payer: ctx.accounts.ticket_buyer.to_account_info(),
+    update_authority: ctx.accounts.nft_authority.to_account_info(),
+    system_program: ctx.accounts.system_program.to_account_info(),
+    rent: ctx.accounts.rent.to_account_info(),
+  };
+
+  create_master_edition(
+    cpi_accounts,
+    signer_seeds,
+    Some(0),
+  )?;
+
   Ok(())
 }
 
@@ -80,7 +99,7 @@ pub fn exec(
   ];
   let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
 
-  mint_token(&ctx, signer_seeds)?;
+  mint_edition_token(&ctx, signer_seeds)?;
   create_nft_metadata(&ctx, signer_seeds, name)?;
 
   Ok(())
