@@ -318,8 +318,7 @@
 				"# Arguments",
 				"",
 				"* `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the",
-				"ticket sale program to create unique PDAs",
-				"* `ticket_type` - The ticket type of the given ticket for which we want to create a sale"
+				"ticket sale program to create unique PDAs as well as access to ticket_type data."
 			],
 			"accounts": [
 				{
@@ -463,66 +462,63 @@
 			}
 		},
 		{
-      "name": "Event",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "bumps",
-            "type": {
-              "defined": "EventBumps"
-            }
-          },
-          {
-            "name": "eventOrganizer",
-            "type": "publicKey"
-          },
-          {
-            "name": "eventCapacity",
-            "type": "publicKey"
-          },
-          {
-            "name": "nTickets",
-            "type": "u32"
-          },
-          {
-            "name": "startTime",
-            "type": "i64"
-          },
-          {
-            "name": "endTime",
-            "type": "i64"
-          },
-          {
-            "name": "currency",
-            "type": {
-              "defined": "Currency"
-            }
-          },
-          {
-            "name": "eventOrganizerPurchaseTokenAta",
-            "type": "publicKey"
-          },
-          {
-            "name": "ticketTypes",
-            "type": {
-              "vec": {
-                "defined": "TicketType"
-              }
-            }
-          }
-        ]
-      }
-    }
+			"name": "Event",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "id",
+						"type": {
+							"array": ["u8", 32]
+						}
+					},
+					{
+						"name": "bumps",
+						"type": {
+							"defined": "EventBumps"
+						}
+					},
+					{
+						"name": "eventOrganizer",
+						"type": "publicKey"
+					},
+					{
+						"name": "eventCapacity",
+						"type": "publicKey"
+					},
+					{
+						"name": "nTickets",
+						"type": "u32"
+					},
+					{
+						"name": "startTime",
+						"type": "i64"
+					},
+					{
+						"name": "endTime",
+						"type": "i64"
+					},
+					{
+						"name": "currency",
+						"type": {
+							"defined": "Currency"
+						}
+					},
+					{
+						"name": "eventOrganizerPurchaseTokenAta",
+						"type": "publicKey"
+					},
+					{
+						"name": "ticketTypes",
+						"type": {
+							"vec": {
+								"defined": "TicketType"
+							}
+						}
+					}
+				]
+			}
+		}
 	],
 	"types": [
 		{
@@ -666,21 +662,21 @@
 			}
 		},
 		{
-      "name": "SeatRange",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "l",
-            "type": "u32"
-          },
-          {
-            "name": "r",
-            "type": "u32"
-          }
-        ]
-      }
-    }
+			"name": "SeatRange",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "l",
+						"type": "u32"
+					},
+					{
+						"name": "r",
+						"type": "u32"
+					}
+				]
+			}
+		}
 	],
 	"errors": [
 		{
