@@ -84,8 +84,10 @@ pub struct FixedPricePurchase<'info> {
   pub event_organizer: AccountInfo<'info>,
 
   /// The token token account that will be receiving the service fee
+  /// This is also stored in the event.currency account
   #[account(
-    mut,
+    init_if_needed,
+    payer = ticket_buyer,
     associated_token::mint = purchase_token,
     associated_token::authority = treasury,
   )]
@@ -177,13 +179,15 @@ pub struct FixedPricePurchase<'info> {
   /// CHECK:
   /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.
-  /// We use AccountInfo for the reason explained above. Also we can add these constraints.
+  /// We use AccountInfo for the reason explained above (ticket_nft account). Also we can add these constraints.
   /// 
   /// associated_token::mint = ticket_nft,
   /// associated_token::authority = cpi_authority,
   /// 
-  /// If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is
-  /// not account yet; it will be created in the Ticket NFT Program
+  /// If we add them then Anchor would have to load the TokenAccount and check these constraints. However, the ticket_nft 
+  /// account as explained earlier is not created yet; it will be created in the Ticket NFT Program
+  /// This is not a security concern because this account will be forwarded to the Ticket NFT Program via a CPI call
+  /// and the latter will check those constraints anyways.
   #[account(mut)]
   pub ticket_nft_ata: AccountInfo<'info>,
 
