@@ -257,10 +257,14 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
     let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
     let metaplex_metadata = find_metadata_account(&ticket_nft).0;
+    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state.pubkey(), 0, event_id).0;
 
     assert_eq!(ticket_metadata.event_id, event_id);
     assert_eq!(ticket_metadata.metadata, metaplex_metadata);
     assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
+    assert_eq!(ticket_metadata.seat_index, seat_index);
+    assert_eq!(ticket_metadata.price_sold, 0);
+    assert_eq!(ticket_metadata.sale, sale);
     assert_eq!(ticket_metadata.attended, false);
   }
 

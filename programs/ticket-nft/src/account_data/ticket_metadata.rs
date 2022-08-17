@@ -21,6 +21,11 @@ pub struct TicketMetadata {
   /// This is useful as we can retrieve information such as ticket type etc.
   pub sale: Pubkey,
 
+  /// The price the ticket is sold for. The reason we need to keep this explicitly is because
+  /// the sale type can an auction and thus the Sale account can't tell us what price the ticket was
+  /// sold for.
+  pub price_sold: u64,
+
   /// The original owner of the Ticket NFT
   pub owner: Pubkey,
 

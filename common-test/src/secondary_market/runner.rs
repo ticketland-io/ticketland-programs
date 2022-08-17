@@ -1,7 +1,6 @@
 use std::sync::{Arc};
 use anchor_lang::{
   prelude::Result as AnchorResult,
-  Id,
   InstructionData,
   ToAccountMetas,
 };

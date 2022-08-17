@@ -47,12 +47,14 @@ pub mod ticket_nft {
 		event_id: [u8; 32],
 		seat_index: u32,
 		sale: Pubkey,
+		price_sold: u64,
 		name: String,
 	) -> Result<()> {
     processors::create_ticket::exec(
 			ctx,
 			event_id,
 			sale,
+			price_sold,
 			seat_index,
 			name
 		)

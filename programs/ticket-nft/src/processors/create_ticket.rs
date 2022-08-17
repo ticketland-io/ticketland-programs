@@ -82,6 +82,7 @@ pub fn exec(
   ctx: Context<CreateTicket>,
   event_id: [u8; 32],
   sale: Pubkey,
+  price_sold: u64,
   seat_index: u32,
   name: String,
 ) -> Result<()> {  
@@ -90,6 +91,7 @@ pub fn exec(
   ticket_metadata.event_id = event_id;
   ticket_metadata.seat_index = seat_index;
   ticket_metadata.sale = sale;
+  ticket_metadata.price_sold = price_sold;
   ticket_metadata.metadata = ctx.accounts.metadata.key();
   ticket_metadata.owner = ctx.accounts.ticket_buyer.key();
   ticket_metadata.attended = false;

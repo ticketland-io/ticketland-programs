@@ -35,7 +35,7 @@ fn transfer_token<'info>(
 }
 
 /// Transfer the purchase funds to event organizer and our treasury
-fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()> {
+fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<u64> {
   let ticket_type = &ctx.accounts.sale.ticket_type;
   let amount = if let SaleType::FixedPrice {amount} = ticket_type.sale_type {
     amount
@@ -63,10 +63,10 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()
     service_fee_amount,
   )?;
 
-  Ok(())
+  Ok(amount)
 }
 
-fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_index: u32, seat_name: String) -> Result<()> {
+fn mint_ticket(ctx: &Context<FixedPricePurchase>, price_sold: u64, seat_index: u32, seat_name: String) -> Result<()> {
   let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
   let cpi_accounts = ticket_nft::cpi::accounts::CreateTicket {
     state: ctx.accounts.ticket_nft_program_state.to_account_info(),
@@ -102,6 +102,7 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_index: u32, seat_name: St
 		ctx.accounts.sale.event_id,
     seat_index,
     ctx.accounts.sale.key(),
+    price_sold,
 		seat_name,
   )?;
 
@@ -167,10 +168,10 @@ pub fn exec(
   );
 
   // 5. Transfer funds
-  transfer_funds(&ctx, &event)?;
+  let price_sold = transfer_funds(&ctx, &event)?;
 
   // 6. CPI to Ticket NFT program to mint the ticket
-  mint_ticket(&ctx, seat_index, seat_name)?;
+  mint_ticket(&ctx, price_sold, seat_index, seat_name)?;
 
   // 7. Update state
   bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);

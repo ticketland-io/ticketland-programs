@@ -53,6 +53,7 @@ fn mint_ticket(ctx: &Context<FreePurchase>, seat_index:  u32, seat_name: String)
 		ctx.accounts.sale.event_id,
     seat_index,
     ctx.accounts.sale.key(),
+    0_u64,
 		seat_name,
   )?;
 
