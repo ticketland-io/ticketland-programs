@@ -15,6 +15,7 @@ pub fn nft_authority(state: &Pubkey) -> (Pubkey, u8) {
 pub fn ticket_nft(
   state: &Pubkey,
   ticket_buyer: &Pubkey,
+  seat_index: u32,
   event_id: [u8; 32],
 ) -> (Pubkey, u8) {
   Pubkey::find_program_address(
@@ -22,6 +23,7 @@ pub fn ticket_nft(
       b"ticket_nft",
       state.as_ref(),
       ticket_buyer.as_ref(),
+      seat_index.to_string().as_ref(),
       &event_id
     ],
     &ticket_nft_program_id()

@@ -167,7 +167,7 @@ impl Runner {
 		merkle_proof: Vec<[u8; 32]>,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
 
     let accounts = ticket_sale::accounts::FixedPricePurchase {
@@ -226,7 +226,7 @@ impl Runner {
 		merkle_proof: Vec<[u8; 32]>,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, &ticket_buyer.pubkey(), seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
 
     let accounts = ticket_sale::accounts::FreePurchase {

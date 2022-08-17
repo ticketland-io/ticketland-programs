@@ -23,6 +23,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
+#[instruction(seat_index: u32)]
 pub struct FixedPricePurchase<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -130,6 +131,7 @@ pub struct FixedPricePurchase<'info> {
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
       ticket_buyer.key().as_ref(),
+      seat_index.to_string().as_ref(),
       &sale.event_id
     ],
     bump,

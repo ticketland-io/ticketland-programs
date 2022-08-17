@@ -17,7 +17,7 @@ use crate::{
 };
 
 
-fn mint_ticket(ctx: &Context<FreePurchase>, seat_name: String) -> Result<()> {
+fn mint_ticket(ctx: &Context<FreePurchase>, seat_index:  u32, seat_name: String) -> Result<()> {
   let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
   let cpi_accounts = ticket_nft::cpi::accounts::CreateTicket {
     state: ctx.accounts.ticket_nft_program_state.to_account_info(),
@@ -50,6 +50,7 @@ fn mint_ticket(ctx: &Context<FreePurchase>, seat_name: String) -> Result<()> {
   ticket_nft::cpi::create_ticket(
     cpi_ctx,
 		ctx.accounts.state.bumps.cpi_authority,
+    seat_index,
 		ctx.accounts.sale.event_id,
 		seat_name,
   )?;
@@ -112,7 +113,7 @@ pub fn exec(
   );
 
   // 5. CPI to Ticket NFT program to mint the ticket
-  mint_ticket(&ctx, seat_name)?;
+  mint_ticket(&ctx, seat_index, seat_name)?;
 
   // 6. Update state
   bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);

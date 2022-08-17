@@ -212,7 +212,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   assert!(result.is_ok());
 
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), event_id).0;
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), seat_index, event_id).0;
 
   // ticket nft Mint account and Metaplex metadata
   {
@@ -277,9 +277,10 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     let mut pt = ticket_sale_runner.pt.lock().await;
     let event_capacity = pt.context.banks_client.get_account(event_capacity).await.unwrap().unwrap();
     let event_capacity = deser_zero_account::<EventCapacity>(&event_capacity.data);
+    let available_tickets = event_capacity.available_tickets;
 
     assert!(bitmap::is_set::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats));
-    assert_eq!(event_capacity.available_tickets, 9);
+    assert_eq!(available_tickets, 9);
     assert_eq!(event_capacity.is_initialized, true);
     assert_eq!(event_capacity.event_id, event_id);
   }
