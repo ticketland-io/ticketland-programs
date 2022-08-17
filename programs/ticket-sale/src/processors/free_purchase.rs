@@ -50,8 +50,9 @@ fn mint_ticket(ctx: &Context<FreePurchase>, seat_index:  u32, seat_name: String)
   ticket_nft::cpi::create_ticket(
     cpi_ctx,
 		ctx.accounts.state.bumps.cpi_authority,
-    seat_index,
 		ctx.accounts.sale.event_id,
+    seat_index,
+    ctx.accounts.sale.key(),
 		seat_name,
   )?;
 

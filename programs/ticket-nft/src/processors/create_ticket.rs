@@ -81,11 +81,15 @@ fn create_nft_metadata(
 pub fn exec(
   ctx: Context<CreateTicket>,
   event_id: [u8; 32],
+  sale: Pubkey,
+  seat_index: u32,
   name: String,
 ) -> Result<()> {  
   let ticket_metadata = &mut ctx.accounts.ticket_metadata;
 
   ticket_metadata.event_id = event_id;
+  ticket_metadata.seat_index = seat_index;
+  ticket_metadata.sale = sale;
   ticket_metadata.metadata = ctx.accounts.metadata.key();
   ticket_metadata.owner = ctx.accounts.ticket_buyer.key();
   ticket_metadata.attended = false;

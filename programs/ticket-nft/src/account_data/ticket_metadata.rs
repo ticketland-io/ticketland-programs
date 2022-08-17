@@ -14,6 +14,13 @@ pub struct TicketMetadata {
   /// The id of the event which this ticket belongs to
   pub event_id: [u8; 32],
 
+  /// The seat index of this ticket
+  pub seat_index: u32,
+
+  /// The primary sale account containing information about how the sale of the ticket.
+  /// This is useful as we can retrieve information such as ticket type etc.
+  pub sale: Pubkey,
+
   /// The original owner of the Ticket NFT
   pub owner: Pubkey,
 

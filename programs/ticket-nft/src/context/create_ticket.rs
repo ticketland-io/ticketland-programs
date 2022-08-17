@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(cpi_authority_bump: u8, seat_index: u32, event_id: [u8; 32])]
+#[instruction(cpi_authority_bump: u8, event_id: [u8; 32], seat_index: u32)]
 pub struct CreateTicket<'info> {
   #[account()]
   pub state: Box<Account<'info, State>>,
