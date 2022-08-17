@@ -120,6 +120,9 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, seat_index: u32, seat_name: St
 /// Event Registry program address, but that would mean we would have to hard code that address which is against the flexibility
 /// we've provided by storing the Event Registry program address in `state` account of this program.
 /// For this reason we will do a few manual checks that we did the declarative constraint macro in the Context.
+///
+/// Also not that we don't have to check if ctx.accounts.event.owner == &state.event_registry_program
+/// because we already have this constraint in the PDA seeds::program = state.event_registry_program,
 fn account_checks(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<()>  {
   let sale = &ctx.accounts.sale;
 
