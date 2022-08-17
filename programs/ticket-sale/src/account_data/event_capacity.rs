@@ -7,6 +7,7 @@ pub const SPACE_MARGIN: usize = 1000;
 pub const MAX_VENUE_CAPACITY: usize = 12_500;
 
 #[account(zero_copy)]
+#[repr(packed)]
 pub struct EventCapacity {
   pub event_id: [u8; 32],
   pub is_initialized: bool,

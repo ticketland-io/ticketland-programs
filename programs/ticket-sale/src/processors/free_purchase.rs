@@ -122,7 +122,8 @@ pub fn exec(
   state.total_sold = state.total_sold.safe_add(1)?;
 
   // - decrease available_tickets
-  event_capacity.available_tickets = event_capacity.available_tickets.safe_sub(1)?;
+  let available_tickets = event_capacity.available_tickets; // use local to avoid reference to packed field is unaligned
+  event_capacity.available_tickets = available_tickets.safe_sub(1)?;
 
   Ok(())
 }

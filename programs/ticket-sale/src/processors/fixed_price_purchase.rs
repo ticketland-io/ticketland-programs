@@ -169,13 +169,14 @@ pub fn exec(
 
   // 7. Update state
   bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);
-  
+
   // - total tickets sold (Ticket Sale State account data)
   let state = &mut ctx.accounts.state;
   state.total_sold = state.total_sold.safe_add(1)?;
 
   // - decrease available_tickets
-  event_capacity.available_tickets = event_capacity.available_tickets.safe_sub(1)?;
+  let available_tickets = event_capacity.available_tickets; // use local to avoid reference to packed field is unaligned
+  event_capacity.available_tickets = available_tickets.safe_sub(1)?;
 
   Ok(())
 }
