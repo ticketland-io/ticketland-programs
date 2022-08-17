@@ -2977,6 +2977,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "secondary-market"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "common-test",
+ "solana-program-test",
+ "solana-sdk",
+ "solana-test-utils",
+ "test-context",
+]
+
+[[package]]
 name = "security-framework"
 version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

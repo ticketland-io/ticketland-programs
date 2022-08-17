@@ -1,12 +1,12 @@
 [package]
-name = "ticket-nft"
+name = "secondary-market"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "ticket_nft"
+name = "secondary_market"
 
 [features]
 no-entrypoint = []
@@ -17,11 +17,8 @@ default = []
 test-bpf = []
 
 [dependencies]
-anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
+anchor-lang = "0.25.0"
 anchor-spl = "0.25.0"
-anchor-safe-math = "0.2.1"
-mpl-token-metadata = "1.2.10"
-anchor-metaplex = { git = "https://github.com/Apocentre/anchor-metaplex", version = "0.4.1" }
 
 [dev-dependencies]
 solana-program-test = "1.8.0"

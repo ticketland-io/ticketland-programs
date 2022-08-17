@@ -36,6 +36,8 @@ pub mod ticket_nft {
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `_cpi_authority_bump` - The bump of the ticket sale cpi authority i.e. the PDA that can call this instruction
 	/// * `event_id` - The event id for which this ticket is created
+	/// * `seat_index` - The index of the seat
+	/// * `sale` - The sale account though which this the ticket was purchased
 	/// * `name` - The name that will be attached to the metaplex metadata. This will most likely be the name of the seat
 	pub fn create_ticket(
 		ctx: Context<CreateTicket>,
