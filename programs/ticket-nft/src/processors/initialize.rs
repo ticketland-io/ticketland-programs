@@ -8,6 +8,8 @@ use crate::{
 
 pub fn exec(
   ctx: Context<Initialize>,
+  ticket_sale_state: Pubkey,
+  ticket_sale_program: Pubkey,
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
@@ -15,8 +17,8 @@ pub fn exec(
     nft_authority: *ctx.bumps.get("nft_authority").unwrap(),
   };
   state.nft_authority = ctx.accounts.nft_authority.key();
-  state.ticket_sale_program = ctx.accounts.ticket_sale_program.key();
-  state.ticket_sale_state = ctx.accounts.ticket_sale_state.key();
+  state.ticket_sale_program = ticket_sale_program;
+  state.ticket_sale_state = ticket_sale_state;
   state.deployer = ctx.accounts.deployer.key();
 
   Ok(())

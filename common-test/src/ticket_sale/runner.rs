@@ -120,8 +120,6 @@ impl Runner {
 
     let accounts = ticket_sale::accounts::Initialize {
       state: state.pubkey(),
-      event_registry_state,
-      event_registry_program: event_registry_program_id(),
       cpi_authority,
       deployer: self.deployer.pubkey(),
       system_program: system_program::ID,
@@ -130,6 +128,8 @@ impl Runner {
 
     let data = ticket_sale::instruction::Initialize {
       treasury: self.treasury.pubkey(),
+      event_registry_state,
+      event_registry_program: event_registry_program_id(),
     }.data();
 
     let ix = Instruction {

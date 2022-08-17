@@ -16,14 +16,6 @@ pub struct Initialize<'info> {
   )]
   pub state: Account<'info, State>,
 
-  /// CHECK: The state account of the event registry program
-  #[account()]
-  pub event_registry_state: AccountInfo<'info>,
-
-  /// CHECK: This is the Event Registry Program account
-  #[account()]
-  pub event_registry_program: AccountInfo<'info>,
-
   /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(
     init,

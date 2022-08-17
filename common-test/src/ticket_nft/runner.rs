@@ -52,14 +52,15 @@ impl Runner {
     let accounts = ticket_nft::accounts::Initialize {
       state: state.pubkey(),
       nft_authority: pda::nft_authority(&state.pubkey()).0,
-      ticket_sale_state,
-      ticket_sale_program: ticket_sale_program_id(),
       deployer: self.deployer.pubkey(),
       system_program: system_program::ID,
       rent: Rent::id(),
     }.to_account_metas(None);
 
-    let data = ticket_nft::instruction::Initialize {}.data();
+    let data = ticket_nft::instruction::Initialize {
+      ticket_sale_state,
+      ticket_sale_program: ticket_sale_program_id(),
+    }.data();
 
     let ix = Instruction {
       program_id: ticket_nft_program_id(),

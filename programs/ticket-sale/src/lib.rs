@@ -35,8 +35,10 @@ pub mod ticket_sale {
 	pub fn initialize(
 		ctx: Context<Initialize>,
 		treasury: Pubkey,
+		event_registry_state: Pubkey,
+		event_registry_program: Pubkey,
 	) -> Result<()> {
-    processors::initialize::exec(ctx, treasury)
+    processors::initialize::exec(ctx, treasury, event_registry_state, event_registry_program)
 	}
 
 	/// Initializes the event capacity account for a single event. This account will be used by all the

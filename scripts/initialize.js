@@ -69,11 +69,11 @@ const initializeTicketSale = async (deploymentConfig, eventRegistryState) => {
 
   await program.rpc.initialize(
     treasury,
+    eventRegistryState,
+    anchor.workspace.EventRegistry.programId,
     {
       accounts: {
         state: state.publicKey,
-        eventRegistryState,
-        eventRegistryProgram: anchor.workspace.EventRegistry.programId,
         cpiAuthority: (await pda.ticketSaleCpiAuthority(state.publicKey, program.programId))[0],
         deployer,
         systemProgram: SystemProgram.programId,
@@ -92,12 +92,12 @@ const initializeTicketNft = async (ticketSaleState) => {
   const deployer = provider.wallet.publicKey
 
   await program.rpc.initialize(
+    ticketSaleState,
+    anchor.workspace.TicketSale.programId,
     {
       accounts: {
         state: state.publicKey,
         nftAuthority: (await pda.nftAuthority(state.publicKey, program.programId))[0],
-        ticketSaleState,
-        ticketSaleProgram: anchor.workspace.TicketSale.programId,
         deployer,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,

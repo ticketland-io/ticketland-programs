@@ -26,13 +26,6 @@ pub struct Initialize<'info> {
   )]
   pub nft_authority: AccountInfo<'info>,
 
-  /// CHECK: The state account of the Ticket sale program
-  #[account()]
-  pub ticket_sale_state: AccountInfo<'info>,
-
-  /// CHECK: This is the Ticket sale Program account
-  #[account()]
-  pub ticket_sale_program: AccountInfo<'info>,
 
   #[account(mut)]
   pub deployer: Signer<'info>,

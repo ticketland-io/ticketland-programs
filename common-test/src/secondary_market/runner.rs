@@ -4,15 +4,9 @@ use anchor_lang::{
   Id,
   InstructionData,
   ToAccountMetas,
-  solana_program::program_option::COption,
 };
 use solana_test_utils::{
   program_test::ProgramTest,
-  test_account::{TestAccount},
-  spl_associated_token_account,
-  spl::Spl,
-  utils::{to_base},
-  spl_token,
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -24,14 +18,11 @@ use solana_sdk::{
   instruction::Instruction,
   native_token::sol_to_lamports,
 };
-use anchor_spl::token::{Token};
 use crate::{
   program_id::{
     secondary_market_program_id,
   },
 };
-
-use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,

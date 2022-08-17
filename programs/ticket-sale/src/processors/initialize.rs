@@ -7,6 +7,8 @@ use crate::{
 pub fn exec(
   ctx: Context<Initialize>,
   treasury: Pubkey,
+  event_registry_state: Pubkey,
+  event_registry_program: Pubkey,
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
@@ -15,8 +17,8 @@ pub fn exec(
   };
 
   state.total_sold = 0;
-  state.event_registry_program = ctx.accounts.event_registry_program.key();
-  state.event_registry_state = ctx.accounts.event_registry_state.key();
+  state.event_registry_program = event_registry_program;
+  state.event_registry_state = event_registry_state;
   state.treasury = treasury;
   state.cpi_authority = ctx.accounts.cpi_authority.key();
   state.deployer = ctx.accounts.deployer.key();
