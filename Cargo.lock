@@ -800,6 +800,7 @@ dependencies = [
  "async-trait",
  "common",
  "event-registry",
+ "secondary-market",
  "solana-program-test",
  "solana-sdk",
  "solana-test-utils",

@@ -3,3 +3,4 @@ pub mod event_registry;
 pub mod ticket_sale;
 pub mod ticket_nft;
 pub mod program_id;
+pub mod secondary_market;

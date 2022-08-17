@@ -13,3 +13,7 @@ pub fn ticket_sale_program_id() -> Pubkey {
 pub fn ticket_nft_program_id() -> Pubkey {
   ticket_nft::id()
 }
+
+pub fn secondary_market_program_id() -> Pubkey {
+  secondary_market::id()
+}

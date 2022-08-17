@@ -23,8 +23,15 @@ pub mod secondary_market {
 	/// * `ctx` - The Anchor context holding the accounts
 	pub fn initialize(
 		ctx: Context<Initialize>,
+		ticket_sale_state: Pubkey,
+		ticket_sale_program: Pubkey,
 		protocol_fee: u16,
 	) -> Result<()> {
-    processors::initialize::exec(ctx, protocol_fee)
+    processors::initialize::exec(
+			ctx, 
+			ticket_sale_state,
+			ticket_sale_program,
+			protocol_fee
+		)
 	}
 }

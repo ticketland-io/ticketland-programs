@@ -15,7 +15,7 @@ pub struct Initialize<'info> {
     space = 8 + size_of::<State>() + SPACE_MARGIN
   )]
   pub state: Account<'info, State>,
-  
+
   /// CHECK: The state account of the event registry program
   #[account()]
   pub event_registry_state: AccountInfo<'info>,

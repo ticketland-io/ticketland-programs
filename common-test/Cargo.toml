@@ -11,6 +11,7 @@ edition = "2021"
 ticket-sale = { path = "../programs/ticket-sale" }
 event-registry = { path = "../programs/event-registry" }
 ticket-nft = { path = "../programs/ticket-nft" }
+secondary-market = { path = "../programs/secondary-market" }
 common = { path = "../common" }
 anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 anchor-spl = "0.25.0"
