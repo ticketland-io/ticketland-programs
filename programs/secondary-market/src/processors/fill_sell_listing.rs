@@ -1,8 +1,27 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
+use common::{
+  account_data::{
+    serialization::deser,
+  },
+};
+use ticket_sale::{
+  account_data::{
+    sale::*,
+  },
+  utils::program_error::ErrorCode as TicketSaleErrorCode
+};
+use ticket_nft::{
+  account_data::{
+    ticket_metadata::*,
+  },
+};
 use crate::{
   context::fill_sell_listing::*,
+  utils::{
+    program_error::ErrorCode,
+  }
 };
 
 fn transfer_token<'info>(
@@ -66,7 +85,23 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
+fn ticket_metadata_account_checks(ctx: &Context<FillSellListing>) -> Result<()> {
+  let ticket_metadata: TicketMetadata = deser(ctx.accounts.ticket_metadata.clone())?;
+  require!(ticket_metadata.sale == ctx.accounts.sale.key(), ErrorCode::WrongSaleAccount);
+
+  Ok(())
+}
+
+fn sale_checks(ctx: &Context<FillSellListing>) -> Result<()> {
+  // Load sale and find the ticket type and check that sale for the ticket type has not ended
+  let sale: Sale = deser(ctx.accounts.sale.clone())?;
+  require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, TicketSaleErrorCode::SaleFinished);
+
+  Ok(())
+}
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
+  ticket_metadata_account_checks(&ctx)?;
+  sale_checks(&ctx)?;
   transfer_funds(&ctx)?;
 
   Ok(())
