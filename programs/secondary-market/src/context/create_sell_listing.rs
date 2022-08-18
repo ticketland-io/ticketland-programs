@@ -61,15 +61,16 @@ pub struct CreateSellListing<'info> {
 
   /// CHECK: The token that was used in the primary market of this event
   #[account()]
-  pub purchase_token: Box<Account<'info, Mint>>,
+  pub purchase_token: Account<'info, Mint>,
 
   /// The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL
   #[account(
-    mut,
+    init_if_needed,
+    payer = ticket_owner,
     associated_token::mint = purchase_token,
     associated_token::authority = ticket_owner,
   )]
-  pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
+  pub ticket_owner_purchase_token_ata: Account<'info, TokenAccount>,
 
   #[account(mut)]
   pub ticket_owner: Signer<'info>,

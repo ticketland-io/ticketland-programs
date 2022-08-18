@@ -12,4 +12,6 @@ pub enum ErrorCode {
   WrongTicketOwner,
   #[msg("Price cap exceeded")]
   PriceCap,
+  #[msg("Wrong ticket owner purchase token ata")]
+  WrongTicketOwnerPurchaseTokenAta,
 }
