@@ -21,7 +21,7 @@ anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
 anchor-spl = "0.25.0"
 anchor-safe-math = "0.2.1"
 common = { path = "../../common" }
-ticket-sale = { path = "../ticket-sale" }
+ticket-sale = { path = "../ticket-sale", features = ["no-entrypoint"] }
 ticket-nft = { path = "../ticket-nft", features = ["cpi"] }
 
 [dev-dependencies]

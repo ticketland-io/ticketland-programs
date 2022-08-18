@@ -56,31 +56,37 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
   .safe_sub(service_fee_amount)?;
 
   // transfer to treasury
-  transfer_token(
-    &ctx,
-    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-    ctx.accounts.service_fee_ata.to_account_info().clone(),
-    ctx.accounts.ticket_buyer.to_account_info().clone(),
-    service_fee_amount,
-  )?;
+  if service_fee_amount > 0 {
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.service_fee_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      service_fee_amount,
+    )?;
+  }
 
   // transfer to event organizer
-  transfer_token(
-    &ctx,
-    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-    ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
-    ctx.accounts.ticket_buyer.to_account_info().clone(),
-    service_fee_amount,
-  )?;
+  if event_organizer_amount > 0 {
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      event_organizer_amount,
+    )?;
+  }
 
   // transfer to ticket seller
-  transfer_token(
-    &ctx,
-    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-    ctx.accounts.ticket_owner_purchase_token_ata.to_account_info().clone(),
-    ctx.accounts.ticket_buyer.to_account_info().clone(),
-    seller_amount,
-  )?;
+  if seller_amount > 0 {
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.ticket_owner_purchase_token_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      seller_amount,
+    )?;
+  }
 
   Ok(())
 }

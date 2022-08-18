@@ -46,22 +46,26 @@ fn transfer_funds(ctx: &Context<FixedPricePurchase>, event: &Event) -> Result<u6
   let (event_organizer_amount, service_fee_amount) = event.currency.calc_fee(amount)?;
 
   // send to treasury
-  transfer_token(
-    &ctx,
-    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-    ctx.accounts.service_fee_ata.to_account_info().clone(),
-    ctx.accounts.ticket_buyer.to_account_info().clone(),
-    service_fee_amount,
-  )?;
+  if service_fee_amount > 0 {
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.service_fee_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      service_fee_amount,
+    )?;
+  }
 
   // send to event organizer
-  transfer_token(
-    &ctx,
-    ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
-    ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
-    ctx.accounts.ticket_buyer.to_account_info().clone(),
-    event_organizer_amount,
-  )?;
+  if event_organizer_amount > 0 {
+    transfer_token(
+      &ctx,
+      ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
+      ctx.accounts.event_organizer_purchase_token_ata.to_account_info().clone(),
+      ctx.accounts.ticket_buyer.to_account_info().clone(),
+      event_organizer_amount,
+    )?;
+  }
 
   Ok(amount)
 }

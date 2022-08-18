@@ -27,7 +27,11 @@ fn lock_deposit(ctx: &Context<CreateEvent>) -> Result<()> {
     .find(|c| c.mint_account == ctx.accounts.deposit_token.key())
     .unwrap();
 
-  token::transfer(cpi_ctx, currency.deposit_amount)
+  if currency.deposit_amount > 0 {
+    return token::transfer(cpi_ctx, currency.deposit_amount)
+  }
+
+  Ok(())
 }
 
 fn init_event_capacity(ctx: &Context<CreateEvent>,) -> Result<()> {
