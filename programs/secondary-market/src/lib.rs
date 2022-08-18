@@ -131,4 +131,30 @@ use super::*;
 			bid_price,
 		)
 	}
+
+	/// This is called via CPI from the Event Registry contract. This is enforced by the event_registry_cpi_authority account which is
+	/// set as the signer of this tx. It will:
+	/// - transfer funds from the buyer to the seller ATA
+	/// - transfer the service fees to the ticket land treasury
+	/// - transfer the event organizer fees
+	/// - close the SellListing account since it's not needed anymore
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
+	///                  signer of this tx
+	/// * `market_id` - A unique id for this market
+	/// * `event_id` - The event id for which the secondary market is created for
+	pub fn fill_sell_listing(
+		ctx: Context<CreateBuyListing>,
+		ticket_nft: Pubkey,
+		market_id: [u8; 32],
+		_event_id: [u8; 32],
+	) -> Result<()> {
+		processors::fill_sell_listing::exec(
+			ctx, 
+			market_id,
+		)
+	}
 }

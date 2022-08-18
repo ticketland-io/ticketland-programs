@@ -44,6 +44,19 @@ pub struct FillSellListing<'info> {
   )]
   pub market: Box<Account<'info, Market>>,
 
+  /// CHECK: The Event account.
+  /// Constraints will be checked in the processor fn
+  #[account(
+    seeds = [
+      b"event",
+      state.event_registry_state.key().as_ref(),
+      &event_id
+    ],
+    bump,
+    seeds::program = state.event_registry_program,
+  )]
+  pub event: AccountInfo<'info>,
+
   /// CHECK: The token that was used in the primary market of this event
   #[account()]
   pub purchase_token: Box<Account<'info, Mint>>,

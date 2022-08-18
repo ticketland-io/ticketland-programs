@@ -13,10 +13,9 @@ use crate::{
   utils::program_error::ErrorCode,
 };
 
-fn event_account_checks(ctx: &Context<CreateMarket>, event_id: [u8; 32]) -> Result<()> {
+fn event_account_checks(ctx: &Context<CreateMarket>) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
   
-  require!(event.id == event_id, ErrorCode::WrongEventAccount);
   require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
 
   Ok(())
@@ -29,7 +28,7 @@ pub fn exec(
   organizer_resale_fee: u16,
   resale_cap: u16,
 ) -> Result<()> {
-  event_account_checks(&ctx, event_id)?;
+  event_account_checks(&ctx)?;
 
   let state = &mut ctx.accounts.state;
   state.n_markets =  state.n_markets.safe_add(1)?;

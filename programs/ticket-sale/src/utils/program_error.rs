@@ -26,6 +26,8 @@ pub enum ErrorCode {
   WrongTreasuryAccount,
   #[msg("Sale has not started")]
   SaleNotStarted,
+  #[msg("Sale has finished")]
+  SaleFinished,
   #[msg("Wrong event organizer Sol treasury")]
   WrongSolTreasury,
   #[msg("Wrong Ticket NFT program")]

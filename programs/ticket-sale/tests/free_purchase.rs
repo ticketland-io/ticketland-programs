@@ -149,6 +149,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
         n_tickets: 4,
         sale_type: SaleType::Free,
         sale_start_time: now + 10, // 10 seconds
+        sale_end_time: now + 10 + 10,
         merkle_root: mt_type_1.root().unwrap(),
         seat_range: SeatRange {l: 0, r: 10_000},
       },
@@ -161,6 +162,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
           drop_interval: 20 * 60,
         },
         sale_start_time: now + 15, // 15 seconds
+        sale_end_time: now + 15 + 10,
         merkle_root: mt_type_2.root().unwrap(),
         seat_range: SeatRange {l: 10_001, r: 20_000},
       },

@@ -150,6 +150,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
         n_tickets: 4,
         sale_type: SaleType::FixedPrice {amount: sol_to_lamports(1_f64)},
         sale_start_time: now + 10, // 10 seconds
+        sale_end_time: now + 10 + 10,
         merkle_root: mt_type_1.root().unwrap(),
         seat_range: SeatRange {l: 0, r: 10_000},
       },
@@ -162,6 +163,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
           drop_interval: 20 * 60,
         },
         sale_start_time: now + 15, // 10 seconds from now,
+        sale_end_time: now + 10 + 10,
         merkle_root: mt_type_2.root().unwrap(),
         seat_range: SeatRange {l: 10_001, r: 20_000},
       },
