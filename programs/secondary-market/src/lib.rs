@@ -10,6 +10,7 @@ use crate::{
 		create_market::*,
 		create_sell_listing::*,
 		create_buy_listing::*,
+		fill_sell_listing::*,
   },
 };
 
@@ -17,7 +18,7 @@ declare_id!("ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f");
 
 #[program]
 pub mod secondary_market {
-  use crate::context::create_buy_listing::CreateBuyListing;
+  use crate::context::{create_buy_listing::CreateBuyListing, fill_sell_listing::FillSellListing};
 
 use super::*;
 
@@ -147,8 +148,8 @@ use super::*;
 	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	pub fn fill_sell_listing(
-		ctx: Context<CreateBuyListing>,
-		ticket_nft: Pubkey,
+		ctx: Context<FillSellListing>,
+		_ticket_nft: Pubkey,
 		market_id: [u8; 32],
 		_event_id: [u8; 32],
 	) -> Result<()> {

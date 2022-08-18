@@ -58,6 +58,7 @@ pub struct FillSellListing<'info> {
   pub event: AccountInfo<'info>,
 
   /// CHECK: The token that was used in the primary market of this event
+  /// The purchase token will be loaded
   #[account()]
   pub purchase_token: Box<Account<'info, Mint>>,
     
@@ -67,6 +68,29 @@ pub struct FillSellListing<'info> {
     constraint = sell_listing.ticket_owner_purchase_token_ata == ticket_owner_purchase_token_ata.key() @ ErrorCode::WrongTicketOwnerPurchaseTokenAta
   )]
   pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: This is the user that created the event earlier
+  /// Check about the correctness of this account will take place in the Ticket sale before this CPI is called
+  #[account(mut)]
+  pub event_organizer: AccountInfo<'info>,
+
+  /// The event organizer ATA that till be receiving the funds from the fees
+  #[account(
+    associated_token::mint = purchase_token,
+    associated_token::authority = event_organizer,
+  )]
+  pub event_organizer_purchase_token_ata: Box<Account<'info, TokenAccount>>,
+
+  /// The token token account that will be receiving the service fee from the resale
+  #[account(
+    associated_token::mint = purchase_token,
+    associated_token::authority = treasury,
+  )]
+  pub service_fee_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: This is ticketland.io treasury address
+  #[account()]
+  pub treasury: AccountInfo<'info>,
 
   #[account(
     mut,
