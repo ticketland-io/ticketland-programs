@@ -3,33 +3,51 @@ use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
-    market::{self, Market},
+    buy_listing::*,
+    buyer_data::*,
   },
 };
 
 #[derive(Accounts)]
 #[instruction(market_id: [u8; 32], event_id: [u8; 32])]
-pub struct CreateMarket<'info> {
+pub struct CreateBuyListing<'info> {
   // The state account of each instance of this program
-  #[account(mut)]
+  #[account()]
   pub state: Account<'info, State>,
 
-  // The state account of each instance of this program
+  // The buy_listing account
   #[account(
-    init,
-    space = 8 + size_of::<Market>() + market::SPACE_MARGIN,
-    payer = event_organizer,
+    init_if_needed,
+    space = 8 + size_of::<BuyerData>(),
+    payer = ticket_buyer,
     seeds = [
-      b"market",
+      b"buyer_data",
       state.key().as_ref(),
+      &market_id,
       &event_id,
     ],
     bump,
   )]
-  pub market: Account<'info, Market>,
+  pub buyer_data: Account<'info, BuyerData>,
+
+  // The buy_listing account
+  #[account(
+    init,
+    space = 8 + size_of::<BuyListing>(),
+    payer = ticket_buyer,
+    seeds = [
+      b"buy_listing",
+      state.key().as_ref(),
+      &market_id,
+      &event_id,
+      buyer_data.n_listing.to_string().as_ref(),
+    ],
+    bump,
+  )]
+  pub buy_listing: Account<'info, BuyListing>,
 
   /// CHECK: The Event account.
-  /// Constraints will be checked in the processor fn
+  /// Additional checks will take place in the processor
   #[account(
     seeds = [
       b"event",
@@ -41,10 +59,8 @@ pub struct CreateMarket<'info> {
   )]
   pub event: AccountInfo<'info>,
 
-  /// This is the user that created the event earlier
-  /// event_organizer.key() == event.event_organizer will be checked in the processor
   #[account(mut)]
-  pub event_organizer: Signer<'info>,
+  pub ticket_buyer: Signer<'info>,
 
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,

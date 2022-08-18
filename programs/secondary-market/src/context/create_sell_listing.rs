@@ -14,7 +14,7 @@ pub struct CreateSellListing<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
-  // The state account of each instance of this program
+  // The sell listing account
   #[account(
     init,
     space = 8 + size_of::<SellListing>(),
