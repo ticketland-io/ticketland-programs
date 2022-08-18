@@ -19,6 +19,18 @@ pub struct CreateSellListing<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
+  /// CHECK: The Event account.
+  #[account(
+    seeds = [
+      b"event",
+      state.event_registry_state.key().as_ref(),
+      &event_id
+    ],
+    bump,
+    seeds::program = state.event_registry_program,
+  )]
+  pub event: AccountInfo<'info>,
+  
   // The market account
   #[account(
     seeds = [
@@ -29,6 +41,7 @@ pub struct CreateSellListing<'info> {
     bump = market.bumps.market,
   )]
   pub market: Account<'info, Market>,
+  
 
   // The sell listing account
   #[account(

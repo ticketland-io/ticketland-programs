@@ -1,19 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
-use common::{
-  account_data::{
-    serialization::deser,
-  },
-};
-use ticket_nft::{
-  account_data::{
-    ticket_metadata::*,
-  },
-};
 use crate::{
   context::fill_sell_listing::*,
-  utils::program_error::ErrorCode,
 };
 
 fn transfer_token<'info>(

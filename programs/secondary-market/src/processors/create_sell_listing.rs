@@ -12,6 +12,9 @@ use ticket_nft::{
 };
 use crate::{
   context::create_sell_listing::*,
+  account_data::{
+    event::*,
+  },
   utils::program_error::ErrorCode,
 };
 
@@ -30,6 +33,15 @@ fn ticket_metadata_account_checks(
   Ok(())
 }
 
+fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()> {
+  let event: Event = deser(ctx.accounts.event.clone())?;
+
+  // The provided purchase token account should be the same as the one store in the event
+  require!(ctx.accounts.purchase_token.key() == event.currency.mint_account, ErrorCode::WrongPurchaseToken);
+
+  Ok(())
+}
+
 pub fn exec(
   ctx: Context<CreateSellListing>,
   market_id: [u8; 32],
@@ -37,6 +49,7 @@ pub fn exec(
   ask_price: u64,
 ) -> Result<()> {
   ticket_metadata_account_checks(&ctx, event_id)?;
+  purchase_token_account_checks(&ctx)?;
 
   let max_price = ask_price
     .safe_mul(ctx.accounts.market.resale_cap.safe_add(10_000)? as u64)?
