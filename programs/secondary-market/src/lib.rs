@@ -7,6 +7,7 @@ use anchor_lang::prelude::*;
 use crate::{
   context::{
     initialize::*,
+		create_market::*,
   },
 };
 
@@ -21,6 +22,11 @@ pub mod secondary_market {
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
+	/// * `event_registry_state` - The state of the event registry program
+	/// * `event_registry_program` - The id of the event registry program
+	/// * `ticket_sale_state` - The state of the ticket sale program
+	/// * `ticket_sale_program` - The program id of the ticket sale program
+	/// * `protocol_fee` - The ticketland protocol fees of every resale
 	pub fn initialize(
 		ctx: Context<Initialize>,
 		event_registry_state: Pubkey,
@@ -36,6 +42,33 @@ pub mod secondary_market {
 			ticket_sale_state,
 			ticket_sale_program,
 			protocol_fee
+		)
+	}
+
+
+	/// Allows the event organizer of the given event id to create a new secondary market
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `market_id` - A unique id for this market
+	/// * `event_id` - The event id for which the secondary market is created for
+	/// * `organizer_resale_fee` - The percentage of the resale price the event organizer will collect
+	/// * `resale_cap` - The max price a ticket can be sold on the secondary market. That will be
+	///                  (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
+	pub fn create_market(
+		ctx: Context<CreateMarket>,
+		market_id: [u8; 32],
+		event_id: [u8; 32],
+		organizer_resale_fee: u16,
+		resale_cap: u16,
+	) -> Result<()> {
+		processors::create_market::exec(
+			ctx, 
+			market_id,
+			event_id,
+			organizer_resale_fee,
+			resale_cap,
 		)
 	}
 }

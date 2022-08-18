@@ -19,6 +19,8 @@ test-bpf = []
 [dependencies]
 anchor-lang = "0.25.0"
 anchor-spl = "0.25.0"
+anchor-safe-math = "0.2.1"
+common = { path = "../../common" }
 
 [dev-dependencies]
 solana-program-test = "1.8.0"

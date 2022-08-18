@@ -3,12 +3,12 @@ use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
-    market::*,
+    market::{self, Market},
   },
 };
 
 #[derive(Accounts)]
-#[instruction(event_id: [u8; 32])]
+#[instruction(market_id: [u8; 32], event_id: [u8; 32])]
 pub struct CreateMarket<'info> {
   // The state account of each instance of this program
   #[account(mut)]
@@ -17,8 +17,15 @@ pub struct CreateMarket<'info> {
   // The state account of each instance of this program
   #[account(
     init,
+    space = 8 + size_of::<Market>() + market::SPACE_MARGIN,
     payer = event_organizer,
-    space = 8 + size_of::<Market>() + SPACE_MARGIN
+    seeds = [
+      b"market",
+      state.key().as_ref(),
+      &market_id,
+      &event_id,
+    ],
+    bump,
   )]
   pub market: Account<'info, Market>,
 
