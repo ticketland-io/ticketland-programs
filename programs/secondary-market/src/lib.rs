@@ -122,7 +122,7 @@ use super::*;
 	pub fn create_buy_listing(
 		ctx: Context<CreateBuyListing>,
 		market_id: [u8; 32],
-		event_id: [u8; 32],
+		_event_id: [u8; 32],
 		bid_price: u64,
 	) -> Result<()> {
 		processors::create_buy_listing::exec(

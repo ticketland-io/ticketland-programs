@@ -1,5 +1,9 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
+use anchor_spl::{
+  token::{Mint, Token, TokenAccount},
+  associated_token::AssociatedToken,
+};
 use crate::{
   account_data::{
     state::*,
@@ -43,9 +47,23 @@ pub struct CreateSellListing<'info> {
   )]
   pub ticket_metadata: AccountInfo<'info>,
 
+  /// CHECK: The token that was used in the primary market of this event
+  #[account()]
+  pub purchase_token: Box<Account<'info, Mint>>,
+
+  /// The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL
+  #[account(
+    mut,
+    associated_token::mint = purchase_token,
+    associated_token::authority = ticket_owner,
+  )]
+  pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
+
   #[account(mut)]
   pub ticket_owner: Signer<'info>,
 
+  pub token_program: Program<'info, Token>,
+  pub associated_token_program: Program<'info, AssociatedToken>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }

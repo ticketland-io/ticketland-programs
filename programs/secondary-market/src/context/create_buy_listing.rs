@@ -25,6 +25,7 @@ pub struct CreateBuyListing<'info> {
       state.key().as_ref(),
       &market_id,
       &event_id,
+      ticket_buyer.key().as_ref(),
     ],
     bump,
   )]
@@ -40,6 +41,7 @@ pub struct CreateBuyListing<'info> {
       state.key().as_ref(),
       &market_id,
       &event_id,
+      ticket_buyer.key().as_ref(),
       buyer_data.n_listing.to_string().as_ref(),
     ],
     bump,
