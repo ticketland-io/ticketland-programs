@@ -7,6 +7,9 @@ use common::{
   account_data::event::{Event as CommonEvent},
 };
 
+
+// We could import this from the event registry program but that would create a cyclic dependency. Thus we have to
+// essentially create a local replica of the same struct
 #[account]
 pub struct Event(pub CommonEvent);
 

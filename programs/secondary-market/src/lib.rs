@@ -8,6 +8,7 @@ use crate::{
   context::{
     initialize::*,
 		create_market::*,
+		create_sell_listing::*,
   },
 };
 
@@ -75,6 +76,32 @@ pub mod secondary_market {
 			event_id,
 			organizer_resale_fee,
 			resale_cap,
+		)
+	}
+
+	/// Allows the ticket owner to list the ticket for sale
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `market_id` - A unique id for this market
+	/// * `event_id` - The event id for which the secondary market is created for
+	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
+	///                  signer of this tx
+	/// * `ask_price` - The  price a ticket will be sold. It must be
+	///                 lower than (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
+	pub fn create_sell_listing(
+		ctx: Context<CreateSellListing>,
+		market_id: [u8; 32],
+		event_id: [u8; 32],
+		ticket_nft: Pubkey,
+		ask_price: u64,
+	) -> Result<()> {
+		processors::create_sell_listing::exec(
+			ctx, 
+			market_id,
+			event_id,
+			ask_price,
 		)
 	}
 }

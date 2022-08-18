@@ -6,4 +6,8 @@ pub enum ErrorCode {
   WrongEventAccount,
   #[msg("Wrong event organizer")]
   WrongEventOrganizer,
+  #[msg("Event if of token metadata does not match")]
+  EventIdDoesNotMatch,
+  #[msg("Wrong ticket owner")]
+  WrongTicketOwner,
 }
