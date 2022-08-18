@@ -104,14 +104,6 @@ pub struct FillSellListing<'info> {
   #[account()]
   pub treasury: AccountInfo<'info>,
 
-  #[account(
-    mut,
-    seeds = [b"cpi_authority", state.event_registry_state.as_ref()],
-    bump,
-    seeds::program = state.event_registry_program,
-  )]
-  pub event_registry_cpi_authority: Signer<'info>,
-
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
 

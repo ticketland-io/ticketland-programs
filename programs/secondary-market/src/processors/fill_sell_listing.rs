@@ -99,10 +99,13 @@ fn sale_checks(ctx: &Context<FillSellListing>) -> Result<()> {
 
   Ok(())
 }
+
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
   ticket_metadata_account_checks(&ctx)?;
   sale_checks(&ctx)?;
   transfer_funds(&ctx)?;
+
+  // TODO: Ticket NFT Transfer CPI to change the owner field of the ticket metadata to the new buyer
 
   Ok(())
 }
