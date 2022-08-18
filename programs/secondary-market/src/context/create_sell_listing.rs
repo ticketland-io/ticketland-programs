@@ -7,6 +7,7 @@ use anchor_spl::{
 use crate::{
   account_data::{
     state::*,
+    market::*,
     sell_listing::*,
   },
 };
@@ -17,6 +18,17 @@ pub struct CreateSellListing<'info> {
   // The state account of each instance of this program
   #[account()]
   pub state: Account<'info, State>,
+
+  // The market account
+  #[account(
+    seeds = [
+      b"market",
+      state.key().as_ref(),
+      &event_id,
+    ],
+    bump = market.bumps.market,
+  )]
+  pub market: Account<'info, Market>,
 
   // The sell listing account
   #[account(

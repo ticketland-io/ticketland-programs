@@ -14,7 +14,7 @@ pub struct CreateMarket<'info> {
   #[account(mut)]
   pub state: Account<'info, State>,
 
-  // The state account of each instance of this program
+  // The market account
   #[account(
     init,
     space = 8 + size_of::<Market>() + market::SPACE_MARGIN,

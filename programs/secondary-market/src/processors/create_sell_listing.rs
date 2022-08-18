@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_safe_math::SafeMath;
 use common::{
   account_data::{
     serialization::deser,
@@ -37,11 +38,16 @@ pub fn exec(
 ) -> Result<()> {
   ticket_metadata_account_checks(&ctx, event_id)?;
 
+  let max_price = ask_price
+    .safe_mul(ctx.accounts.market.resale_cap.safe_add(10_000)? as u64)?
+    .safe_div(10_000)?;
+
+  require!(ask_price <= max_price, ErrorCode::PriceCap);
+
   let sell_listing = &mut ctx.accounts.sell_listing;
   sell_listing.market_id = market_id;
-  sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
   sell_listing.ask_price = ask_price;
+  sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
   sell_listing.ticket_owner_purchase_token_ata = ctx.accounts.ticket_owner_purchase_token_ata.key();
-
   Ok(())
 }
