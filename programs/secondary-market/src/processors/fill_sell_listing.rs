@@ -66,10 +66,7 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
-pub fn exec(
-  ctx: Context<FillSellListing>,
-  market_id: [u8; 32],
-) -> Result<()> {
+pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
   transfer_funds(&ctx)?;
 
   Ok(())

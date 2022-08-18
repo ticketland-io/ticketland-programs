@@ -150,12 +150,9 @@ use super::*;
 	pub fn fill_sell_listing(
 		ctx: Context<FillSellListing>,
 		_ticket_nft: Pubkey,
-		market_id: [u8; 32],
+		_market_id: [u8; 32],
 		_event_id: [u8; 32],
 	) -> Result<()> {
-		processors::fill_sell_listing::exec(
-			ctx, 
-			market_id,
-		)
+		processors::fill_sell_listing::exec(ctx)
 	}
 }
