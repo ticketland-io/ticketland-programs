@@ -14,6 +14,8 @@ pub struct InitBumps {
 pub struct State {
   pub protocol_fee: u16,
   pub deployer: Pubkey,
+  pub event_registry_state: Pubkey,
+  pub event_registry_program: Pubkey,
   pub ticket_sale_state: Pubkey,
   pub ticket_sale_program: Pubkey,
 }

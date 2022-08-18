@@ -5,7 +5,7 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[account]
 pub struct Market {
-  pub market_id: [u8; 32],
+  pub id: [u8; 32],
   pub event_id: [u8; 32],
 
   /// percentage fee that will be collected by the event organizer when someone sells the ticket on the secondary maker

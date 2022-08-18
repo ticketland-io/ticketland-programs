@@ -20,6 +20,7 @@ use solana_sdk::{
 use crate::{
   program_id::{
     secondary_market_program_id,
+    event_registry_program_id,
   },
 };
 
@@ -51,6 +52,7 @@ impl Runner {
   pub async fn initialize(
     &mut self,
     state: &Keypair,
+    event_registry_state: Pubkey,
     ticket_sale_state: Pubkey,
 		protocol_fee: u16,
   ) {
@@ -62,6 +64,8 @@ impl Runner {
     }.to_account_metas(None);
 
     let data = secondary_market::instruction::Initialize {
+      event_registry_state,
+      event_registry_program: event_registry_program_id(),
       ticket_sale_state,
       ticket_sale_program: secondary_market_program_id(),
       protocol_fee
