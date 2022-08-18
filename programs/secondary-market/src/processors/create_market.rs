@@ -8,7 +8,7 @@ use common::{
 use crate::{
   context::create_market::*,
   account_data::{
-    event::Event,
+    event::Event, market::MarketBump,
   },
   utils::program_error::ErrorCode,
 };
@@ -35,10 +35,14 @@ pub fn exec(
   state.n_markets =  state.n_markets.safe_add(1)?;
 
   let market = &mut ctx.accounts.market;
+  
+  market.bumps = MarketBump {
+    market: *ctx.bumps.get("market").unwrap(),
+  };
   market.id = market_id;
   market.event_id = event_id;
   market.organizer_resale_fee = organizer_resale_fee;
   market.resale_cap = resale_cap;
-
-  todo!()
+  
+  Ok(())
 }
