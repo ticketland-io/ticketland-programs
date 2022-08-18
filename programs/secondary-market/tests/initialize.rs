@@ -15,6 +15,7 @@ async fn should_initialize_secondary_market(ctx: &mut TestContext) {
   let event_registry_state = Keypair::new();
   let secondary_market_state = Keypair::new();
   let ticket_sale_state = Keypair::new();
+  let ticket_nft_state = Keypair::new();
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let secondary_market_runner = &mut ctx.secondary_market_runner;
@@ -28,6 +29,12 @@ async fn should_initialize_secondary_market(ctx: &mut TestContext) {
     &ticket_sale_state,
     event_registry_state.pubkey(),
   ).await;
+
+  ticket_nft_runner.initialize(
+    &ticket_nft_state,
+    ticket_sale_state.pubkey(),
+  ).await;
+
 
   secondary_market_runner.initialize(
     &secondary_market_state,

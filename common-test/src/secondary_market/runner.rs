@@ -21,6 +21,7 @@ use crate::{
   program_id::{
     secondary_market_program_id,
     event_registry_program_id,
+    ticket_nft_program_id,
   },
 };
 
@@ -54,6 +55,7 @@ impl Runner {
     state: &Keypair,
     event_registry_state: Pubkey,
     ticket_sale_state: Pubkey,
+    ticket_nft_state: Pubkey,
 		protocol_fee: u16,
   ) {
     let accounts = secondary_market::accounts::Initialize {
@@ -68,6 +70,8 @@ impl Runner {
       event_registry_program: event_registry_program_id(),
       ticket_sale_state,
       ticket_sale_program: secondary_market_program_id(),
+      ticket_nft_state,
+      ticket_nft_program: ticket_nft_program_id(),
       protocol_fee
     }.data();
 

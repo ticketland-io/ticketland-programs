@@ -20,4 +20,6 @@ pub struct State {
   pub event_registry_program: Pubkey,
   pub ticket_sale_state: Pubkey,
   pub ticket_sale_program: Pubkey,
+  pub ticket_nft_state: Pubkey,
+  pub ticket_nft_program: Pubkey,
 }

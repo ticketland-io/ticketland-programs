@@ -26,6 +26,8 @@ pub mod secondary_market {
 	/// * `event_registry_program` - The id of the event registry program
 	/// * `ticket_sale_state` - The state of the ticket sale program
 	/// * `ticket_sale_program` - The program id of the ticket sale program
+	/// * `ticket_nft_state` - The state of the ticket nft program
+	/// * `ticket_nft_program` - The program id of the ticket nft program
 	/// * `protocol_fee` - The ticketland protocol fees of every resale
 	pub fn initialize(
 		ctx: Context<Initialize>,
@@ -33,6 +35,8 @@ pub mod secondary_market {
 		event_registry_program: Pubkey,
 		ticket_sale_state: Pubkey,
 		ticket_sale_program: Pubkey,
+		ticket_nft_state: Pubkey,
+		ticket_nft_program: Pubkey,
 		protocol_fee: u16,
 	) -> Result<()> {
     processors::initialize::exec(
@@ -41,6 +45,8 @@ pub mod secondary_market {
 			event_registry_program,
 			ticket_sale_state,
 			ticket_sale_program,
+			ticket_nft_state,
+			ticket_nft_program,
 			protocol_fee
 		)
 	}
