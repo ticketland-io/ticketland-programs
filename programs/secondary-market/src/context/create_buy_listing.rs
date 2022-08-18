@@ -46,19 +46,6 @@ pub struct CreateBuyListing<'info> {
   )]
   pub buy_listing: Account<'info, BuyListing>,
 
-  /// CHECK: The Event account.
-  /// Additional checks will take place in the processor
-  #[account(
-    seeds = [
-      b"event",
-      state.event_registry_state.key().as_ref(),
-      &event_id
-    ],
-    bump,
-    seeds::program = state.event_registry_program,
-  )]
-  pub event: AccountInfo<'info>,
-
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
 

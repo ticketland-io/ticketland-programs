@@ -9,6 +9,7 @@ use crate::{
     initialize::*,
 		create_market::*,
 		create_sell_listing::*,
+		create_buy_listing::*,
   },
 };
 
@@ -16,7 +17,9 @@ declare_id!("ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f");
 
 #[program]
 pub mod secondary_market {
-  use super::*;
+  use crate::context::create_buy_listing::CreateBuyListing;
+
+use super::*;
 
 	/// Initializes the state i.e. instance of a given program
 	/// 
@@ -92,9 +95,9 @@ pub mod secondary_market {
 	///                 lower than (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
 	pub fn create_sell_listing(
 		ctx: Context<CreateSellListing>,
+		_ticket_nft: Pubkey,
 		market_id: [u8; 32],
 		event_id: [u8; 32],
-		ticket_nft: Pubkey,
 		ask_price: u64,
 	) -> Result<()> {
 		processors::create_sell_listing::exec(
@@ -102,6 +105,30 @@ pub mod secondary_market {
 			market_id,
 			event_id,
 			ask_price,
+		)
+	}
+
+	/// Allows anyone to create a buy listing that is to publish an interest to buy a ticket at a given price
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `market_id` - A unique id for this market
+	/// * `event_id` - The event id for which the secondary market is created for
+	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
+	///                  signer of this tx
+	/// * `bid_price` - The  price at which the user is willing to buy a ticket. Note that during the settlemt the following must be true
+	///                 bid_price <= (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
+	pub fn create_buy_listing(
+		ctx: Context<CreateBuyListing>,
+		market_id: [u8; 32],
+		event_id: [u8; 32],
+		bid_price: u64,
+	) -> Result<()> {
+		processors::create_buy_listing::exec(
+			ctx, 
+			market_id,
+			bid_price,
 		)
 	}
 }

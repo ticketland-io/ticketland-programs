@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(market_id: [u8; 32], event_id: [u8; 32], ticket_nft: Pubkey)]
+#[instruction(ticket_nft: Pubkey, market_id: [u8; 32], event_id: [u8; 32])]
 pub struct CreateSellListing<'info> {
   // The state account of each instance of this program
   #[account()]
@@ -29,20 +29,6 @@ pub struct CreateSellListing<'info> {
     bump,
   )]
   pub sell_listing: Account<'info, SellListing>,
-
-  /// CHECK: The Event account.
-  /// Additional checks will take place in the processor
-  #[account(
-    seeds = [
-      b"event",
-      state.event_registry_state.key().as_ref(),
-      &event_id
-    ],
-    bump,
-    seeds::program = state.event_registry_program,
-  )]
-  pub event: AccountInfo<'info>,
-
 
   /// CHECK: The ticket metadata account.
   /// Additional checks will take place in the processor
