@@ -1,13 +1,8 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Transfer};
 use anchor_safe_math::SafeMath;
 use common::{
-  utils::bitmap,
   account_data::{
     serialization::deser,
-  },
-  state::{
-    sale_type::*,
   },
 };
 use crate::{
@@ -37,7 +32,7 @@ pub fn exec(
   event_account_checks(&ctx, event_id)?;
 
   let state = &mut ctx.accounts.state;
-  state.nMarkets =  state.nMarkets.safe_add(1)?;
+  state.n_markets =  state.n_markets.safe_add(1)?;
 
   let market = &mut ctx.accounts.market;
   market.id = market_id;
