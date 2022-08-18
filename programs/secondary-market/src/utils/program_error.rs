@@ -16,4 +16,6 @@ pub enum ErrorCode {
   WrongTicketOwnerPurchaseTokenAta,
   #[msg("Wrong purchase token account")]
   WrongPurchaseToken,
+  #[msg("Wrong ticket seller account")]
+  WrongTicketSeller,
 }

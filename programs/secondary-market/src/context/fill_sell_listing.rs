@@ -21,7 +21,10 @@ pub struct FillSellListing<'info> {
   pub state: Box<Account<'info, State>>,
 
   // The sell listing account
+  // It will be closed right after the instruction is executed
   #[account(
+    mut,
+    close = ticket_seller,
     seeds = [
       b"sell_listing",
       state.key().as_ref(),
@@ -32,6 +35,13 @@ pub struct FillSellListing<'info> {
     bump,
   )]
   pub sell_listing: Box<Account<'info, SellListing>>,
+
+  /// CHECK: This is ticketland.io treasury address
+  #[account(
+    mut,
+    constraint = ticket_seller.key() == sell_listing.ticket_seller @ ErrorCode::WrongTicketSeller
+  )]
+  pub ticket_seller: AccountInfo<'info>,
 
   // The market account
   #[account(

@@ -61,6 +61,7 @@ pub fn exec(
   sell_listing.market_id = market_id;
   sell_listing.ask_price = ask_price;
   sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
+  sell_listing.ticket_seller = ctx.accounts.ticket_owner.key();
   sell_listing.ticket_owner_purchase_token_ata = ctx.accounts.ticket_owner_purchase_token_ata.key();
   Ok(())
 }
