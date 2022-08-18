@@ -29,12 +29,12 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
   .safe_div(10_000)?;
 
   let event_organizer_amount = sell_listing.ask_price
-    .safe_mul(10_000_u16.safe_sub(market.organizer_resale_fee)? as u64)?
-    .safe_div(10_000)?;
+  .safe_mul(10_000_u16.safe_sub(market.organizer_resale_fee)? as u64)?
+  .safe_div(10_000)?;
 
   let seller_amount = sell_listing.ask_price
-    .safe_sub(event_organizer_amount)?
-    .safe_sub(service_fee_amount)?;
+  .safe_sub(event_organizer_amount)?
+  .safe_sub(service_fee_amount)?;
 
   // transfer to treasury
   transfer_token(
@@ -60,7 +60,7 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
     ctx.accounts.ticket_buyer_ata.to_account_info().clone(),
     ctx.accounts.ticket_owner_purchase_token_ata.to_account_info().clone(),
     ctx.accounts.ticket_buyer.to_account_info().clone(),
-    service_fee_amount,
+    seller_amount,
   )?;
 
   Ok(())
