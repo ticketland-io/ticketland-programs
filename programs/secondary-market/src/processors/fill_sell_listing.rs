@@ -98,7 +98,7 @@ fn ticket_metadata_account_checks(ctx: &Context<FillSellListing>) -> Result<()> 
   Ok(())
 }
 
-fn sale_checks(ctx: &Context<FillSellListing>) -> Result<()> {
+fn time_checks(ctx: &Context<FillSellListing>) -> Result<()> {
   // Load sale and find the ticket type and check that sale for the ticket type has not ended
   let sale: Sale = deser(ctx.accounts.sale.clone())?;
   require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, TicketSaleErrorCode::SaleFinished);
@@ -133,7 +133,7 @@ fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
 
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
   ticket_metadata_account_checks(&ctx)?;
-  sale_checks(&ctx)?;
+  time_checks(&ctx)?;
   transfer_funds(&ctx)?;
   change_ticket_ownership(&ctx)?;
 
