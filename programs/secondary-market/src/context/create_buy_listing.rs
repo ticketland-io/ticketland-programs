@@ -52,7 +52,7 @@ pub struct CreateBuyListing<'info> {
   )]
   pub buy_listing: Account<'info, BuyListing>,
 
-  /// The account that will be the authority of the vault ATA that will be holding the escrowed funds for the purchase
+  /// CHECK: The account that will be the authority of the vault ATA that will be holding the escrowed funds for the purchase
   #[account(
     init,
     space = 0,
