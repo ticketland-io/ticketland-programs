@@ -130,7 +130,6 @@ pub struct FixedPricePurchase<'info> {
     seeds = [
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
-      ticket_buyer.key().as_ref(),
       seat_index.to_string().as_ref(),
       &sale.event_id
     ],

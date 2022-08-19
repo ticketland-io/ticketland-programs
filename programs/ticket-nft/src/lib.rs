@@ -8,6 +8,7 @@ use crate::{
   context::{
     initialize::*,
 		create_ticket::*,
+		transfer::*,
   },
 };
 
@@ -66,5 +67,10 @@ pub mod ticket_nft {
 			seat_index,
 			name
 		)
+	}
+
+	pub fn transfer(ctx: Context<Transfer>) -> Result<()> {
+		// processors::transfer::exec(ctx)
+		Ok(())
 	}
 }

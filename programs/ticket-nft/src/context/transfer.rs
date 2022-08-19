@@ -12,35 +12,15 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_owner: Pubkey, event_id: [u8; 32], seat_index: u32)]
 pub struct Transfer<'info> {
   #[account()]
   pub state: Box<Account<'info, State>>,
 
   /// The newly created Ticket Metadata 
-  #[account(
-    mut,
-    seeds = [
-      b"ticket_metadata",
-      state.key().as_ref(),
-      ticket_nft.key().as_ref(),
-    ],
-    bump
-  )]
+  /// We do not apply the seeds because this IX can only be called by the secondary_market_cpi_authority
+  /// which will make sure the correct ticket_metadata is passed.
+  #[account(mut)]
   pub ticket_metadata: Box<Account<'info, TicketMetadata>>,
-
-  /// The underlying Ticket NFT Mint account
-  #[account(
-    seeds = [
-      b"ticket_nft",
-      state.key().as_ref(),
-      ticket_owner.as_ref(),
-      seat_index.to_string().as_ref(),
-      &event_id
-    ],
-    bump,
-  )]
-  pub ticket_nft: Box<Account<'info, Mint>>,
 
   /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
   #[account(
@@ -48,5 +28,5 @@ pub struct Transfer<'info> {
     bump,
     seeds::program = state.secondary_market_program,
   )]
-  pub cpi_authority: AccountInfo<'info>,
+  pub secondary_market_cpi_authority: AccountInfo<'info>,
 }

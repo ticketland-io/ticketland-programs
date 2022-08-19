@@ -22,7 +22,6 @@ pub fn ticket_nft(
     &[
       b"ticket_nft",
       state.as_ref(),
-      ticket_buyer.as_ref(),
       seat_index.to_string().as_ref(),
       &event_id
     ],
