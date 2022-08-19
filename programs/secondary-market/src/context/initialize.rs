@@ -16,6 +16,16 @@ pub struct Initialize<'info> {
   )]
   pub state: Account<'info, State>,
 
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    init,
+    payer = deployer,
+    space = 0,
+    seeds = [b"market:cpi_authority", state.key().as_ref()],
+    bump,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
+
   #[account(mut)]
   pub deployer: Signer<'info>,
 
