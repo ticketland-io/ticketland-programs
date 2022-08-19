@@ -1,11 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
-use ticket_nft::{
-  account_data::{
-    ticket_metadata::*,
-  },
-};
 use crate::{
   context::fill_sell_listing::*,
   acl::{
