@@ -21,7 +21,8 @@ use anchor_lang::{
 };
 use crate::program_id::{
   ticket_nft_program_id,
-  ticket_sale_program_id
+  ticket_sale_program_id,
+  secondary_market_program_id,
 };
 use super::pda;
 
@@ -48,6 +49,7 @@ impl Runner {
     &mut self,
     state: &Keypair,
     ticket_sale_state: Pubkey,
+    secondary_market_state: Pubkey,
   ) {
     let accounts = ticket_nft::accounts::Initialize {
       state: state.pubkey(),
@@ -60,6 +62,8 @@ impl Runner {
     let data = ticket_nft::instruction::Initialize {
       ticket_sale_state,
       ticket_sale_program: ticket_sale_program_id(),
+      secondary_market_state,
+      secondary_market_program: secondary_market_program_id(),
     }.data();
 
     let ix = Instruction {

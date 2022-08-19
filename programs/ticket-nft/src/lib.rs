@@ -27,8 +27,16 @@ pub mod ticket_nft {
 		ctx: Context<Initialize>,
 		ticket_sale_state: Pubkey,
 		ticket_sale_program: Pubkey,
+		secondary_market_state: Pubkey,
+		secondary_market_program: Pubkey,
 	) -> Result<()> {
-    processors::initialize::exec(ctx, ticket_sale_state, ticket_sale_program)
+    processors::initialize::exec(
+			ctx,
+			ticket_sale_state,
+			ticket_sale_program,
+			secondary_market_state,
+			secondary_market_program,
+		)
 	}
 
 	/// Creates a new Ticket NFT. Only the ticket sale contract can call this instruction

@@ -18,9 +18,15 @@ pub struct State {
   /// A State account of the Ticket sale Program
   pub ticket_sale_state: Pubkey,
 
+  /// The Secondary Market Program
+  pub secondary_market_program: Pubkey,
+
+  /// A State account of the Secondary Market Program
+  pub secondary_market_state: Pubkey,
+
   /// The authority of all NFT Mints that are created in this contract
   pub nft_authority: Pubkey,
 
   /// The deployer of this instance
-  pub deployer: Pubkey,
+  pub deployer: Pubkey
 }

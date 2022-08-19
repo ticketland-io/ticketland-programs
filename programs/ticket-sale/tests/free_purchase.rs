@@ -54,6 +54,7 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
   let event_registry_state = Keypair::new();
   let ticket_sale_state = Keypair::new();
   let ticket_nft_state = Keypair::new();
+  let secondary_market_state = Keypair::new();
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let ticket_nft_runner = &mut ctx.ticket_nft_runner;
@@ -73,6 +74,7 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
   ticket_nft_runner.initialize(
     &ticket_nft_state,
     ticket_sale_state.pubkey(),
+    secondary_market_state.pubkey(),
   ).await;
 
   (

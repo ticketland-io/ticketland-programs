@@ -24,6 +24,7 @@ use crate::{
     ticket_nft_program_id,
   },
 };
+use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,
@@ -61,6 +62,7 @@ impl Runner {
     let accounts = secondary_market::accounts::Initialize {
       state: state.pubkey(),
       deployer: self.deployer.pubkey(),
+      cpi_authority: pda::cpi_authority(&state.pubkey()).0,
       system_program: system_program::ID,
       rent: Rent::id(),
     }.to_account_metas(None);

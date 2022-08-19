@@ -19,6 +19,7 @@ pub struct Transfer<'info> {
 
   /// The newly created Ticket Metadata 
   #[account(
+    mut,
     seeds = [
       b"ticket_metadata",
       state.key().as_ref(),
@@ -40,4 +41,12 @@ pub struct Transfer<'info> {
     bump,
   )]
   pub ticket_nft: Box<Account<'info, Mint>>,
+
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    seeds = [b"market:cpi_authority", state.secondary_market_state.as_ref()],
+    bump,
+    seeds::program = state.secondary_market_program,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
 }
