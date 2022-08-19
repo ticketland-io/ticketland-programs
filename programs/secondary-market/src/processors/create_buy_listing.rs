@@ -3,7 +3,9 @@ use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
 use crate::{
   context::create_buy_listing::*,
-  acl::sale_time_checks,
+  account_data::{
+    buy_listing::*,
+  },
 };
 
 fn transfer_token<'info>(
@@ -42,6 +44,10 @@ pub fn exec(
   transfer_funds(&ctx, bid_price)?;
 
   let buy_listing = &mut ctx.accounts.buy_listing;
+
+  buy_listing.bumps = BuyListingBumps {
+    listing_escrow: *ctx.bumps.get("listing_escrow").unwrap(),
+  };
   buy_listing.market_id = market_id;
   buy_listing.bid_price = bid_price;
 
