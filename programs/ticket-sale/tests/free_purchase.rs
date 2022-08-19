@@ -216,7 +216,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   assert!(result.is_ok());
 
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), seat_index, event_id).0;
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
 
   // ticket nft Mint account and Metaplex metadata
   {

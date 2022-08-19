@@ -14,7 +14,6 @@ pub fn nft_authority(state: &Pubkey) -> (Pubkey, u8) {
 
 pub fn ticket_nft(
   state: &Pubkey,
-  ticket_buyer: &Pubkey,
   seat_index: u32,
   event_id: [u8; 32],
 ) -> (Pubkey, u8) {

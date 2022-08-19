@@ -253,7 +253,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     assert_eq!(treasury_funds_after - treasury_funds_before, sol_to_lamports(0.05_f64));
   }
 
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), &ticket_buyer.pubkey(), seat_index, event_id).0;
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
 
   // ticket nft Mint account and Metaplex metadata
   {
