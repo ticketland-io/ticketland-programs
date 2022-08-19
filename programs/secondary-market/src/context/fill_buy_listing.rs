@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_nft: Pubkey, market_id: [u8; 32], event_id: [u8; 32], n_listing: u16)]
+#[instruction(n_listing: u16, market_id: [u8; 32], event_id: [u8; 32])]
 pub struct FillBuyListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -31,6 +31,8 @@ pub struct FillBuyListing<'info> {
   // The sell listing account
   // It will be closed right after the instruction is executed
   #[account(
+    mut,
+    close = ticket_buyer,
     seeds = [
       b"buy_listing",
       state.key().as_ref(),

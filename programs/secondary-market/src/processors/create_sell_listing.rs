@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_safe_math::SafeMath;
 use common::{
   account_data::{
     serialization::deser,
@@ -18,6 +17,7 @@ use crate::{
   acl::{
     sale_time_checks,
     sale_account,
+    price_cap,
   },
   utils::program_error::ErrorCode,
 };
@@ -52,6 +52,11 @@ fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()>
     &ctx.accounts.ticket_metadata,
     &ctx.accounts.sale
   )
+  price_cap::check(
+    &ctx.accounts.ticket_metadata,
+    ctx.accounts.market.resale_cap,
+    ask_price,
+  )
 )]
 pub fn exec(
   ctx: Context<CreateSellListing>,
@@ -61,12 +66,6 @@ pub fn exec(
 ) -> Result<()> {
   ticket_metadata_account_checks(&ctx, event_id)?;
   purchase_token_account_checks(&ctx)?;
-
-  let max_price = ask_price
-    .safe_mul(ctx.accounts.market.resale_cap.safe_add(10_000)? as u64)?
-    .safe_div(10_000)?;
-
-  require!(ask_price <= max_price, ErrorCode::PriceCap);
 
   let sell_listing = &mut ctx.accounts.sell_listing;
   sell_listing.market_id = market_id;

@@ -12,6 +12,7 @@ use crate::{
 		create_sell_listing::*,
 		create_buy_listing::*,
 		fill_sell_listing::*,
+		fill_buy_listing::*,
   },
 };
 
@@ -134,8 +135,7 @@ use super::*;
 		)
 	}
 
-	/// This is called via CPI from the Event Registry contract. This is enforced by the event_registry_cpi_authority account which is
-	/// set as the signer of this tx. It will:
+	/// It will:
 	/// - transfer funds from the buyer to the seller ATA
 	/// - transfer the service fees to the ticket land treasury
 	/// - transfer the event organizer fees
@@ -155,5 +155,26 @@ use super::*;
 		_event_id: [u8; 32],
 	) -> Result<()> {
 		processors::fill_sell_listing::exec(ctx)
+	}
+
+	/// It will:
+	/// - transfer funds from the buy listing escrow ata to the seller's ATA
+	/// - transfer the service fees to the ticket land treasury
+	/// - transfer the event organizer fees
+	/// - close the BuyListing account since it's not needed anymore
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `n_listing` - This is part of the seed to re-create the buy_listing PDA
+	/// * `market_id` - A unique id for this market
+	/// * `event_id` - The event id for which the secondary market is created for
+	pub fn fill_buy_listing(
+		ctx: Context<FillBuyListing>,
+		_n_listing: Pubkey,
+		_market_id: [u8; 32],
+		_event_id: [u8; 32],
+	) -> Result<()> {
+		processors::fill_buy_listing::exec(ctx)
 	}
 }
