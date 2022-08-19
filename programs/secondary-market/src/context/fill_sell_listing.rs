@@ -3,6 +3,9 @@ use anchor_spl::{
   token::{Mint, Token, TokenAccount},
   associated_token::AssociatedToken,
 };
+use ticket_nft::{
+  program::TicketNft,
+};
 use crate::{
   account_data::{
     state::*,
@@ -19,6 +22,11 @@ use crate::{
 pub struct FillSellListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
+
+  #[account(
+    constraint = ticket_nft_program_state.key() == state.ticket_nft_state @ ErrorCode::WrongTicketNftState
+  )]
+  pub ticket_nft_program_state: Box<Account<'info, State>>,
 
   // The sell listing account
   // It will be closed right after the instruction is executed
@@ -51,6 +59,13 @@ pub struct FillSellListing<'info> {
   /// Processor will check that the ticket_metadata.sale does much this key
   #[account()]
   pub sale: AccountInfo<'info>,
+
+  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  #[account(
+    seeds = [b"market:cpi_authority", state.key().as_ref()],
+    bump = state.bumps.cpi_authority,
+  )]
+  pub cpi_authority: AccountInfo<'info>,
 
   /// CHECK: The ticket metadata account.
   #[account(
@@ -113,6 +128,8 @@ pub struct FillSellListing<'info> {
     associated_token::authority = ticket_buyer,
   )]
   pub ticket_buyer_ata: Box<Account<'info, TokenAccount>>,
+
+  pub ticket_nft_program: Program<'info, TicketNft>,
 
   pub token_program: Program<'info, Token>,
   pub associated_token_program: Program<'info, AssociatedToken>,

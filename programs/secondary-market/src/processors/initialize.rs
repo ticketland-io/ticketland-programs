@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 use crate::{
   context::initialize::Initialize,
+  account_data::{
+    state::*,
+  },
 };
 
 pub fn exec(
@@ -15,6 +18,9 @@ pub fn exec(
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
+  state.bumps = InitBumps {
+    cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
+  };
   state.event_registry_state = event_registry_state;
   state.event_registry_program = event_registry_program;
   state.ticket_sale_state = ticket_sale_state;

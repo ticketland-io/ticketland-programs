@@ -5,13 +5,13 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
-  pub event_nft_authority: u8,
   pub cpi_authority: u8,
 }
 
 #[account]
 #[derive(Default)]
 pub struct State {
+  pub bumps: InitBumps,
   /// The fees that will be collected by ticketland on every sale
   pub protocol_fee: u16,
   pub n_markets: u32,

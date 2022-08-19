@@ -22,4 +22,6 @@ pub enum ErrorCode {
   WrongTicketMetadata,
   #[msg("Wrong sale account")]
   WrongSaleAccount,
+  #[msg("Wrong ticket nft state")]
+  WrongTicketNftState,
 }

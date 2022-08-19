@@ -106,12 +106,36 @@ fn sale_checks(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
+fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
+  let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
+  let cpi_accounts = ticket_nft::cpi::accounts::Transfer {
+    state: ctx.accounts.ticket_nft_program_state.to_account_info(),
+    ticket_metadata: ctx.accounts.ticket_metadata.to_account_info(),
+    secondary_market_cpi_authority:  ctx.accounts.cpi_authority.to_account_info(),
+  };
+
+  let state = &ctx.accounts.state;
+  let state_key = state.key();
+  let seeds: &[&[u8]] = &[
+    b"market:cpi_authority", state_key.as_ref(),
+    &[state.bumps.cpi_authority]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+
+  ticket_nft::cpi::transfer(
+    cpi_ctx,
+    ctx.accounts.sell_listing.ticket_owner,
+  )?;
+
+  Ok(())
+}
+
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
   ticket_metadata_account_checks(&ctx)?;
   sale_checks(&ctx)?;
   transfer_funds(&ctx)?;
-
-  // TODO: Ticket NFT Transfer CPI to change the owner field of the ticket metadata to the new buyer
+  change_ticket_ownership(&ctx)?;
 
   Ok(())
 }
