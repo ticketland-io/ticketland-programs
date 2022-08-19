@@ -1,11 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
-use common::{
-  account_data::{
-    serialization::deser,
-  },
-};
 use ticket_nft::{
   account_data::{
     ticket_metadata::*,
@@ -15,10 +10,8 @@ use crate::{
   context::fill_sell_listing::*,
   acl::{
     sale_time_checks,
+    sale_account,
   },
-  utils::{
-    program_error::ErrorCode,
-  }
 };
 
 fn transfer_token<'info>(
@@ -88,13 +81,6 @@ fn transfer_funds(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
-fn ticket_metadata_account_checks(ctx: &Context<FillSellListing>) -> Result<()> {
-  let ticket_metadata: TicketMetadata = deser(ctx.accounts.ticket_metadata.clone())?;
-  require!(ticket_metadata.sale == ctx.accounts.sale.key(), ErrorCode::WrongSaleAccount);
-
-  Ok(())
-}
-
 fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
   let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
   let cpi_accounts = ticket_nft::cpi::accounts::Transfer {
@@ -120,11 +106,14 @@ fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
-#[access_control(sale_time_checks::check(
-  &ctx.accounts.sale
-))]
+#[access_control(
+  sale_time_checks::check(&ctx.accounts.sale)
+  sale_account::check(
+    &ctx.accounts.ticket_metadata,
+    &ctx.accounts.sale
+  )
+)]
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
-  ticket_metadata_account_checks(&ctx)?;
   transfer_funds(&ctx)?;
   change_ticket_ownership(&ctx)?;
 

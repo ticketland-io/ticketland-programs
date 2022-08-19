@@ -19,13 +19,6 @@ pub struct CreateBuyListing<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
-  /// CHECK: The Sale account stored in the ticket_metadata
-  /// We don't care about checking this account because the only way we use it is to read the end time of the sale.
-  /// A user could trick by using any sale contract but that would simply allow him to list buy order which will be then
-  /// rejected when the sale is filled since we do check the sale account there.
-  #[account()]
-  pub sale: AccountInfo<'info>,
-
   // The buy_listing account
   #[account(
     init_if_needed,

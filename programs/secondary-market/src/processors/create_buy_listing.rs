@@ -34,9 +34,6 @@ fn transfer_funds(ctx: &Context<CreateBuyListing>, bid_price: u64) -> Result<()>
   Ok(())
 }
 
-#[access_control(sale_time_checks::check(
-  &ctx.accounts.sale
-))]
 pub fn exec(
   ctx: Context<CreateBuyListing>,
   market_id: [u8; 32],

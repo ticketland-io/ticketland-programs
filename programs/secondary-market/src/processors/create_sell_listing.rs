@@ -15,6 +15,10 @@ use crate::{
   account_data::{
     event::*,
   },
+  acl::{
+    sale_time_checks,
+    sale_account,
+  },
   utils::program_error::ErrorCode,
 };
 
@@ -42,6 +46,13 @@ fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()>
   Ok(())
 }
 
+#[access_control(
+  sale_time_checks::check(&ctx.accounts.sale)
+  sale_account::check(
+    &ctx.accounts.ticket_metadata,
+    &ctx.accounts.sale
+  )
+)]
 pub fn exec(
   ctx: Context<CreateSellListing>,
   market_id: [u8; 32],
