@@ -69,8 +69,7 @@ pub mod ticket_nft {
 		)
 	}
 
-	pub fn transfer(ctx: Context<Transfer>) -> Result<()> {
-		// processors::transfer::exec(ctx)
-		Ok(())
+	pub fn transfer(ctx: Context<Transfer>, new_owner: Pubkey) -> Result<()> {
+		processors::transfer::exec(ctx, new_owner)
 	}
 }

@@ -1,13 +1,8 @@
 use anchor_lang::prelude::*;
-use std::mem::size_of;
-use anchor_spl::{
-  token::{Mint, Token, TokenAccount},
-  associated_token::AssociatedToken,
-};
 use crate::{
   account_data::{
     state::*,
-    ticket_metadata::{TicketMetadata, SPACE_MARGIN},
+    ticket_metadata::*,
   },
 };
 
