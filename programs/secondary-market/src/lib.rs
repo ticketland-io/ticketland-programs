@@ -2,6 +2,7 @@ pub mod account_data;
 pub mod context;
 pub mod processors;
 pub mod utils;
+pub mod acl;
 
 use anchor_lang::prelude::*;
 use crate::{

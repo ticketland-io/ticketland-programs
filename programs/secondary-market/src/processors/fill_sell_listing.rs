@@ -6,12 +6,6 @@ use common::{
     serialization::deser,
   },
 };
-use ticket_sale::{
-  account_data::{
-    sale::*,
-  },
-  utils::program_error::ErrorCode as TicketSaleErrorCode
-};
 use ticket_nft::{
   account_data::{
     ticket_metadata::*,
@@ -19,6 +13,9 @@ use ticket_nft::{
 };
 use crate::{
   context::fill_sell_listing::*,
+  acl::{
+    sale_time_checks,
+  },
   utils::{
     program_error::ErrorCode,
   }
@@ -98,14 +95,6 @@ fn ticket_metadata_account_checks(ctx: &Context<FillSellListing>) -> Result<()> 
   Ok(())
 }
 
-fn time_checks(ctx: &Context<FillSellListing>) -> Result<()> {
-  // Load sale and find the ticket type and check that sale for the ticket type has not ended
-  let sale: Sale = deser(ctx.accounts.sale.clone())?;
-  require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, TicketSaleErrorCode::SaleFinished);
-
-  Ok(())
-}
-
 fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
   let cpi_program = ctx.accounts.ticket_nft_program.to_account_info();
   let cpi_accounts = ticket_nft::cpi::accounts::Transfer {
@@ -131,9 +120,11 @@ fn change_ticket_ownership(ctx: &Context<FillSellListing>) -> Result<()> {
   Ok(())
 }
 
+#[access_control(sale_time_checks::check(
+  &ctx.accounts.sale
+))]
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
   ticket_metadata_account_checks(&ctx)?;
-  time_checks(&ctx)?;
   transfer_funds(&ctx)?;
   change_ticket_ownership(&ctx)?;
 

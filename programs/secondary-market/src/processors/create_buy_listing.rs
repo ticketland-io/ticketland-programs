@@ -3,6 +3,7 @@ use anchor_safe_math::SafeMath;
 use anchor_spl::token::{self, Transfer};
 use crate::{
   context::create_buy_listing::*,
+  acl::sale_time_checks,
 };
 
 fn transfer_token<'info>(
@@ -33,6 +34,9 @@ fn transfer_funds(ctx: &Context<CreateBuyListing>, bid_price: u64) -> Result<()>
   Ok(())
 }
 
+#[access_control(sale_time_checks::check(
+  &ctx.accounts.sale
+))]
 pub fn exec(
   ctx: Context<CreateBuyListing>,
   market_id: [u8; 32],
