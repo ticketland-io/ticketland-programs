@@ -3,7 +3,7 @@ use anchor_lang::{
   prelude::Result as AnchorResult,
   InstructionData,
   ToAccountMetas,
-  Id,
+  Id, Key,
 };
 use anchor_spl::token::{Token};
 use solana_test_utils::{
@@ -195,10 +195,13 @@ impl Runner {
     seat_index: u32,
     ticket_nft_program_state: Pubkey,
     purchase_token: Pubkey,
-    ticket_owner: &Keypair,
+    treasury: Pubkey,
+    ticket_owner: Pubkey,
+    ticket_buyer: &Keypair,
     event_organizer: Pubkey,
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
@@ -207,28 +210,36 @@ impl Runner {
       state,
       ticket_nft_program_state,
       sell_listing,
+      event,
       market,
       sale,
       cpi_authority: pda::cpi_authority(&state).0,
       ticket_metadata,
       purchase_token,
-      ticket_owner: ticket_owner.pubkey(),
-      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
+      ticket_owner,
+      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner, &purchase_token),
       event_organizer,
       event_organizer_purchase_token_ata: Spl::get_associated_token_address(&event_organizer, &purchase_token),
-      // market,
-      // sell_listing,
-      // ticket_metadata,
-      // purchase_token,
-      // ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
-      // ticket_owner: ticket_owner.pubkey(),
-
+      treasury,
+      service_fee_ata: Spl::get_associated_token_address(&treasury, &purchase_token),
+      ticket_buyer: ticket_buyer.pubkey(),
+      ticket_buyer_ata: Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token),
+      ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
-      system_program: system_program::ID,
-      rent: Rent::id(),
     }.to_account_metas(None);
 
-    todo!()
+    let data = secondary_market::instruction::FillSellListing {
+      _ticket_nft: ticket_nft,
+      _event_id: event_id,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_buyer_ata])).await
   }
 }
