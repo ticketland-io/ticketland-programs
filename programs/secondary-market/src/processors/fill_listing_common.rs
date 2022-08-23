@@ -41,11 +41,11 @@ pub fn transfer_funds<'info>(
   authority: AccountInfo<'info>,
 ) -> Result<()> {
   let service_fee_amount = price
-  .safe_mul(10_000_u16.safe_sub(state.protocol_fee)? as u64)?
+  .safe_mul(state.protocol_fee as u64)?
   .safe_div(10_000)?;
 
   let event_organizer_amount = price
-  .safe_mul(10_000_u16.safe_sub(market.organizer_resale_fee)? as u64)?
+  .safe_mul(market.organizer_resale_fee as u64)?
   .safe_div(10_000)?;
 
   let seller_amount = price

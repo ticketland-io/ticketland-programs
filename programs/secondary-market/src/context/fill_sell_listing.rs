@@ -18,15 +18,16 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_nft: Pubkey, event_id: [u8; 32])]
+#[instruction(event_id: [u8; 32])]
 pub struct FillSellListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
 
+  /// CHECK: It should be the same as the one stored in the state during initialize
   #[account(
     constraint = ticket_nft_program_state.key() == state.ticket_nft_state @ ErrorCode::WrongTicketNftState
   )]
-  pub ticket_nft_program_state: Box<Account<'info, State>>,
+  pub ticket_nft_program_state: AccountInfo<'info>,
 
   // The sell listing account
   // It will be closed right after the instruction is executed
@@ -37,7 +38,7 @@ pub struct FillSellListing<'info> {
       b"sell_listing",
       state.key().as_ref(),
       &event_id,
-      ticket_nft.as_ref(),
+      ticket_metadata.key().as_ref(),
     ],
     bump,
   )]

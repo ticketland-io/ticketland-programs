@@ -229,7 +229,6 @@ impl Runner {
     }.to_account_metas(None);
 
     let data = secondary_market::instruction::FillSellListing {
-      _ticket_nft: ticket_nft,
       _event_id: event_id,
     }.data();
 

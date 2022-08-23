@@ -23,10 +23,11 @@ pub struct FillBuyListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
 
+  /// CHECK: It should be the same as the one stored in the state during initialize
   #[account(
     constraint = ticket_nft_program_state.key() == state.ticket_nft_state @ ErrorCode::WrongTicketNftState
   )]
-  pub ticket_nft_program_state: Box<Account<'info, State>>,
+  pub ticket_nft_program_state: AccountInfo<'info>,
 
   // The sell listing account
   // It will be closed right after the instruction is executed

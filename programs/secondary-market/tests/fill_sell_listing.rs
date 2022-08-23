@@ -136,8 +136,8 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     secondary_market_state,
     event_id,
     seat_index,
-    _,
-    ticket_buyer,
+    event_organizer,
+    ticket_owner, // ticket buyer from primary market is the ticket owner
     purchase_token,
     ticket_type_index,
     _,
@@ -151,18 +151,9 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       event_id,
     ).0;
 
-
-    // event_id: [u8; 32],
-    // state: Pubkey,
-    // event_registry_state: Pubkey,
-    // sale: Pubkey,
-    // seat_index: u32,
-    // ticket_nft_program_state: Pubkey,
-    // purchase_token: Pubkey,
-    // treasury: Pubkey,
-    // ticket_owner: Pubkey,
-    // ticket_buyer: &Keypair,
-    // event_organizer: Pubkey,
+    let event_registry_runner = &mut ctx.event_registry_runner;
+    let treasury = event_registry_runner.get_participant(5);
+    let ticket_buyer = event_registry_runner.get_participant(4);
     
     let result = secondary_market_runner.fill_sell_listing(
       event_id,
@@ -172,7 +163,10 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       seat_index,
       ticket_nft_state.pubkey(),
       purchase_token,
-      &ticket_buyer, 
+      treasury.pubkey(),
+      ticket_owner.pubkey(),
+      &ticket_buyer,
+      event_organizer.pubkey(),
     ).await;
     assert!(result.is_ok());
   }
