@@ -5,14 +5,21 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
+use solana_test_utils::{
+  spl::Spl,
+};
 use common_test::{
   test_context::TestContext,
   ticket_sale::{
     pda::{self as TicketSalePda},
   },
+  ticket_nft::{
+    pda as TicketNftPda,
+  },
   secondary_market::{
     common::{init, setup},
     error::Error,
+    pda
   }
 };
 
@@ -332,4 +339,92 @@ async fn should_fail_if_given_purchase_account_does_not_match_event(ctx: &mut Te
 
     Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
   } 
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_create_sell_listing(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+  ) = init(ctx).await;
+
+  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+  let seat_index = 0;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let event_organizer = event_registry_runner.get_participant(1);
+  let ticket_buyer = event_registry_runner.get_participant(2);
+  let deposit_token = event_registry_runner.deposit_tokens[2];
+  let purchase_token = deposit_token;
+  let ticket_type_index = 0;
+
+  let _ = setup(
+    ctx,
+    &event_organizer,
+    &ticket_buyer,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    deposit_token,
+    purchase_token,
+    event_id,
+    seat_index,
+    ticket_type_index,
+  ).await;
+
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    
+    let result = secondary_market_runner.create_market(
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      event_id,
+      &event_organizer,
+      500, // organizer_resale_fee 10%
+      1000, // resale_cap 10%
+    ).await;
+    assert!(result.is_ok());
+  }
+
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
+
+    let result = secondary_market_runner.create_sell_listing(
+      event_id,
+      // 9.9% higher than the price sold in the primary market.
+      // cap is at 10%
+      sol_to_lamports(1.099),
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      purchase_token,
+      &ticket_buyer, 
+    ).await;
+    assert!(result.is_ok());
+  }
+
+  {
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&secondary_market_state.pubkey(), event_id, &ticket_metadata).0;
+    let ticket_owner_purchase_token_ata = Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token);
+
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let sell_listing_data = pt.get_account::<secondary_market::account_data::sell_listing::SellListing>(sell_listing).await;
+
+    assert_eq!(sell_listing_data.ask_price, sol_to_lamports(1.099));
+    assert_eq!(sell_listing_data.ticket_metadata, ticket_metadata);
+    assert_eq!(sell_listing_data.ticket_owner, ticket_buyer.pubkey());
+    assert_eq!(sell_listing_data.ticket_owner_purchase_token_ata, ticket_owner_purchase_token_ata);
+  }
 }
