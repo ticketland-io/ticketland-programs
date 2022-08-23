@@ -122,6 +122,33 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
   }
 
+  // Should fail is asking price higher than the price cap
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
+
+    let result = secondary_market_runner.create_sell_listing(
+      event_id,
+      // 5.1% higher than the price sold in the primary market.
+      // cap is at 5%
+      sol_to_lamports(1.051),
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      purchase_token,
+      &ticket_buyer,
+    ).await;
+
+    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::PriceCap);
+  }
+
   // move to the end of sale
   {
     let ticket_sale_runner = &mut ctx.ticket_sale_runner;
