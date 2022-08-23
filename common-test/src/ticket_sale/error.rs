@@ -36,12 +36,12 @@ impl TryFrom<u32> for Error {
       7 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::UnexpectedSaleAccount)),
       8 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::UnsupportedPurchaseToken)),
       9 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongEventOrganizer)),
-      11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTreasuryAccount)),
+      10 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTreasuryAccount)),
       11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SaleNotStarted)),
-      11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SaleFinished)),
-      11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongSolTreasury)),
-      11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgram)),
-      11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgramStateAccount)),
+      12 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SaleFinished)),
+      13 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongSolTreasury)),
+      14 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgram)),
+      15 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgramStateAccount)),
       _ => Err(())
     }
   }

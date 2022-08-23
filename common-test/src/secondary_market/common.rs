@@ -150,7 +150,7 @@ pub async fn setup(
     event_id,
     &event_organizer,
     ticket_sale_state,
-    0, // ticket_type_index
+    ticket_type_index, // ticket_type_index
   ).await;
 
   assert!(result.is_ok());
