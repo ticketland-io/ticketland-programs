@@ -75,6 +75,7 @@ pub async fn setup(
   purchase_token: Pubkey,
   event_id: [u8; 32],
   seat_index: u32,
+  ticket_type_index: u8,
 ) -> (Vec<TicketType>,) {
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
@@ -170,7 +171,7 @@ pub async fn setup(
     event_organizer.pubkey(),
     ticket_nft_state,
     event_id,
-    0, // ticket_type_index
+    ticket_type_index, // ticket_type_index
     seat_index,
     TicketSaleRunner::dummy_seat_name(0),
     mt_type_1.proof(&[0]), // proof path for leaf 0

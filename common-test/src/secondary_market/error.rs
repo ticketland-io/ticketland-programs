@@ -11,6 +11,11 @@ use anchor_lang::{
     ERROR_CODE_OFFSET,
   },
 };
+use crate::{
+  ticket_sale::{
+    error::Error as TicketSaleError,
+  }
+};
 
 #[derive(Debug)]
 pub struct Error(pub secondary_market::utils::program_error::ErrorCode);
@@ -47,6 +52,17 @@ impl Error {
     if let Err(LibError::ProgramError(ProgramErrorWithOrigin {program_error, ..})) = result {
       let code = Into::<u64>::into(program_error) as u32;
       let error = TryInto::<Error>::try_into(code).expect("no error found");
+      
+      assert_eq!(format!("{}", error), format!("{}", expected_error));
+    } else {
+      assert!(false, "expected error but none found")
+    }
+  }
+
+  pub fn assert_ticket_sale_err(result: AnchorResult<()>, expected_error: ticket_sale::utils::program_error::ErrorCode) {
+    if let Err(LibError::ProgramError(ProgramErrorWithOrigin {program_error, ..})) = result {
+      let code = Into::<u64>::into(program_error) as u32;
+      let error = TryInto::<TicketSaleError>::try_into(code).expect("no error found");
       
       assert_eq!(format!("{}", error), format!("{}", expected_error));
     } else {

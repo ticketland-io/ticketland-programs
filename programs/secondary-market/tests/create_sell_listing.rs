@@ -20,11 +20,14 @@ use common_test::{
   test_context::TestContext,
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
+    pda::{self as TicketSalePda, ticket_sale_state},
   },
   secondary_market::{
     common::{init, setup},
+    error::Error,
   }
 };
+use ticket_sale::account_data::event;
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
@@ -43,6 +46,7 @@ async fn should_fail_if_sale_finished(ctx: &mut TestContext) {
   let ticket_buyer = event_registry_runner.get_participant(2);
   let deposit_token = event_registry_runner.deposit_tokens[2];
   let purchase_token = deposit_token;
+  let ticket_type_index = 0;
 
   let (ticket_types,) = setup(
     ctx,
@@ -55,26 +59,47 @@ async fn should_fail_if_sale_finished(ctx: &mut TestContext) {
     purchase_token,
     event_id,
     seat_index,
+    ticket_type_index,
   ).await;
 
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  
+  let result = secondary_market_runner::create_market(
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    event_id,
+    &event_organizer,
+    500, // organizer_resale_fee 5%
+    1000, // resale_cap 10%
+  ).await;
+  assert!(result.is_ok());
+
   // move to the end of sale
-  // {
-  //   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  //   let mut pt = ticket_sale_runner.pt.lock().await;
-  //   pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time).await;
-  // }
+  {
+    let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time).await;
+  }
 
-  // let secondary_market_runner = &mut ctx.secondary_market_runner;
-  // let result = secondary_market_runner.create_sell_listing(
-  //   event_id,
-  //   sol_to_lamports(1.05), // 5% higher than the price sold in the primary market
-  //   secondary_market_state,
-  //   sale: Pubkey,
-  //   seat_index: u32,
-  //   event: Pubkey,
-  //   ticket_nft_state,
-  //   purchase_token,
-  //   &ticket_buyer,
-  // ).await;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
+  let result = secondary_market_runner::create_sell_listing(
+    event_id,
+    // 4% higher than the price sold in the primary market.
+    // cap is at 5%
+    sol_to_lamports(1.04),
+    secondary_market_state,
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    purchase_token,
+    &ticket_buyer,
+  ).await;
+
+  Error::assert_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
 }

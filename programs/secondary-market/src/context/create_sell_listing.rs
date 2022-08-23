@@ -21,6 +21,7 @@ pub struct CreateSellListing<'info> {
 
   /// CHECK: The Sale account stored in the ticket_metadata
   /// Processor will check that the ticket_metadata.sale does match this key
+  /// This is useful because it contains data such as ticket type
   #[account()]
   pub sale: AccountInfo<'info>,
 
