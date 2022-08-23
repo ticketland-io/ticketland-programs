@@ -32,7 +32,7 @@ fn ticket_metadata_account_checks(
   let ticket_metadata: TicketMetadata = deser(ctx.accounts.ticket_metadata.clone())?;
   
   require!(ticket_metadata.event_id == event_id, ErrorCode::EventIdDoesNotMatch);
-  require!(ticket_metadata.owner == ctx.accounts.ticket_owner.key(), ErrorCode::WrongTicketOwner);
+  require!(ticket_metadata.owner == ctx.accounts.ticket_owner.key(), ErrorCode::OnlyTicketOwner);
 
   Ok(())
 }

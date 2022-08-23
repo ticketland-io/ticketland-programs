@@ -34,15 +34,14 @@ impl TryFrom<u32> for Error {
       0 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongEventAccount)),
       1 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer)),
       2 => Ok(Error(secondary_market::utils::program_error::ErrorCode::EventIdDoesNotMatch)),
-      3 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketOwner)),
-      4 => Ok(Error(secondary_market::utils::program_error::ErrorCode::PriceCap)),
-      5 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketOwnerPurchaseTokenAta)),
-      6 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken)),
-      7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketSeller)),
-      8 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketMetadata)),
-      9 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongSaleAccount)),
-      10 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketNftState)),
-      11 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner)),
+      3 => Ok(Error(secondary_market::utils::program_error::ErrorCode::PriceCap)),
+      4 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketOwnerPurchaseTokenAta)),
+      5 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken)),
+      6 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketSeller)),
+      7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketMetadata)),
+      8 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongSaleAccount)),
+      9 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketNftState)),
+      10 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner)),
       _ => Err(())
     }
   }

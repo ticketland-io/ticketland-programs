@@ -17,7 +17,7 @@ use crate::{
 pub struct CreateSellListing<'info> {
   // The state account of each instance of this program
   #[account()]
-  pub state: Account<'info, State>,
+  pub state: Box<Account<'info, State>>,
 
   /// CHECK: The Sale account stored in the ticket_metadata
   /// Processor will check that the ticket_metadata.sale does match this key
@@ -46,7 +46,7 @@ pub struct CreateSellListing<'info> {
     ],
     bump = market.bumps.market,
   )]
-  pub market: Account<'info, Market>,
+  pub market: Box<Account<'info, Market>>,
   
 
   // The sell listing account
@@ -64,7 +64,7 @@ pub struct CreateSellListing<'info> {
     ],
     bump,
   )]
-  pub sell_listing: Account<'info, SellListing>,
+  pub sell_listing: Box<Account<'info, SellListing>>,
 
   /// CHECK: The ticket metadata account.
   /// Additional checks will take place in the processor
@@ -81,7 +81,7 @@ pub struct CreateSellListing<'info> {
 
   /// CHECK: The token that was used in the primary market of this event
   #[account()]
-  pub purchase_token: Account<'info, Mint>,
+  pub purchase_token: Box<Account<'info, Mint>>,
 
   /// The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL
   #[account(
@@ -90,7 +90,7 @@ pub struct CreateSellListing<'info> {
     associated_token::mint = purchase_token,
     associated_token::authority = ticket_owner,
   )]
-  pub ticket_owner_purchase_token_ata: Account<'info, TokenAccount>,
+  pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(mut)]
   pub ticket_owner: Signer<'info>,

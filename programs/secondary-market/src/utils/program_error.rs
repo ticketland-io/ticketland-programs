@@ -8,8 +8,6 @@ pub enum ErrorCode {
   OnlyEventOrganizer,
   #[msg("Event if of token metadata does not match")]
   EventIdDoesNotMatch,
-  #[msg("Wrong ticket owner")]
-  WrongTicketOwner,
   #[msg("Price cap exceeded")]
   PriceCap,
   #[msg("Wrong ticket owner purchase token ata")]
@@ -24,6 +22,6 @@ pub enum ErrorCode {
   WrongSaleAccount,
   #[msg("Wrong ticket nft state")]
   WrongTicketNftState,
-  #[msg("Wrong ticket owner")]
+  #[msg("only ticket owner")]
   OnlyTicketOwner,
 }
