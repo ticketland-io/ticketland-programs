@@ -1,28 +1,14 @@
 #![cfg(feature = "test-bpf")]
-use anchor_lang::{
-  prelude::{
-    Pubkey,
-  },
-};
 use test_context::{test_context, futures};
 use solana_sdk::{
-  signature::{Signer, Keypair},
-  native_token::sol_to_lamports,
+  signature::{Signer},
 };
 use solana_program_test::{tokio};
-use common::{
-  state::{
-    ticket_type::{TicketType, SeatRange},
-    sale_type::SaleType,
-  },
-};
 use common_test::{
   test_context::TestContext,
-  ticket_sale::{
-    runner::Runner as TicketSaleRunner,
-  },
   secondary_market::{
     common::{init, setup},
+    pda,
   }
 };
 
@@ -57,17 +43,24 @@ async fn should_create_new_market(ctx: &mut TestContext) {
     seat_index,
   ).await;
 
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
   let result = secondary_market_runner.create_market(
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
     event_id,
-    sol_to_lamports(1.05), // 5% higher than the price sold in the primary market
-    secondary_market_state,
-    sale: Pubkey,
-    seat_index: u32,
-    event: Pubkey,
-    ticket_nft_state,
-    purchase_token,
-    &ticket_buyer,
+    &event_organizer,
+    500, // organizer_resale_fee 5%
+    1000, // resale_cap 10%
   ).await;
 
   assert!(result.is_ok());
+
+  let (market, market_bump) = pda::market(&secondary_market_state.pubkey(), event_id);
+  let mut pt = secondary_market_runner.pt.lock().await;
+  let market_data = pt.get_account::<secondary_market::account_data::market::Market>(market).await;
+  
+  assert_eq!(market_data.event_id, event_id);
+  assert_eq!(market_data.bumps.market, market_bump);
+  assert_eq!(market_data.organizer_resale_fee, 500);
+  assert_eq!(market_data.resale_cap, 1000);
 }
