@@ -24,6 +24,7 @@ use anchor_metaplex::{
 };
 use solana_program_test::{tokio};
 use common_test::{
+  test_context::TestContext,
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
   },
@@ -32,7 +33,6 @@ use common_test::{
     runner::Runner,
     error::Error,
   },
-  test_context::TestContext,
 };
 use anchor_lang::{
   prelude::Result as AnchorResult,
