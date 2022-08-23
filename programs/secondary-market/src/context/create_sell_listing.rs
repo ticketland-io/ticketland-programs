@@ -20,7 +20,7 @@ pub struct CreateSellListing<'info> {
   pub state: Account<'info, State>,
 
   /// CHECK: The Sale account stored in the ticket_metadata
-  /// Processor will check that the ticket_metadata.sale does much this key
+  /// Processor will check that the ticket_metadata.sale does match this key
   #[account()]
   pub sale: AccountInfo<'info>,
 

@@ -3,9 +3,13 @@ use anchor_lang::{
   prelude::Result as AnchorResult,
   InstructionData,
   ToAccountMetas,
+  Id,
 };
+use anchor_spl::token::{Token};
 use solana_test_utils::{
   program_test::ProgramTest,
+  spl_associated_token_account,
+  spl::Spl,
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -22,6 +26,9 @@ use crate::{
     secondary_market_program_id,
     event_registry_program_id,
     ticket_nft_program_id,
+  },
+  ticket_nft::{
+    pda as TicketNftPda,
   },
 };
 use super::pda;
@@ -85,5 +92,56 @@ impl Runner {
 
     let mut lock_pt = self.pt.lock().await;
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
+  }
+
+  pub async fn create_sell_listing(
+    &self,
+    event_id: [u8; 32],
+    market_id: [u8; 32],
+    ask_price: u64,
+    state: Pubkey,
+    sale: Pubkey,
+    seat_index: u32,
+    event: Pubkey,
+    ticket_nft_program_state: Pubkey,
+    purchase_token: Pubkey,
+    ticket_owner: &Keypair,
+  ) -> AnchorResult<()> {
+    let market = pda::market(&state, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&state, market_id, event_id, &ticket_metadata).0;
+
+    let accounts = secondary_market::accounts::CreateSellListing {
+      state,
+      sale,
+      event,
+      market,
+      sell_listing,
+      ticket_metadata,
+      purchase_token,
+      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
+      ticket_owner: ticket_owner.pubkey(),
+
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = secondary_market::instruction::CreateSellListing {
+      _ticket_nft: ticket_nft,
+      market_id,
+      event_id,
+      ask_price,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_owner])).await
   }
 }
