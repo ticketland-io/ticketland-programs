@@ -16,7 +16,7 @@ use crate::{
 fn event_account_checks(ctx: &Context<CreateMarket>) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
   
-  require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::WrongEventOrganizer);
+  require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::OnlyEventOrganizer);
 
   Ok(())
 }

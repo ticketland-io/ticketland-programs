@@ -4,8 +4,8 @@ use anchor_lang::prelude::*;
 pub enum ErrorCode {
   #[msg("Not event account")]
   WrongEventAccount,
-  #[msg("Wrong event organizer")]
-  WrongEventOrganizer,
+  #[msg("Only event organizer")]
+  OnlyEventOrganizer,
   #[msg("Event if of token metadata does not match")]
   EventIdDoesNotMatch,
   #[msg("Wrong ticket owner")]
