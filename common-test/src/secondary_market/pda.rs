@@ -1,7 +1,6 @@
 use solana_sdk::{
   pubkey::Pubkey,
 };
-use ticket_nft::account_data::ticket_metadata;
 use crate::{
   program_id::secondary_market_program_id,
 };

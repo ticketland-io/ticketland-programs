@@ -94,6 +94,13 @@ impl Runner {
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
   }
 
+  pub async fn create_market(
+    &self,
+
+  ) -> AnchorResult<()> {
+
+  }
+  
   pub async fn create_sell_listing(
     &self,
     event_id: [u8; 32],

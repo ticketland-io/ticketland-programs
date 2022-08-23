@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(market_id: [u8; 32], event_id: [u8; 32])]
+#[instruction(event_id: [u8; 32])]
 pub struct CreateMarket<'info> {
   // The state account of each instance of this program
   #[account(mut)]
