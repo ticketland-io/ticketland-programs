@@ -10,6 +10,7 @@ use crate::{
   acl::{
     sale_time_checks,
     sale_account,
+    purchase_token,
   },
 };
 
@@ -18,6 +19,10 @@ use crate::{
   sale_account::check(
     &ctx.accounts.ticket_metadata,
     &ctx.accounts.sale
+  )
+  purchase_token::check(
+    &ctx.accounts.event,
+    &ctx.accounts.purchase_token,
   )
 )]
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {

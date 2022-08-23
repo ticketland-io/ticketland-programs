@@ -18,6 +18,7 @@ use crate::{
     sale_time_checks,
     sale_account,
     price_cap,
+    purchase_token,
   },
   utils::program_error::ErrorCode,
 };
@@ -37,15 +38,6 @@ fn ticket_metadata_account_checks(
   Ok(())
 }
 
-fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()> {
-  let event: Event = deser(ctx.accounts.event.clone())?;
-
-  // The provided purchase token account should be the same as the one store in the event
-  require!(ctx.accounts.purchase_token.key() == event.currency.mint_account, ErrorCode::WrongPurchaseToken);
-
-  Ok(())
-}
-
 #[access_control(
   sale_time_checks::check(&ctx.accounts.sale)
   sale_account::check(
@@ -57,6 +49,10 @@ fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()>
     ctx.accounts.market.resale_cap,
     ask_price,
   )
+  purchase_token::check(
+    &ctx.accounts.event,
+    &ctx.accounts.purchase_token,
+  )
 )]
 pub fn exec(
   ctx: Context<CreateSellListing>,
@@ -64,7 +60,6 @@ pub fn exec(
   ask_price: u64,
 ) -> Result<()> {
   ticket_metadata_account_checks(&ctx, event_id)?;
-  purchase_token_account_checks(&ctx)?;
 
   let sell_listing = &mut ctx.accounts.sell_listing;
   sell_listing.ask_price = ask_price;

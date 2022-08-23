@@ -43,6 +43,18 @@ pub struct FillSellListing<'info> {
   )]
   pub sell_listing: Box<Account<'info, SellListing>>,
 
+  /// CHECK: The Event account.
+  #[account(
+    seeds = [
+      b"event",
+      state.event_registry_state.key().as_ref(),
+      &event_id
+    ],
+    bump,
+    seeds::program = state.event_registry_program,
+  )]
+  pub event: AccountInfo<'info>,
+
   // The market account
   #[account(
     seeds = [
@@ -96,7 +108,6 @@ pub struct FillSellListing<'info> {
   pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: This is the user that created the event earlier
-  /// Check about the correctness of this account will take place in the Ticket sale before this CPI is called
   #[account(mut)]
   pub event_organizer: AccountInfo<'info>,
 

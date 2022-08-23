@@ -182,4 +182,51 @@ impl Runner {
 
     self.process_transaction(&[ix], Some(&[&ticket_owner])).await
   }
+
+  pub async fn fill_sell_listing(
+    &self,
+    event_id: [u8; 32],
+    ask_price: u64,
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    sale: Pubkey,
+    seat_index: u32,
+    ticket_nft_program_state: Pubkey,
+    purchase_token: Pubkey,
+    ticket_owner: &Keypair,
+    event_organizer: Pubkey,
+  ) -> AnchorResult<()> {
+    let market = pda::market(&state, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
+
+    let accounts = secondary_market::accounts::FillSellListing {
+      state,
+      ticket_nft_program_state,
+      sell_listing,
+      market,
+      sale,
+      cpi_authority: pda::cpi_authority(&state).0,
+      ticket_metadata,
+      purchase_token,
+      ticket_owner: ticket_owner.pubkey(),
+      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
+      event_organizer,
+      event_organizer_purchase_token_ata: Spl::get_associated_token_address(&event_organizer, &purchase_token),
+      // market,
+      // sell_listing,
+      // ticket_metadata,
+      // purchase_token,
+      // ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
+      // ticket_owner: ticket_owner.pubkey(),
+
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    todo!()
+  }
 }

@@ -110,7 +110,7 @@ async fn before_each(ctx: &mut TestContext) -> (
     ).await;
     assert!(result.is_ok());
   }
-  
+
   (
     event_registry_state,
     ticket_sale_state,
@@ -126,9 +126,27 @@ async fn before_each(ctx: &mut TestContext) -> (
   )
 }
 
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_enforce_access_control(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+    event_id,
+    seat_index,
+    _,
+    ticket_buyer,
+    purchase_token,
+    ticket_type_index,
+    _,
+  ) = before_each(ctx).await;
+}
+
 // #[test_context(TestContext)]
 // #[tokio::test(flavor = "multi_thread")]
-// async fn should_enforce_access_control(ctx: &mut TestContext) {
+// async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
   
 // }
 
