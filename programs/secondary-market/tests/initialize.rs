@@ -37,7 +37,6 @@ async fn should_initialize_secondary_market(ctx: &mut TestContext) {
     secondary_market_state.pubkey(),
   ).await;
 
-
   secondary_market_runner.initialize(
     &secondary_market_state,
     event_registry_state.pubkey(),
