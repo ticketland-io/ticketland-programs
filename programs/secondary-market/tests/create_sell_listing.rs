@@ -18,6 +18,9 @@ use common::{
 };
 use common_test::{
   test_context::TestContext,
+  ticket_sale::{
+    runner::Runner as TicketSaleRunner,
+  },
 };
 
 async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair) {
@@ -64,11 +67,17 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair) {
   )
 }
 
-async fn custom_create_event(
+async fn setup(
   ctx: &mut TestContext,
+  event_organizer: &Keypair,
+  ticket_buyer: &Keypair,
   event_registry_state: Pubkey,
-  ticket_sale_program_state: Pubkey,
+  ticket_sale_state: Pubkey,
+  ticket_nft_state: Pubkey,
+  deposit_token: Pubkey,
+  purchase_token: Pubkey,
   event_id: [u8; 32],
+  seat_index: u32,
 ) -> (Vec<TicketType>,) {
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
@@ -109,16 +118,13 @@ async fn custom_create_event(
     ];
   }
 
-  let event_organizer = event_registry_runner.get_participant(1);
-  let deposit_token = event_registry_runner.deposit_tokens[2];
-
-  let _ = event_registry_runner.create_event(
+  let result = event_registry_runner.create_event(
     event_registry_state,
     event_capacity,
-    ticket_sale_program_state,
+    ticket_sale_state,
     event_id,
     deposit_token,
-    deposit_token,
+    purchase_token,
     &event_organizer,
     10, // num of tickets
     100,
@@ -126,8 +132,10 @@ async fn custom_create_event(
 		ticket_types.clone(),
   ).await;
 
+  assert!(result.is_ok());
+
   // Create the NFT as well
-  let _ = event_registry_runner.create_event_nft(
+  let result = event_registry_runner.create_event_nft(
     event_registry_state,
     event_id,
     &event_organizer,
@@ -136,7 +144,46 @@ async fn custom_create_event(
     "https://ticketland.io".to_owned(),
   ).await;
 
-  (ticket_types,)
+  assert!(result.is_ok());
+
+  // Create a new ticket sale for the first ticket type
+  let result = event_registry_runner.create_ticket_sale(
+    event_registry_state,
+    event_id,
+    &event_organizer,
+    ticket_sale_state,
+    0, // ticket_type_index
+  ).await;
+
+  assert!(result.is_ok());
+
+  // move to the start of sale
+  {
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+  }
+
+  // Purchase a new ticket from the primary market
+  let result = ticket_sale_runner.fixed_price_purchase(
+    &ticket_buyer,
+    event_registry_state,
+    ticket_sale_state,
+    event_capacity,
+    purchase_token,
+    event_organizer.pubkey(),
+    ticket_nft_state,
+    event_id,
+    0, // ticket_type_index
+    seat_index,
+    TicketSaleRunner::dummy_seat_name(0),
+    mt_type_1.proof(&[0]), // proof path for leaf 0
+  ).await;
+  
+    assert!(result.is_ok());
+
+  (
+    ticket_types,
+  )
 }
 
 #[test_context(TestContext)]
@@ -150,12 +197,24 @@ async fn should_fail_if_sale_finished(ctx: &mut TestContext) {
   ) = init(ctx).await;
 
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  
-  let (ticket_types,) = custom_create_event(
+  let seat_index = 0;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let event_organizer = event_registry_runner.get_participant(1);
+  let ticket_buyer = event_registry_runner.get_participant(2);
+  let deposit_token = event_registry_runner.deposit_tokens[2];
+  let purchase_token = deposit_token;
+
+  let (ticket_types,) = setup(
     ctx,
+    &event_organizer,
+    &ticket_buyer,
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    deposit_token,
+    purchase_token,
     event_id,
+    seat_index,
   ).await;
 
   // move to the end of sale
