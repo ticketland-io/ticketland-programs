@@ -380,7 +380,6 @@ async fn should_create_sell_listing(ctx: &mut TestContext) {
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
     let sell_listing = pda::sell_listing(&secondary_market_state.pubkey(), event_id, &ticket_metadata).0;
-    let ticket_owner_purchase_token_ata = Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token);
 
     let secondary_market_runner = &mut ctx.secondary_market_runner;
     let mut pt = secondary_market_runner.pt.lock().await;
@@ -389,6 +388,5 @@ async fn should_create_sell_listing(ctx: &mut TestContext) {
     assert_eq!(sell_listing_data.ask_price, sol_to_lamports(1.099));
     assert_eq!(sell_listing_data.ticket_metadata, ticket_metadata);
     assert_eq!(sell_listing_data.ticket_owner, ticket_buyer.pubkey());
-    assert_eq!(sell_listing_data.ticket_owner_purchase_token_ata, ticket_owner_purchase_token_ata);
   }
 }

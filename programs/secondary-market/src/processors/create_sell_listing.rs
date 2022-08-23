@@ -11,9 +11,6 @@ use ticket_nft::{
 };
 use crate::{
   context::create_sell_listing::*,
-  account_data::{
-    event::*,
-  },
   acl::{
     sale_time_checks,
     sale_account,
@@ -65,6 +62,5 @@ pub fn exec(
   sell_listing.ask_price = ask_price;
   sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
   sell_listing.ticket_owner = ctx.accounts.ticket_owner.key();
-  sell_listing.ticket_owner_purchase_token_ata = ctx.accounts.ticket_owner_purchase_token_ata.key();
   Ok(())
 }

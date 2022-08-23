@@ -12,6 +12,8 @@ use crate::{
     sale_account,
     only_ticket_metadata_owner,
     price_cap,
+    purchase_token,
+    event_organizer,
   },
 };
 
@@ -29,6 +31,14 @@ use crate::{
     &ctx.accounts.ticket_metadata,
     ctx.accounts.market.resale_cap,
     ctx.accounts.buy_listing.bid_price,
+  )
+  purchase_token::check(
+    &ctx.accounts.event,
+    &ctx.accounts.purchase_token,
+  )
+  event_organizer::check(
+    &ctx.accounts.event,
+    &ctx.accounts.event_organizer,
   )
 )]
 pub fn exec(ctx: Context<FillBuyListing>) -> Result<()> {

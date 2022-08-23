@@ -240,6 +240,6 @@ impl Runner {
       data,
     };
 
-    self.process_transaction(&[ix], Some(&[&ticket_buyer_ata])).await
+    self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
 }

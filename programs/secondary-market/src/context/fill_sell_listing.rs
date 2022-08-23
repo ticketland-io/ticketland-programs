@@ -139,7 +139,6 @@ pub struct FillSellListing<'info> {
   pub ticket_buyer_ata: Box<Account<'info, TokenAccount>>,
 
   pub ticket_nft_program: Program<'info, TicketNft>,
-
   pub token_program: Program<'info, Token>,
   pub associated_token_program: Program<'info, AssociatedToken>,
 }

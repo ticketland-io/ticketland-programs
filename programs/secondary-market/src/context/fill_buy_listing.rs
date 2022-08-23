@@ -44,6 +44,18 @@ pub struct FillBuyListing<'info> {
   )]
   pub buy_listing: Account<'info, BuyListing>,
 
+  /// CHECK: The Event account
+  #[account(
+    seeds = [
+      b"event",
+      state.event_registry_state.key().as_ref(),
+      &event_id
+    ],
+    bump,
+    seeds::program = state.event_registry_program,
+  )]
+  pub event: AccountInfo<'info>,
+
   // The market account
   #[account(
     seeds = [
@@ -68,6 +80,7 @@ pub struct FillBuyListing<'info> {
   pub cpi_authority: AccountInfo<'info>,
   
   /// CHECK: The token that was used in the primary market of this event
+  /// Additional checks take place in the processor
   #[account()]
   pub purchase_token: Box<Account<'info, Mint>>,
   
@@ -120,7 +133,9 @@ pub struct FillBuyListing<'info> {
   pub service_fee_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: This is ticketland.io treasury address
-  #[account()]
+  #[account(
+    constraint = state.treasury == treasury.key() @ ErrorCode::WrongTreasuryAccount,
+  )]
   pub treasury: AccountInfo<'info>,
 
   /// The ticket owner ata that will receive the funds from the ticket sell
