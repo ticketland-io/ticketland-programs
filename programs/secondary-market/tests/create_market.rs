@@ -56,14 +56,23 @@ async fn should_create_new_market(ctx: &mut TestContext) {
 
   assert!(result.is_ok());
 
-  let (market, market_bump) = pda::market(&secondary_market_state.pubkey(), event_id);
-  let mut pt = secondary_market_runner.pt.lock().await;
-  let market_data = pt.get_account::<secondary_market::account_data::market::Market>(market).await;
+  {
+    let (market, market_bump) = pda::market(&secondary_market_state.pubkey(), event_id);
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let market_data = pt.get_account::<secondary_market::account_data::market::Market>(market).await;
+    
+    assert_eq!(market_data.event_id, event_id);
+    assert_eq!(market_data.bumps.market, market_bump);
+    assert_eq!(market_data.organizer_resale_fee, 500);
+    assert_eq!(market_data.resale_cap, 1000);
+  }
   
-  assert_eq!(market_data.event_id, event_id);
-  assert_eq!(market_data.bumps.market, market_bump);
-  assert_eq!(market_data.organizer_resale_fee, 500);
-  assert_eq!(market_data.resale_cap, 1000);
+  // should update the secondary market state as well
+  {
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let state_data = pt.get_account::<secondary_market::account_data::state::State>(secondary_market_state.pubkey()).await;
+    assert_eq!(state_data.n_markets, 1);
+  }
 }
 
 #[test_context(TestContext)]
