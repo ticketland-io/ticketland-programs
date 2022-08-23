@@ -96,7 +96,8 @@ async fn should_only_be_called_by_the_event_organizer(ctx: &mut TestContext) {
     let ticket_buyer = event_registry_runner.get_participant(2);
     let deposit_token = event_registry_runner.deposit_tokens[2];
     let purchase_token = deposit_token;
-
+    let ticket_type_index = 0;
+    
     let _ = setup(
       ctx,
       &event_organizer,
@@ -108,6 +109,7 @@ async fn should_only_be_called_by_the_event_organizer(ctx: &mut TestContext) {
       purchase_token,
       event_id,
       seat_index,
+      ticket_type_index,
     ).await;
   }
 

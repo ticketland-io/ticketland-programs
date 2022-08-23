@@ -30,6 +30,8 @@ pub async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair)
   let ticket_nft_runner = &mut ctx.ticket_nft_runner;
   let secondary_market_runner = &mut ctx.secondary_market_runner;
 
+  let treasury = event_registry_runner.get_participant(5);
+
   event_registry_runner.initialize(
     &event_registry_state,
 		1_000, // 10%
@@ -53,6 +55,7 @@ pub async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair)
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
     ticket_nft_state.pubkey(),
+    treasury.pubkey(),
     500, // 5%
   ).await;
 

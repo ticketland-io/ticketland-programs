@@ -142,6 +142,41 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     ticket_type_index,
     _,
   ) = before_each(ctx).await;
+
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
+
+
+    // event_id: [u8; 32],
+    // state: Pubkey,
+    // event_registry_state: Pubkey,
+    // sale: Pubkey,
+    // seat_index: u32,
+    // ticket_nft_program_state: Pubkey,
+    // purchase_token: Pubkey,
+    // treasury: Pubkey,
+    // ticket_owner: Pubkey,
+    // ticket_buyer: &Keypair,
+    // event_organizer: Pubkey,
+    
+    let result = secondary_market_runner.fill_sell_listing(
+      event_id,
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      purchase_token,
+      &ticket_buyer, 
+    ).await;
+    assert!(result.is_ok());
+  }
+
 }
 
 // #[test_context(TestContext)]

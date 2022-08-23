@@ -3,7 +3,7 @@ use anchor_lang::{
   prelude::Result as AnchorResult,
   InstructionData,
   ToAccountMetas,
-  Id, Key,
+  Id,
 };
 use anchor_spl::token::{Token};
 use solana_test_utils::{
@@ -188,7 +188,6 @@ impl Runner {
   pub async fn fill_sell_listing(
     &self,
     event_id: [u8; 32],
-    ask_price: u64,
     state: Pubkey,
     event_registry_state: Pubkey,
     sale: Pubkey,
