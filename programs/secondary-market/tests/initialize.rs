@@ -37,17 +37,21 @@ async fn should_initialize_secondary_market(ctx: &mut TestContext) {
     secondary_market_state.pubkey(),
   ).await;
 
+  let treasury = event_registry_runner.get_participant(5);
+
   secondary_market_runner.initialize(
     &secondary_market_state,
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
     ticket_nft_state.pubkey(),
+    treasury.pubkey(),
     500, // 5%
   ).await;
 
   let mut pt = secondary_market_runner.pt.lock().await;
   let state_data = pt.get_account::<secondary_market::account_data::state::State>(secondary_market_state.pubkey()).await;
   
+  assert_eq!(state_data.treasury, treasury.pubkey());
   assert_eq!(state_data.protocol_fee, 500);
   assert_eq!(state_data.deployer, secondary_market_runner.deployer.pubkey());
   assert_eq!(state_data.ticket_sale_state, ticket_sale_state.pubkey());

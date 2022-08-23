@@ -8,6 +8,7 @@ use crate::{
 
 pub fn exec(
   ctx: Context<Initialize>,
+  treasury: Pubkey,
   event_registry_state: Pubkey,
   event_registry_program: Pubkey,
   ticket_sale_state: Pubkey,
@@ -21,6 +22,7 @@ pub fn exec(
   state.bumps = InitBumps {
     cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
   };
+  state.treasury = treasury;
   state.event_registry_state = event_registry_state;
   state.event_registry_program = event_registry_program;
   state.ticket_sale_state = ticket_sale_state;

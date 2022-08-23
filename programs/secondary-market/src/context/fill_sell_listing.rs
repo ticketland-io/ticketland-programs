@@ -123,7 +123,9 @@ pub struct FillSellListing<'info> {
   pub service_fee_ata: Box<Account<'info, TokenAccount>>,
 
   /// CHECK: This is ticketland.io treasury address
-  #[account()]
+  #[account(
+    constraint = state.treasury == treasury.key() @ ErrorCode::WrongTreasuryAccount,
+  )]
   pub treasury: AccountInfo<'info>,
 
   #[account(mut)]

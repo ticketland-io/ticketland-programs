@@ -67,6 +67,7 @@ impl Runner {
     event_registry_state: Pubkey,
     ticket_sale_state: Pubkey,
     ticket_nft_state: Pubkey,
+    treasury: Pubkey,
 		protocol_fee: u16,
   ) {
     let accounts = secondary_market::accounts::Initialize {
@@ -84,6 +85,7 @@ impl Runner {
       ticket_sale_program: secondary_market_program_id(),
       ticket_nft_state,
       ticket_nft_program: ticket_nft_program_id(),
+      treasury,
       protocol_fee
     }.data();
 

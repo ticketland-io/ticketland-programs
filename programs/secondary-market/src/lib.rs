@@ -35,6 +35,7 @@ use super::*;
 	/// * `ticket_sale_program` - The program id of the ticket sale program
 	/// * `ticket_nft_state` - The state of the ticket nft program
 	/// * `ticket_nft_program` - The program id of the ticket nft program
+	/// * `treasury` - The treasury whose ATA will be receiving the protocol fee
 	/// * `protocol_fee` - The ticketland protocol fees of every resale
 	pub fn initialize(
 		ctx: Context<Initialize>,
@@ -44,10 +45,12 @@ use super::*;
 		ticket_sale_program: Pubkey,
 		ticket_nft_state: Pubkey,
 		ticket_nft_program: Pubkey,
+		treasury: Pubkey,
 		protocol_fee: u16,
 	) -> Result<()> {
     processors::initialize::exec(
-			ctx, 
+			ctx,
+			treasury,
 			event_registry_state,
 			event_registry_program,
 			ticket_sale_state,

@@ -14,6 +14,7 @@ pub struct State {
   pub bumps: InitBumps,
   /// The fees that will be collected by ticketland on every sale
   pub protocol_fee: u16,
+  pub treasury: Pubkey,
   pub n_markets: u32,
   pub deployer: Pubkey,
   pub event_registry_state: Pubkey,
