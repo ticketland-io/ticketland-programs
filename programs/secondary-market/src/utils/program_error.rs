@@ -6,7 +6,7 @@ pub enum ErrorCode {
   WrongEventAccount,
   #[msg("Only event organizer")]
   OnlyEventOrganizer,
-  #[msg("Event if of token metadata does not match")]
+  #[msg("Event id of token metadata does not match")]
   EventIdDoesNotMatch,
   #[msg("Price cap exceeded")]
   PriceCap,
