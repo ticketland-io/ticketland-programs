@@ -10,8 +10,8 @@ pub enum ErrorCode {
   EventIdDoesNotMatch,
   #[msg("Price cap exceeded")]
   PriceCap,
-  #[msg("Wrong ticket owner purchase token ata")]
-  WrongTicketOwnerPurchaseTokenAta,
+  #[msg("Wrong event organizer")]
+  WrongEventOrganizer,
   #[msg("Wrong purchase token account")]
   WrongPurchaseToken,
   #[msg("Wrong ticket seller account")]

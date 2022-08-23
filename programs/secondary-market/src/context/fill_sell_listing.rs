@@ -43,7 +43,7 @@ pub struct FillSellListing<'info> {
   )]
   pub sell_listing: Box<Account<'info, SellListing>>,
 
-  /// CHECK: The Event account.
+  /// CHECK: The Event account
   #[account(
     seeds = [
       b"event",
@@ -85,6 +85,7 @@ pub struct FillSellListing<'info> {
   pub ticket_metadata: AccountInfo<'info>,
   
   /// CHECK: The token that was used in the primary market of this event
+  /// Additional checks take place in the processor
   #[account()]
   pub purchase_token: Box<Account<'info, Mint>>,
     
@@ -96,14 +97,10 @@ pub struct FillSellListing<'info> {
   pub ticket_owner: AccountInfo<'info>,
 
   /// The ticket owner ata that will receive the funds from the ticket sell
-  /// The last constraint will make sure that the purchase token account is correct. This is because
-  /// When the sell listing is created the purchase token is verified that it is the same as the event currency; so
-  /// if ATA constraints create the correct account then the purchase token is also correct
   #[account(
     mut,
     associated_token::mint = purchase_token,
     associated_token::authority = ticket_owner,
-    constraint = sell_listing.ticket_owner_purchase_token_ata == ticket_owner_purchase_token_ata.key() @ ErrorCode::WrongTicketOwnerPurchaseTokenAta
   )]
   pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 

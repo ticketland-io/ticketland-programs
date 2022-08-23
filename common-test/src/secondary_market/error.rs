@@ -35,7 +35,7 @@ impl TryFrom<u32> for Error {
       1 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer)),
       2 => Ok(Error(secondary_market::utils::program_error::ErrorCode::EventIdDoesNotMatch)),
       3 => Ok(Error(secondary_market::utils::program_error::ErrorCode::PriceCap)),
-      4 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketOwnerPurchaseTokenAta)),
+      4 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer)),
       5 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken)),
       6 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketSeller)),
       7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketMetadata)),

@@ -10,7 +10,4 @@ pub struct SellListing {
 
   /// The account that sells the ticket
   pub ticket_owner: Pubkey,
-
-  /// This is where the funds will be sent after this listing is filled by a buyer
-  pub ticket_owner_purchase_token_ata: Pubkey,
 }

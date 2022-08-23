@@ -11,6 +11,7 @@ use crate::{
     sale_time_checks,
     sale_account,
     purchase_token,
+    event_organizer,
   },
 };
 
@@ -23,6 +24,10 @@ use crate::{
   purchase_token::check(
     &ctx.accounts.event,
     &ctx.accounts.purchase_token,
+  )
+  event_organizer::check(
+    &ctx.accounts.event,
+    &ctx.accounts.event_organizer,
   )
 )]
 pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {

@@ -1,9 +1,6 @@
 use anchor_lang::{
   prelude::*,
 };
-use anchor_spl::{
-  token::{Mint},
-};
 use common::{
   account_data::{
     serialization::deser,
@@ -19,12 +16,12 @@ use crate::{
 
 pub fn check<'info>(
   event: &AccountInfo<'info>,
-  purchase_token: &Account<'info, Mint>,
+  event_organizer: &AccountInfo<'info>,
 ) -> Result<()> {
   let event: Event = deser(event.clone())?;
 
-  // The provided purchase token account should be the same as the one stored in the event
-  require!(purchase_token.key() == event.currency.mint_account, ErrorCode::WrongPurchaseToken);
+  // The provided event organizer account should be the same as the one stored in the event
+  require!(event_organizer.key() == event.event_organizer, ErrorCode::WrongEventOrganizer);
 
   Ok(())
 }
