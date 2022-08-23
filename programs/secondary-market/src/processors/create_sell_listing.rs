@@ -60,7 +60,6 @@ fn purchase_token_account_checks(ctx: &Context<CreateSellListing>) -> Result<()>
 )]
 pub fn exec(
   ctx: Context<CreateSellListing>,
-  market_id: [u8; 32],
   event_id: [u8; 32],
   ask_price: u64,
 ) -> Result<()> {
@@ -68,7 +67,6 @@ pub fn exec(
   purchase_token_account_checks(&ctx)?;
 
   let sell_listing = &mut ctx.accounts.sell_listing;
-  sell_listing.market_id = market_id;
   sell_listing.ask_price = ask_price;
   sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
   sell_listing.ticket_owner = ctx.accounts.ticket_owner.key();

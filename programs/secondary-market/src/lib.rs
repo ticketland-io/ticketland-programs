@@ -64,21 +64,18 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	/// * `organizer_resale_fee` - The percentage of the resale price the event organizer will collect
 	/// * `resale_cap` - The max price a ticket can be sold on the secondary market. That will be
 	///                  (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
 	pub fn create_market(
 		ctx: Context<CreateMarket>,
-		market_id: [u8; 32],
 		event_id: [u8; 32],
 		organizer_resale_fee: u16,
 		resale_cap: u16,
 	) -> Result<()> {
 		processors::create_market::exec(
 			ctx, 
-			market_id,
 			event_id,
 			organizer_resale_fee,
 			resale_cap,
@@ -90,7 +87,6 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
 	///                  signer of this tx
@@ -99,13 +95,11 @@ use super::*;
 	pub fn create_sell_listing(
 		ctx: Context<CreateSellListing>,
 		_ticket_nft: Pubkey,
-		market_id: [u8; 32],
 		event_id: [u8; 32],
 		ask_price: u64,
 	) -> Result<()> {
 		processors::create_sell_listing::exec(
-			ctx, 
-			market_id,
+			ctx,
 			event_id,
 			ask_price,
 		)
@@ -116,7 +110,6 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
 	///                  signer of this tx
@@ -124,13 +117,11 @@ use super::*;
 	///                 bid_price <= (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
 	pub fn create_buy_listing(
 		ctx: Context<CreateBuyListing>,
-		market_id: [u8; 32],
 		_event_id: [u8; 32],
 		bid_price: u64,
 	) -> Result<()> {
 		processors::create_buy_listing::exec(
-			ctx, 
-			market_id,
+			ctx,
 			bid_price,
 		)
 	}
@@ -146,12 +137,10 @@ use super::*;
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
 	///                  signer of this tx
-	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	pub fn fill_sell_listing(
 		ctx: Context<FillSellListing>,
 		_ticket_nft: Pubkey,
-		_market_id: [u8; 32],
 		_event_id: [u8; 32],
 	) -> Result<()> {
 		processors::fill_sell_listing::exec(ctx)
@@ -167,12 +156,10 @@ use super::*;
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `n_listing` - This is part of the seed to re-create the buy_listing PDA
-	/// * `market_id` - A unique id for this market
 	/// * `event_id` - The event id for which the secondary market is created for
 	pub fn fill_buy_listing(
 		ctx: Context<FillBuyListing>,
 		_n_listing: Pubkey,
-		_market_id: [u8; 32],
 		_event_id: [u8; 32],
 	) -> Result<()> {
 		processors::fill_buy_listing::exec(ctx)

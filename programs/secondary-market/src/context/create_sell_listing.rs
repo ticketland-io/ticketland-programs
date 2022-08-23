@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_nft: Pubkey, market_id: [u8; 32], event_id: [u8; 32])]
+#[instruction(ticket_nft: Pubkey, event_id: [u8; 32])]
 pub struct CreateSellListing<'info> {
   // The state account of each instance of this program
   #[account()]
@@ -49,6 +49,8 @@ pub struct CreateSellListing<'info> {
   
 
   // The sell listing account
+  // Note we don't include the ticket_owner in the PDA because this account will be closed when this listing is filled.
+  // Thus, the new owner can further list it for sell. The account pubkey will be the same in both cases.
   #[account(
     init,
     space = 8 + size_of::<SellListing>(),
@@ -56,7 +58,6 @@ pub struct CreateSellListing<'info> {
     seeds = [
       b"sell_listing",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       ticket_metadata.key().as_ref(),
     ],

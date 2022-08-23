@@ -23,7 +23,6 @@ fn event_account_checks(ctx: &Context<CreateMarket>) -> Result<()> {
 
 pub fn exec(
   ctx: Context<CreateMarket>,
-  market_id: [u8; 32],
   event_id: [u8; 32],
   organizer_resale_fee: u16,
   resale_cap: u16,
@@ -38,7 +37,6 @@ pub fn exec(
   market.bumps = MarketBump {
     market: *ctx.bumps.get("market").unwrap(),
   };
-  market.id = market_id;
   market.event_id = event_id;
   market.organizer_resale_fee = organizer_resale_fee;
   market.resale_cap = resale_cap;

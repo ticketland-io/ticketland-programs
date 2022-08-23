@@ -5,7 +5,6 @@ pub const SPACE_MARGIN: usize = 1000;
 
 #[account]
 pub struct Listing {
-  pub market_id: [u8; 32],
   pub nft_ticket_metadata: Pubkey,
   pub asking_price: u64,
 }

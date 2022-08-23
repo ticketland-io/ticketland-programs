@@ -38,7 +38,6 @@ fn transfer_funds(ctx: &Context<CreateBuyListing>, bid_price: u64) -> Result<()>
 
 pub fn exec(
   ctx: Context<CreateBuyListing>,
-  market_id: [u8; 32],
   bid_price: u64,
 ) -> Result<()> {
   transfer_funds(&ctx, bid_price)?;
@@ -48,7 +47,6 @@ pub fn exec(
   buy_listing.bumps = BuyListingBumps {
     listing_escrow: *ctx.bumps.get("listing_escrow").unwrap(),
   };
-  buy_listing.market_id = market_id;
   buy_listing.bid_price = bid_price;
 
   let buyer_data = &mut ctx.accounts.buyer_data;

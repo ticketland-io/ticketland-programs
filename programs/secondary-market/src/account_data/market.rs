@@ -10,7 +10,6 @@ pub struct MarketBump {
 
 #[account]
 pub struct Market {
-  pub id: [u8; 32],
   pub event_id: [u8; 32],
 
   pub bumps: MarketBump,

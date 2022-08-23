@@ -100,11 +100,10 @@ impl Runner {
   ) -> AnchorResult<()> {
 
   }
-  
+
   pub async fn create_sell_listing(
     &self,
     event_id: [u8; 32],
-    market_id: [u8; 32],
     ask_price: u64,
     state: Pubkey,
     sale: Pubkey,
@@ -117,7 +116,7 @@ impl Runner {
     let market = pda::market(&state, event_id).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
-    let sell_listing = pda::sell_listing(&state, market_id, event_id, &ticket_metadata).0;
+    let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
 
     let accounts = secondary_market::accounts::CreateSellListing {
       state,
@@ -138,7 +137,6 @@ impl Runner {
 
     let data = secondary_market::instruction::CreateSellListing {
       _ticket_nft: ticket_nft,
-      market_id,
       event_id,
       ask_price,
     }.data();

@@ -27,7 +27,6 @@ pub struct CreateBuyListing<'info> {
     seeds = [
       b"buyer_data",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       ticket_buyer.key().as_ref(),
     ],
@@ -43,7 +42,6 @@ pub struct CreateBuyListing<'info> {
     seeds = [
       b"buy_listing",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       ticket_buyer.key().as_ref(),
       buyer_data.n_listing.to_string().as_ref(),
@@ -60,7 +58,6 @@ pub struct CreateBuyListing<'info> {
     seeds = [
       b"listing_vault",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       buy_listing.key().as_ref(),
     ],

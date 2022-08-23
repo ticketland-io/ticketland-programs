@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(ticket_nft: Pubkey, market_id: [u8; 32], event_id: [u8; 32])]
+#[instruction(ticket_nft: Pubkey, event_id: [u8; 32])]
 pub struct FillSellListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -36,7 +36,6 @@ pub struct FillSellListing<'info> {
     seeds = [
       b"sell_listing",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       ticket_nft.as_ref(),
     ],

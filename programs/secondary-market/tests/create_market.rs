@@ -59,7 +59,6 @@ async fn should_create_new_market(ctx: &mut TestContext) {
 
   let result = secondary_market_runner.create_market(
     event_id,
-    market_id,
     sol_to_lamports(1.05), // 5% higher than the price sold in the primary market
     secondary_market_state,
     sale: Pubkey,

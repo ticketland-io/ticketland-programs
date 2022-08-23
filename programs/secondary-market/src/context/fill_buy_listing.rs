@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(n_listing: u16, market_id: [u8; 32], event_id: [u8; 32])]
+#[instruction(n_listing: u16, event_id: [u8; 32])]
 pub struct FillBuyListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -36,7 +36,6 @@ pub struct FillBuyListing<'info> {
     seeds = [
       b"buy_listing",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       ticket_buyer.key().as_ref(),
       n_listing.to_string().as_ref(),
@@ -77,7 +76,6 @@ pub struct FillBuyListing<'info> {
     seeds = [
       b"listing_vault",
       state.key().as_ref(),
-      &market_id,
       &event_id,
       buy_listing.key().as_ref(),
     ],
