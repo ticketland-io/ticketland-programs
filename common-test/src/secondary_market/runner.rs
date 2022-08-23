@@ -30,6 +30,9 @@ use crate::{
   ticket_nft::{
     pda as TicketNftPda,
   },
+  event_registry::{
+    pda as EventRegistryPda,
+  },
 };
 use super::pda;
 
@@ -96,9 +99,38 @@ impl Runner {
 
   pub async fn create_market(
     &self,
-
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    event_id: [u8; 32],
+    event_organizer: &Keypair,
+    organizer_resale_fee: u16,
+    resale_cap: u16,
   ) -> AnchorResult<()> {
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let market = pda::market(&state, event_id).0;
+    
+    let accounts = secondary_market::accounts::CreateMarket {
+      state,
+      event,
+      market,
+      event_organizer: event_organizer.pubkey(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
 
+    let data = secondary_market::instruction::CreateMarket {
+      event_id,
+      organizer_resale_fee,
+      resale_cap,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&event_organizer])).await
   }
 
   pub async fn create_sell_listing(
@@ -106,14 +138,15 @@ impl Runner {
     event_id: [u8; 32],
     ask_price: u64,
     state: Pubkey,
+    event_registry_state: Pubkey,
     sale: Pubkey,
     seat_index: u32,
-    event: Pubkey,
     ticket_nft_program_state: Pubkey,
     purchase_token: Pubkey,
     ticket_owner: &Keypair,
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
