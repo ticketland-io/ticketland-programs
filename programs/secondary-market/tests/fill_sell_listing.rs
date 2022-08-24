@@ -143,13 +143,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     ticket_types,
   ) = before_each(ctx).await;
 
-  // move to the end of sale
-  {
-    let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-    let mut pt = ticket_sale_runner.pt.lock().await;
-    pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time + 1).await;
-  }
-
   // should fail if wrong sale account is passed
   {
     let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
@@ -216,6 +209,76 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
   }
 
+  // should fail if wrong purchase token is given
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
+
+
+    let event_registry_runner = &mut ctx.event_registry_runner;
+    let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
+    let treasury = event_registry_runner.get_participant(5);
+    let ticket_buyer = event_registry_runner.get_participant(4);
+
+    let result = secondary_market_runner.fill_sell_listing(
+      event_id,
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      wrong_purchase_token,
+      treasury.pubkey(),
+      ticket_owner.pubkey(),
+      &ticket_buyer,
+      event_organizer.pubkey(),
+    ).await;
+
+    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
+  }
+
+  // should fail if wrong event_organizer account is used
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
+
+    let event_registry_runner = &mut ctx.event_registry_runner;
+    let treasury = event_registry_runner.get_participant(5);
+    let ticket_buyer = event_registry_runner.get_participant(4);
+    let wrong_event_organizer = event_registry_runner.get_participant(2);
+    
+    let result = secondary_market_runner.fill_sell_listing(
+      event_id,
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      purchase_token,
+      treasury.pubkey(),
+      ticket_owner.pubkey(),
+      &ticket_buyer,
+      wrong_event_organizer.pubkey(),
+    ).await;
+
+    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
+  }
+
+  // move to the end of sale
+  {
+    let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time + 1).await;
+  }
+  
   // Should fail if ticket sale is finished
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
