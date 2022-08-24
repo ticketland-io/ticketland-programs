@@ -502,11 +502,61 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
   }
 }
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_close_sell_listing_account(ctx: &mut TestContext) {
-  
-// }
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_sell_listing_account(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+    event_id,
+    seat_index,
+    event_organizer,
+    ticket_owner, // ticket buyer from primary market is the ticket owner
+    purchase_token,
+    ticket_type_index,
+    _,
+  ) = before_each(ctx).await;
+
+
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let ticket_buyer = event_registry_runner.get_participant(4);
+
+  let result = secondary_market_runner.fill_sell_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    purchase_token,
+    treasury.pubkey(),
+    ticket_owner.pubkey(),
+    &ticket_buyer,
+    event_organizer.pubkey(),
+  ).await;
+  assert!(result.is_ok());
+
+  {
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&secondary_market_state.pubkey(), event_id, &ticket_metadata).0;
+
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let account = pt.context.banks_client.get_account(sell_listing).await.unwrap();
+
+    assert!(account.is_none());
+  }
+}
 
 // #[test_context(TestContext)]
 // #[tokio::test(flavor = "multi_thread")]
