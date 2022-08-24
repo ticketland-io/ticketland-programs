@@ -143,6 +143,13 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     ticket_types,
   ) = before_each(ctx).await;
 
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+
   // should fail if wrong sale account is passed
   {
     let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
@@ -212,13 +219,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   // should fail if wrong purchase token is given
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let sale = TicketSalePda::ticket_sale_state(
-      &ticket_sale_state.pubkey(),
-      ticket_type_index,
-      event_id,
-    ).0;
-
-
     let event_registry_runner = &mut ctx.event_registry_runner;
     let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
     let treasury = event_registry_runner.get_participant(5);
@@ -244,12 +244,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   // should fail if wrong event_organizer account is used
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let sale = TicketSalePda::ticket_sale_state(
-      &ticket_sale_state.pubkey(),
-      ticket_type_index,
-      event_id,
-    ).0;
-
     let event_registry_runner = &mut ctx.event_registry_runner;
     let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
@@ -282,12 +276,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   // Should fail if ticket sale is finished
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let sale = TicketSalePda::ticket_sale_state(
-      &ticket_sale_state.pubkey(),
-      ticket_type_index,
-      event_id,
-    ).0;
-
     let event_registry_runner = &mut ctx.event_registry_runner;
     let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
@@ -310,11 +298,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   }
 }
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
-  
-// }
 
 // #[test_context(TestContext)]
 // #[tokio::test(flavor = "multi_thread")]
