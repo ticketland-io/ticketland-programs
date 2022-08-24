@@ -305,10 +305,10 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
     event_id,
     seat_index,
     event_organizer,
-    ticket_owner, // ticket buyer from primary market is the ticket owner
+    _,
     purchase_token,
     ticket_type_index,
-    ticket_types,
+    _,
   ) = before_each(ctx).await;
 
   let sale = TicketSalePda::ticket_sale_state(
@@ -354,7 +354,7 @@ async fn should_fail_when_wrong_treasury(ctx: &mut TestContext) {
     ticket_owner, // ticket buyer from primary market is the ticket owner
     purchase_token,
     ticket_type_index,
-    ticket_types,
+    _,
   ) = before_each(ctx).await;
 
   let sale = TicketSalePda::ticket_sale_state(
@@ -402,58 +402,105 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
     _,
   ) = before_each(ctx).await;
 
-  {
-    let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let sale = TicketSalePda::ticket_sale_state(
-      &ticket_sale_state.pubkey(),
-      ticket_type_index,
-      event_id,
-    ).0;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-    let event_registry_runner = &mut ctx.event_registry_runner;
-    let treasury = event_registry_runner.get_participant(5);
-    let ticket_buyer = event_registry_runner.get_participant(4);
-    
-    let (
-      treasury_balance_before,
-      event_organizer_balance_before,
-      ticket_owner_balance_before,
-    ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let ticket_buyer = event_registry_runner.get_participant(4);
+  
+  let (
+    treasury_balance_before,
+    event_organizer_balance_before,
+    ticket_owner_balance_before,
+  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
 
-    let result = secondary_market_runner.fill_sell_listing(
-      event_id,
-      secondary_market_state.pubkey(),
-      event_registry_state.pubkey(),
-      sale,
-      seat_index,
-      ticket_nft_state.pubkey(),
-      purchase_token,
-      treasury.pubkey(),
-      ticket_owner.pubkey(),
-      &ticket_buyer,
-      event_organizer.pubkey(),
-    ).await;
-    assert!(result.is_ok());
+  let result = secondary_market_runner.fill_sell_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    purchase_token,
+    treasury.pubkey(),
+    ticket_owner.pubkey(),
+    &ticket_buyer,
+    event_organizer.pubkey(),
+  ).await;
+  assert!(result.is_ok());
 
-    let (
-      treasury_balance_after,
-      event_organizer_balance_after,
-      ticket_owner_balance_after,
-    ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
+  let (
+    treasury_balance_after,
+    event_organizer_balance_after,
+    ticket_owner_balance_after,
+  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
 
-    // 5% goes to treasury and 5% to the event organizer
-    // The sell price is 1.1
-    assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055_f64));
-    assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055_f64));
-    assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99_f64));
-  }
+  // 5% goes to treasury and 5% to the event organizer
+  // The sell price is 1.1
+  assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055_f64));
+  assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055_f64));
+  assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99_f64));
 }
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
-  
-// }
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+    event_id,
+    seat_index,
+    event_organizer,
+    ticket_owner, // ticket buyer from primary market is the ticket owner
+    purchase_token,
+    ticket_type_index,
+    _,
+  ) = before_each(ctx).await;
+
+
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let ticket_buyer = event_registry_runner.get_participant(4);
+
+  let result = secondary_market_runner.fill_sell_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    purchase_token,
+    treasury.pubkey(),
+    ticket_owner.pubkey(),
+    &ticket_buyer,
+    event_organizer.pubkey(),
+  ).await;
+  assert!(result.is_ok());
+
+  {
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let ticket_metadata_data = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
+
+    assert_eq!(ticket_metadata_data.owner, ticket_buyer.pubkey());
+  }
+}
 
 // #[test_context(TestContext)]
 // #[tokio::test(flavor = "multi_thread")]

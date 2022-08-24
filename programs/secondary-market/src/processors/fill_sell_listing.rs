@@ -49,7 +49,7 @@ pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
     ctx.accounts.ticket_nft_program_state.to_account_info(),
     ctx.accounts.ticket_metadata.to_account_info(),
     ctx.accounts.cpi_authority.to_account_info(),
-    ctx.accounts.sell_listing.ticket_owner,
+    ctx.accounts.ticket_buyer.key(),
   )?;
   Ok(())
 }
