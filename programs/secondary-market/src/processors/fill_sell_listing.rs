@@ -51,5 +51,6 @@ pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
     ctx.accounts.cpi_authority.to_account_info(),
     ctx.accounts.ticket_buyer.key(),
   )?;
+  
   Ok(())
 }
