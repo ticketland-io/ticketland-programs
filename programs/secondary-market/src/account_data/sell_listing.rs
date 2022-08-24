@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(Debug)]
 pub struct SellListing {
   /// The metadata of the ticket nft that is listed for sale
   pub ticket_metadata: Pubkey,
