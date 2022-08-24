@@ -6,6 +6,12 @@ use crate::{
   account_data::{
     buy_listing::*,
   },
+  acl::{
+    sale_time_checks,
+    sale_account,
+    price_cap,
+    purchase_token,
+  },
 };
 
 fn transfer_token<'info>(
@@ -36,6 +42,12 @@ fn transfer_funds(ctx: &Context<CreateBuyListing>, bid_price: u64) -> Result<()>
   Ok(())
 }
 
+#[access_control(
+  purchase_token::check(
+    &ctx.accounts.event,
+    &ctx.accounts.purchase_token,
+  )
+)]
 pub fn exec(
   ctx: Context<CreateBuyListing>,
   bid_price: u64,

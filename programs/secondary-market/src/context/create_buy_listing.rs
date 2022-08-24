@@ -19,6 +19,18 @@ pub struct CreateBuyListing<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
+  /// CHECK: The Event account.
+  #[account(
+    seeds = [
+      b"event",
+      state.event_registry_state.key().as_ref(),
+      &event_id
+    ],
+    bump,
+    seeds::program = state.event_registry_program,
+  )]
+  pub event: AccountInfo<'info>,
+
   // The buy_listing account
   #[account(
     init_if_needed,
