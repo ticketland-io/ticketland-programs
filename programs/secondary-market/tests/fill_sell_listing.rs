@@ -26,7 +26,6 @@ use common_test::{
   }
 };
 
-
 async fn before_each(ctx: &mut TestContext) -> (
   Keypair,
   Keypair,
