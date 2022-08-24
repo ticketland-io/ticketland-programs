@@ -146,7 +146,6 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     event_id,
   ).0;
 
-
   // should fail if wrong sale account is passed
   {
     let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
@@ -295,6 +294,51 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   }
 }
 
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+    event_id,
+    seat_index,
+    event_organizer,
+    ticket_owner, // ticket buyer from primary market is the ticket owner
+    purchase_token,
+    ticket_type_index,
+    ticket_types,
+  ) = before_each(ctx).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let ticket_buyer = event_registry_runner.get_participant(4);
+  let wrong_ticket_owner = event_registry_runner.get_participant(1);
+  
+  let result = secondary_market_runner.fill_sell_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    purchase_token,
+    treasury.pubkey(),
+    wrong_ticket_owner.pubkey(),
+    &ticket_buyer,
+    event_organizer.pubkey(),
+  ).await;
+
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTicketSeller);
+}
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
