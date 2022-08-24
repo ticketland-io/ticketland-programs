@@ -29,7 +29,17 @@ use common_test::{
 async fn before_each(ctx: &mut TestContext) -> (
   Keypair,
   Keypair,
+  Keypair,
+  Keypair,
+  Keypair,
+  Keypair,
+  Pubkey,
+  Pubkey,
   [u8; 32],
+  u8,
+  u16,
+  u32,
+  Vec<TicketType>
  ) {
   let (
     event_registry_state,
@@ -43,14 +53,16 @@ async fn before_each(ctx: &mut TestContext) -> (
   let event_registry_runner = &mut ctx.event_registry_runner;
   let event_organizer = event_registry_runner.get_participant(1);
   let ticket_buyer = event_registry_runner.get_participant(2);
+  let ticket_owner = event_registry_runner.get_participant(3);
   let deposit_token = event_registry_runner.deposit_tokens[2];
   let purchase_token = deposit_token;
   let ticket_type_index = 0;
+  let n_listing = 0;
 
   let (ticket_types,) = setup(
     ctx,
     &event_organizer,
-    &ticket_buyer,
+    &ticket_owner,
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
     ticket_nft_state.pubkey(),
@@ -92,13 +104,70 @@ async fn before_each(ctx: &mut TestContext) -> (
   (
     event_registry_state,
     secondary_market_state,
-    event_id,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer.pubkey(),
     purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    ticket_types,
   )
 }
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_enforce_access_control(ctx: &mut TestContext) {
+async fn should_fail_if_sale_ended(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    ticket_types,
+  ) = before_each(ctx).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  // move to the end of sale
+  {
+    let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time + 1).await;
+  }
   
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer,
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  
+  Error::assert_ticket_sale_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
 }

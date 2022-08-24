@@ -288,7 +288,7 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
 
-  pub async fn buy_sell_listing(
+  pub async fn fill_buy_listing(
     &self,
     event_id: [u8; 32],
     state: Pubkey,
