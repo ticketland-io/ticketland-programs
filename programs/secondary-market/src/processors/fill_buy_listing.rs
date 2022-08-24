@@ -5,6 +5,7 @@ use crate::{
     fill_listing_common::{
       transfer_funds,
       change_ticket_ownership,
+      close_ata,
     },
   },
   acl::{
@@ -77,15 +78,14 @@ pub fn exec(ctx: Context<FillBuyListing>, event_id: [u8; 32]) -> Result<()> {
     ctx.accounts.ticket_buyer.key(),
   )?;
 
-  // Close token account
-  let cpi_accounts = CloseAccount {
-      account: ctx.accounts.user_token.to_account_info(),
-      destination: ctx.accounts.user.to_account_info(),
-      authority: ctx.accounts.user.to_account_info(),
-  };
-  let cpi_program = ctx.accounts.token_program.to_account_info();
-  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-  token::close_account(cpi_ctx)?;
-  
+  // close the tmp listing_escrow_ata
+  close_ata(
+    &ctx.accounts.token_program,
+    ctx.accounts.listing_escrow_ata.to_account_info(),
+    ctx.accounts.ticket_buyer.to_account_info(),
+    ctx.accounts.listing_escrow.to_account_info(),
+    Some(signer_seeds),
+  )?;
+
   Ok(())
 }

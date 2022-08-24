@@ -310,25 +310,6 @@ impl Runner {
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
 
-    println!("state {}", state);
-    println!("ticket_nft_program_state {}", ticket_nft_program_state);
-    println!("buy_listing {}", buy_listing);
-    println!("event {}", event);
-    println!("market {}", market);
-    println!("sale {}", sale);
-    println!("cpi_authority {}", pda::cpi_authority(&state).0);
-    println!("purchase_token {}", purchase_token);
-    println!("listing_escrow {}", listing_escrow);
-    println!("listing_escrow_ata {}", Spl::get_associated_token_address(&listing_escrow, &purchase_token));
-    println!("ticket_buyer {}", ticket_buyer);
-    println!("ticket_metadata {}", ticket_metadata);
-    println!("event_organizer {}", event_organizer);
-    println!("event_organizer_purchase_token_ata {}", Spl::get_associated_token_address(&event_organizer, &purchase_token));
-    println!("service_fee_ata {}", Spl::get_associated_token_address(&treasury, &purchase_token));
-    println!("treasury {}", treasury);
-    println!("ticket_owner_purchase_token_ata {}", Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token));
-    println!("ticket_owner {}", ticket_owner.pubkey());
-
     let accounts = secondary_market::accounts::FillBuyListing {
       state,
       ticket_nft_program_state,

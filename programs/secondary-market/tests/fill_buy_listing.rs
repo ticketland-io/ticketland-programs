@@ -118,392 +118,392 @@ async fn before_each(ctx: &mut TestContext, bid_price: u64) -> (
   )
 }
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_sale_ended(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     ticket_types,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_sale_ended(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    ticket_types,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   // move to the end of sale
-//   {
-//     let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-//     let mut pt = ticket_sale_runner.pt.lock().await;
-//     pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time + 1).await;
-//   }
+  // move to the end of sale
+  {
+    let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+    let mut pt = ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_end_time + 1).await;
+  }
 
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let treasury = event_registry_runner.get_participant(5);
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   Error::assert_ticket_sale_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
-// }
+  Error::assert_ticket_sale_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_sale_account_is_wrong(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_sale_account_is_wrong(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+  let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   
-//   {
-//     // prepare new accounts
-//     let event_registry_runner = &mut ctx.event_registry_runner;
-//     let deposit_token = event_registry_runner.deposit_tokens[2];
-//     // create a new event
-//     let _ = setup(
-//       ctx,
-//       &event_organizer,
-//       &ticket_owner,
-//       event_registry_state.pubkey(),
-//       ticket_sale_state.pubkey(),
-//       ticket_nft_state.pubkey(),
-//       deposit_token,
-//       purchase_token,
-//       some_other_event_id,
-//       seat_index,
-//       ticket_type_index,
-//     ).await;
+  {
+    // prepare new accounts
+    let event_registry_runner = &mut ctx.event_registry_runner;
+    let deposit_token = event_registry_runner.deposit_tokens[2];
+    // create a new event
+    let _ = setup(
+      ctx,
+      &event_organizer,
+      &ticket_owner,
+      event_registry_state.pubkey(),
+      ticket_sale_state.pubkey(),
+      ticket_nft_state.pubkey(),
+      deposit_token,
+      purchase_token,
+      some_other_event_id,
+      seat_index,
+      ticket_type_index,
+    ).await;
 
-//     let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
 
-//     // create a market for that sale
-//     let result = secondary_market_runner.create_market(
-//       secondary_market_state.pubkey(),
-//       event_registry_state.pubkey(),
-//       some_other_event_id,
-//       &event_organizer,
-//       500, // organizer_resale_fee 5%
-//       1000, // resale_cap 10%
-//     ).await;
-//     assert!(result.is_ok());
-//   }
+    // create a market for that sale
+    let result = secondary_market_runner.create_market(
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      some_other_event_id,
+      &event_organizer,
+      500, // organizer_resale_fee 5%
+      1000, // resale_cap 10%
+    ).await;
+    assert!(result.is_ok());
+  }
 
-//   // now use this new sale to create listing for a ticket that was purchased in the previous sale
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     some_other_event_id,
-//   ).0;
+  // now use this new sale to create listing for a ticket that was purchased in the previous sale
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    some_other_event_id,
+  ).0;
 
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let treasury = event_registry_runner.get_participant(5);
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
 
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
-// }
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     _,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    _,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let treasury = event_registry_runner.get_participant(5);
-//   let wrong_ticket_owner = event_registry_runner.get_participant(6);
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let wrong_ticket_owner = event_registry_runner.get_participant(6);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &wrong_ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &wrong_ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
-// }
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_price_cap_exceed(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.11)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_price_cap_exceed(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.11)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let treasury = event_registry_runner.get_participant(5);
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   // The buy listing has an ask price of 1.11 but the ticket was initially sold for 1 SOL
-//   // This exceeds the price cap thus it should fail
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::PriceCap);
-// }
+  // The buy listing has an ask price of 1.11 but the ticket was initially sold for 1 SOL
+  // This exceeds the price cap thus it should fail
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::PriceCap);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_wrong_purchase_token(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     _,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_wrong_purchase_token(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    _,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
   
-//   // create the listing ATA so it doesn't fail due to an inexistent account
-//   {
-//     let buy_listing = pda::buy_listing(&secondary_market_state.pubkey(), event_id, &ticket_buyer.pubkey(), n_listing).0;
-//     let listing_escrow = pda::listing_escrow(&secondary_market_state.pubkey(), event_id, &buy_listing).0;
+  // create the listing ATA so it doesn't fail due to an inexistent account
+  {
+    let buy_listing = pda::buy_listing(&secondary_market_state.pubkey(), event_id, &ticket_buyer.pubkey(), n_listing).0;
+    let listing_escrow = pda::listing_escrow(&secondary_market_state.pubkey(), event_id, &buy_listing).0;
 
-//     let secondary_market_runner = &mut ctx.secondary_market_runner;
-//     secondary_market_runner.spl.create_associated_account(&listing_escrow, &wrong_purchase_token).await;
-//   }
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    secondary_market_runner.spl.create_associated_account(&listing_escrow, &wrong_purchase_token).await;
+  }
   
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let treasury = event_registry_runner.get_participant(5);
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     wrong_purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    wrong_purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
-// }
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     _,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    _,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let treasury = event_registry_runner.get_participant(5);
-//   let wrong_event_organizer = event_registry_runner.get_participant(6);
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let wrong_event_organizer = event_registry_runner.get_participant(6);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     wrong_event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    wrong_event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
-// }
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
+}
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_fail_if_wrong_treasury(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_wrong_treasury(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let wrong_treasury = event_registry_runner.get_participant(6);
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let wrong_treasury = event_registry_runner.get_participant(6);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     wrong_treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    wrong_treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
   
-//   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount);
-// }
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount);
+}
 
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
@@ -577,70 +577,60 @@ async fn should_transfer_funds_from_escrow_to_all_entities(ctx: &mut TestContext
   assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055));
   assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055));
   assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99));
-
-  let escrow_balance_after = secondary_market_runner.get_listing_escrow_balance(
-    secondary_market_state.pubkey(),
-    ticket_buyer.pubkey(),
-    event_id,
-    n_listing,
-    purchase_token,
-  ).await;
-
-  assert_eq!(escrow_balance_after, sol_to_lamports(0_f64));
 }
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
-//   let (
-//     event_registry_state,
-//     secondary_market_state,
-//     ticket_sale_state,
-//     ticket_nft_state,
-//     ticket_buyer,
-//     ticket_owner,
-//     event_organizer,
-//     purchase_token,
-//     event_id,
-//     ticket_type_index,
-//     n_listing,
-//     seat_index,
-//     _,
-//   ) = before_each(ctx, sol_to_lamports(1.1)).await;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
-//   let sale = TicketSalePda::ticket_sale_state(
-//     &ticket_sale_state.pubkey(),
-//     ticket_type_index,
-//     event_id,
-//   ).0;
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
 
-//   let event_registry_runner = &mut ctx.event_registry_runner;
-//   let secondary_market_runner = &mut ctx.secondary_market_runner;
-//   let treasury = event_registry_runner.get_participant(5);
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
 
-//   let result = secondary_market_runner.fill_buy_listing(
-//     event_id,
-//     secondary_market_state.pubkey(),
-//     event_registry_state.pubkey(),
-//     ticket_nft_state.pubkey(),
-//     sale,
-//     purchase_token,
-//     treasury.pubkey(),
-//     ticket_buyer.pubkey(),
-//     event_organizer.pubkey(),
-//     &ticket_owner,
-//     n_listing,
-//     seat_index,
-//   ).await;
-//   assert!(result.is_ok());
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  assert!(result.is_ok());
 
-//   {
-//     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
-//     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+  {
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
 
-//     let mut pt = secondary_market_runner.pt.lock().await;
-//     let ticket_metadata_data = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let ticket_metadata_data = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
 
-//     assert_eq!(ticket_metadata_data.owner, ticket_buyer.pubkey());
-//   }
-// }
+    assert_eq!(ticket_metadata_data.owner, ticket_buyer.pubkey());
+  }
+}

@@ -99,7 +99,7 @@ pub fn transfer_funds<'info>(
 }
 
 pub fn close_ata<'info>(
-  token_program: Program<'info, Token>,
+  token_program: &Program<'info, Token>,
   account: AccountInfo<'info>,
   destination: AccountInfo<'info>,
   authority: AccountInfo<'info>,

@@ -100,7 +100,6 @@ pub struct FillBuyListing<'info> {
 
   #[account(
     mut,
-    close = ticket_buyer,
     associated_token::mint = purchase_token,
     associated_token::authority = listing_escrow,
   )]
