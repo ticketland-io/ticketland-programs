@@ -68,7 +68,7 @@ pub struct CreateBuyListing<'info> {
     space = 0,
     payer = ticket_buyer,
     seeds = [
-      b"listing_vault",
+      b"listing_escrow",
       state.key().as_ref(),
       &event_id,
       buy_listing.key().as_ref(),

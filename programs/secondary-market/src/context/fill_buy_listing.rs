@@ -88,7 +88,7 @@ pub struct FillBuyListing<'info> {
   /// CHECK: The account that will be the authority of the vault ATA that will be holding the escrowed funds for the purchase
   #[account(
     seeds = [
-      b"listing_vault",
+      b"listing_escrow",
       state.key().as_ref(),
       &event_id,
       buy_listing.key().as_ref(),

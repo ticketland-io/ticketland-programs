@@ -118,5 +118,20 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     ticket_types,
   ) = before_each(ctx).await;
 
-  
+  // should fail is wrong purchase token is provided
+  let result = secondary_market_runner.create_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    sale,
+    seat_index,
+    ticket_nft_state.pubkey(),
+    wrong_purchase_token,
+    treasury.pubkey(),
+    ticket_owner.pubkey(),
+    &ticket_buyer,
+    event_organizer.pubkey(),
+  ).await;
+
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
 }
