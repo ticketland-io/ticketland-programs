@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
-use anchor_spl::token::{self, Token, Transfer};
+use anchor_spl::token::{self, Token, Transfer, CloseAccount};
 use ticket_nft::{
   program::TicketNft,
 };
@@ -96,6 +96,29 @@ pub fn transfer_funds<'info>(
   }
 
   Ok(())
+}
+
+pub fn close_ata<'info>(
+  token_program: Program<'info, Token>,
+  account: AccountInfo<'info>,
+  destination: AccountInfo<'info>,
+  authority: AccountInfo<'info>,
+  signer_seeds: Option<&[&[&[u8]]]>,
+) -> Result<()> {
+  let cpi_accounts = CloseAccount {
+    account: account.clone(),
+    destination: destination,
+    authority:authority,
+  };
+  let cpi_program = token_program.to_account_info();
+
+  if let Some(signer_seeds) = signer_seeds {
+    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+    token::close_account(cpi_ctx)
+  } else {
+    let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+    token::close_account(cpi_ctx)
+  }
 }
 
 pub fn change_ticket_ownership<'info>(

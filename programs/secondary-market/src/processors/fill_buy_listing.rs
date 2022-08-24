@@ -77,5 +77,15 @@ pub fn exec(ctx: Context<FillBuyListing>, event_id: [u8; 32]) -> Result<()> {
     ctx.accounts.ticket_buyer.key(),
   )?;
 
+  // Close token account
+  let cpi_accounts = CloseAccount {
+      account: ctx.accounts.user_token.to_account_info(),
+      destination: ctx.accounts.user.to_account_info(),
+      authority: ctx.accounts.user.to_account_info(),
+  };
+  let cpi_program = ctx.accounts.token_program.to_account_info();
+  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+  token::close_account(cpi_ctx)?;
+  
   Ok(())
 }
