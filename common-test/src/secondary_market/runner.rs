@@ -298,10 +298,26 @@ impl Runner {
     let treasury_ata = Spl::get_associated_token_address(&treasury, &mint_account);
     let event_organizer_ata = Spl::get_associated_token_address(&event_organizer, &mint_account);
     let ticket_owner_ata = Spl::get_associated_token_address(&ticket_owner, &mint_account);
+    
     (
       self.spl.get_token_account(treasury_ata).await.amount,
       self.spl.get_token_account(event_organizer_ata).await.amount,
       self.spl.get_token_account(ticket_owner_ata).await.amount,
     )
+  }
+
+  pub async fn get_listing_escrow_balance(
+    &mut self,
+    state: Pubkey,
+    ticket_buyer: Pubkey,
+    event_id: [u8; 32],
+    n_listing: u16,
+    mint_account: Pubkey,
+  ) -> u64 {
+    let buy_listing = pda::buy_listing(&state, event_id, &ticket_buyer, n_listing).0;
+    let listing_escrow = pda::listing_escrow(&state, event_id, &buy_listing).0;
+    let listing_escrow_ata = Spl::get_associated_token_address(&listing_escrow, &mint_account);
+
+    self.spl.get_token_account(listing_escrow_ata).await.amount
   }
 }

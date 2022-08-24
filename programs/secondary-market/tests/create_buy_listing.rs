@@ -1,4 +1,5 @@
 #![cfg(feature = "test-bpf")]
+use secondary_market::acl::purchase_token;
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -100,4 +101,31 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   ).await;
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_transfer_funds_to_listing_escrow(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    event_id,
+    purchase_token,
+  ) = before_each(ctx).await;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let ticket_buyer = event_registry_runner.get_participant(3);
+  let escrow_balance_before = secondary_market_runner.get_listing_escrow_balance();
+
+  // should fail is wrong purchase token is provided
+  let result = secondary_market_runner.create_buy_listing(
+    event_id,
+    sol_to_lamports(1.1),
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    purchase_token,
+    &ticket_buyer,
+    0,
+  ).await;
 }
