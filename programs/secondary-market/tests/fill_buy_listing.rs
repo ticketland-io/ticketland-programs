@@ -6,6 +6,9 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
+use solana_test_utils::{
+  spl::Spl,
+};
 use common::{
   state::{
     ticket_type::{TicketType},
@@ -632,5 +635,63 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
     let ticket_metadata_data = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
 
     assert_eq!(ticket_metadata_data.owner, ticket_buyer.pubkey());
+  }
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_the_listing_and_escrow_ata_accounts(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  assert!(result.is_ok());
+
+  {
+    let buy_listing = pda::buy_listing(&secondary_market_state.pubkey(), event_id, &ticket_buyer.pubkey(), n_listing).0;
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let account = pt.context.banks_client.get_account(buy_listing).await.unwrap();
+    assert!(account.is_none());
+
+    let listing_escrow = pda::listing_escrow(&secondary_market_state.pubkey(), event_id, &buy_listing).0;
+    let listing_escrow_ata = Spl::get_associated_token_address(&listing_escrow, &purchase_token);
+    let account = pt.context.banks_client.get_account(listing_escrow_ata).await.unwrap();
+    assert!(account.is_none());
   }
 }
