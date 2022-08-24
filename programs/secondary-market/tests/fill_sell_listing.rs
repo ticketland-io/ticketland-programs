@@ -299,37 +299,37 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
 }
 
 
-// #[test_context(TestContext)]
-// #[tokio::test(flavor = "multi_thread")]
-// async fn should_transfer_funds(ctx: &mut TestContext) {
-//   {
-//     let secondary_market_runner = &mut ctx.secondary_market_runner;
-//     let sale = TicketSalePda::ticket_sale_state(
-//       &ticket_sale_state.pubkey(),
-//       ticket_type_index,
-//       event_id,
-//     ).0;
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_transfer_funds(ctx: &mut TestContext) {
+  {
+    let secondary_market_runner = &mut ctx.secondary_market_runner;
+    let sale = TicketSalePda::ticket_sale_state(
+      &ticket_sale_state.pubkey(),
+      ticket_type_index,
+      event_id,
+    ).0;
 
-//     let event_registry_runner = &mut ctx.event_registry_runner;
-//     let treasury = event_registry_runner.get_participant(5);
-//     let ticket_buyer = event_registry_runner.get_participant(4);
+    let event_registry_runner = &mut ctx.event_registry_runner;
+    let treasury = event_registry_runner.get_participant(5);
+    let ticket_buyer = event_registry_runner.get_participant(4);
     
-//     let result = secondary_market_runner.fill_sell_listing(
-//       event_id,
-//       secondary_market_state.pubkey(),
-//       event_registry_state.pubkey(),
-//       sale,
-//       seat_index,
-//       ticket_nft_state.pubkey(),
-//       purchase_token,
-//       treasury.pubkey(),
-//       ticket_owner.pubkey(),
-//       &ticket_buyer,
-//       event_organizer.pubkey(),
-//     ).await;
-//     assert!(result.is_ok());
-//   }
-// }
+    let result = secondary_market_runner.fill_sell_listing(
+      event_id,
+      secondary_market_state.pubkey(),
+      event_registry_state.pubkey(),
+      sale,
+      seat_index,
+      ticket_nft_state.pubkey(),
+      purchase_token,
+      treasury.pubkey(),
+      ticket_owner.pubkey(),
+      &ticket_buyer,
+      event_organizer.pubkey(),
+    ).await;
+    assert!(result.is_ok());
+  }
+}
 
 // #[test_context(TestContext)]
 // #[tokio::test(flavor = "multi_thread")]

@@ -38,16 +38,19 @@ use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,
+  pub spl: Spl,
   pub deployer: Keypair,
 }
 
 impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
+    let spl = Spl::new(Arc::clone(&pt));
     let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
 
     Self {
       pt: Arc::clone(&pt),
+      spl,
       deployer,
     }
   }
@@ -239,5 +242,12 @@ impl Runner {
     };
 
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
+
+  pub async fn get_ata_balance(
+    &mut self, 
+    ata: Pubkey,
+  ) -> u64 {
+    self.spl.get_token_account(ata).await.amount
   }
 }
