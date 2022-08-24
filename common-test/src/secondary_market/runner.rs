@@ -244,10 +244,20 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
 
-  pub async fn get_ata_balance(
-    &mut self, 
-    ata: Pubkey,
-  ) -> u64 {
-    self.spl.get_token_account(ata).await.amount
+  pub async fn get_ata_balances(
+    &mut self,
+    treasury: Pubkey,
+    event_organizer: Pubkey,
+    ticket_owner: Pubkey,
+    mint_account: Pubkey,
+  ) -> (u64, u64, u64) {
+    let treasury_ata = Spl::get_associated_token_address(&treasury, &mint_account);
+    let event_organizer_ata = Spl::get_associated_token_address(&event_organizer, &mint_account);
+    let ticket_owner_ata = Spl::get_associated_token_address(&ticket_owner, &mint_account);
+    (
+      self.spl.get_token_account(treasury_ata).await.amount,
+      self.spl.get_token_account(event_organizer_ata).await.amount,
+      self.spl.get_token_account(ticket_owner_ata).await.amount,
+    )
   }
 }

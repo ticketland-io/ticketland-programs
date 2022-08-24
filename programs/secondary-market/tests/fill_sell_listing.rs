@@ -314,6 +314,10 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
     let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
     
+    let treasury_balance_before = secondary_market.get_ata_balance();
+    let event_organizer_balance_before = secondary_market.get_ata_balance();
+    let ticket_owner_balance_before = secondary_market.get_ata_balance();
+
     let result = secondary_market_runner.fill_sell_listing(
       event_id,
       secondary_market_state.pubkey(),
@@ -327,7 +331,11 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
       &ticket_buyer,
       event_organizer.pubkey(),
     ).await;
-    assert!(result.is_ok());
+    
+    let treasury_balance_after = secondary_market.get_ata_balance();
+    let event_organizer_balance_after = secondary_market.get_ata_balance();
+    let ticket_owner_balance_after = secondary_market.get_ata_balance();
+
   }
 }
 
