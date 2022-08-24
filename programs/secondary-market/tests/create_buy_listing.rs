@@ -1,5 +1,4 @@
 #![cfg(feature = "test-bpf")]
-use secondary_market::acl::purchase_token;
 use test_context::{test_context, futures};
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -84,6 +83,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     _,
   ) = before_each(ctx).await;
 
+  let n_listing = 0;
   let event_registry_runner = &mut ctx.event_registry_runner;
   let secondary_market_runner = &mut ctx.secondary_market_runner;
   let ticket_buyer = event_registry_runner.get_participant(3);
@@ -97,7 +97,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
     event_registry_state.pubkey(),
     wrong_purchase_token,
     &ticket_buyer,
-    0,
+    n_listing,
   ).await;
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
@@ -113,10 +113,10 @@ async fn should_transfer_funds_to_listing_escrow(ctx: &mut TestContext) {
     purchase_token,
   ) = before_each(ctx).await;
 
+  let n_listing = 0;
   let event_registry_runner = &mut ctx.event_registry_runner;
   let secondary_market_runner = &mut ctx.secondary_market_runner;
   let ticket_buyer = event_registry_runner.get_participant(3);
-  let escrow_balance_before = secondary_market_runner.get_listing_escrow_balance();
 
   // should fail is wrong purchase token is provided
   let result = secondary_market_runner.create_buy_listing(
@@ -126,6 +126,17 @@ async fn should_transfer_funds_to_listing_escrow(ctx: &mut TestContext) {
     event_registry_state.pubkey(),
     purchase_token,
     &ticket_buyer,
-    0,
+    n_listing,
   ).await;
+  assert!(result.is_ok());
+
+  let escrow_balance = secondary_market_runner.get_listing_escrow_balance(
+    secondary_market_state.pubkey(),
+    ticket_buyer.pubkey(),
+    event_id,
+    n_listing,
+    purchase_token,
+  ).await;
+
+  assert_eq!(escrow_balance, sol_to_lamports(1.1));
 }
