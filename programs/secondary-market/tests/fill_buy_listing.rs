@@ -26,7 +26,7 @@ use common_test::{
   }
 };
 
-async fn before_each(ctx: &mut TestContext) -> (
+async fn before_each(ctx: &mut TestContext, bid_price: u64) -> (
   Keypair,
   Keypair,
   Keypair,
@@ -91,7 +91,7 @@ async fn before_each(ctx: &mut TestContext) -> (
     let secondary_market_runner = &mut ctx.secondary_market_runner;
     let result = secondary_market_runner.create_buy_listing(
       event_id,
-      sol_to_lamports(1.1),
+      bid_price,
       secondary_market_state.pubkey(),
       event_registry_state.pubkey(),
       purchase_token,
@@ -135,7 +135,7 @@ async fn should_fail_if_sale_ended(ctx: &mut TestContext) {
     n_listing,
     seat_index,
     ticket_types,
-  ) = before_each(ctx).await;
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
   let sale = TicketSalePda::ticket_sale_state(
     &ticket_sale_state.pubkey(),
@@ -189,7 +189,7 @@ async fn should_fail_if_sale_account_is_wrong(ctx: &mut TestContext) {
     n_listing,
     seat_index,
     _,
-  ) = before_each(ctx).await;
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
   let some_other_event_id: [u8; 32] = "aaaa6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   
@@ -272,7 +272,7 @@ async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
     n_listing,
     seat_index,
     _,
-  ) = before_each(ctx).await;
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
 
   let sale = TicketSalePda::ticket_sale_state(
     &ticket_sale_state.pubkey(),
@@ -301,4 +301,53 @@ async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_price_cap_exceed(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.11)).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  
+  // The buy listing has an ask price of 1.11 but the ticket was initially sold for 1 SOL
+  // This exceeds the price cap thus it should fail
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::PriceCap);
 }
