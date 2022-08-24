@@ -254,3 +254,51 @@ async fn should_fail_if_sale_account_is_wrong(ctx: &mut TestContext) {
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    _,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let wrong_ticket_owner = event_registry_runner.get_participant(6);
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &wrong_ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
+}
