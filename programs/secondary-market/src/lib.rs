@@ -161,7 +161,7 @@ use super::*;
 	/// * `event_id` - The event id for which the secondary market is created for
 	pub fn fill_buy_listing(
 		ctx: Context<FillBuyListing>,
-		_n_listing: Pubkey,
+		_n_listing: u16,
 		_event_id: [u8; 32],
 	) -> Result<()> {
 		processors::fill_buy_listing::exec(ctx)

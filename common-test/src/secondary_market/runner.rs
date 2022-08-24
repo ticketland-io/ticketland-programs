@@ -288,6 +288,66 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
 
+  pub async fn buy_sell_listing(
+    &self,
+    event_id: [u8; 32],
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    ticket_nft_program_state: Pubkey,
+    sale: Pubkey,
+    purchase_token: Pubkey,
+    treasury: Pubkey,
+    ticket_buyer: Pubkey,
+    event_organizer: Pubkey,
+    ticket_owner: &Keypair,
+    n_listing: u16,
+    seat_index: u32,
+  ) -> AnchorResult<()> {
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let market = pda::market(&state, event_id).0;
+    let buy_listing = pda::buy_listing(&state, event_id, &ticket_buyer, n_listing).0;
+    let listing_escrow = pda::listing_escrow(&state, event_id, &buy_listing).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
+
+    let accounts = secondary_market::accounts::FillBuyListing {
+      state,
+      ticket_nft_program_state,
+      buy_listing,
+      event,
+      market,
+      sale,
+      cpi_authority: pda::cpi_authority(&state).0,
+      purchase_token,
+      listing_escrow,
+      listing_escrow_ata: Spl::get_associated_token_address(&listing_escrow, &purchase_token),
+      ticket_buyer,
+      ticket_metadata,
+      event_organizer,
+      event_organizer_purchase_token_ata: Spl::get_associated_token_address(&event_organizer, &purchase_token),
+      service_fee_ata: Spl::get_associated_token_address(&treasury, &purchase_token),
+      treasury,
+      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
+      ticket_owner: ticket_owner.pubkey(),
+      ticket_nft_program: ticket_nft_program_id(),
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+    }.to_account_metas(None);
+
+    let data = secondary_market::instruction::FillBuyListing {
+      _n_listing: n_listing,
+      _event_id: event_id,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_owner])).await
+  }
+
   pub async fn get_ata_balances(
     &mut self,
     treasury: Pubkey,
