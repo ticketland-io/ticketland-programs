@@ -81,6 +81,7 @@ pub struct FillSellListing<'info> {
 
   /// CHECK: The ticket metadata account.
   #[account(
+    mut,
     constraint = ticket_metadata.key() == sell_listing.ticket_metadata @ ErrorCode::WrongTicketMetadata,
   )]
   pub ticket_metadata: AccountInfo<'info>,
@@ -111,6 +112,7 @@ pub struct FillSellListing<'info> {
 
   /// The event organizer ATA that till be receiving the funds from the fees
   #[account(
+    mut,
     associated_token::mint = purchase_token,
     associated_token::authority = event_organizer,
   )]
@@ -118,6 +120,7 @@ pub struct FillSellListing<'info> {
 
   /// The token token account that will be receiving the service fee from the resale
   #[account(
+    mut,
     associated_token::mint = purchase_token,
     associated_token::authority = treasury,
   )]

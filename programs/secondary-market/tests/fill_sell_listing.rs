@@ -6,9 +6,6 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
-use solana_test_utils::{
-  spl::Spl,
-};
 use common::{
   state::{
     ticket_type::{TicketType},
@@ -97,9 +94,9 @@ async fn before_each(ctx: &mut TestContext) -> (
 
     let result = secondary_market_runner.create_sell_listing(
       event_id,
-      // 9.9% higher than the price sold in the primary market.
+      // 10% higher than the price sold in the primary market.
       // cap is at 10%
-      sol_to_lamports(1.099),
+      sol_to_lamports(1.1),
       secondary_market_state.pubkey(),
       event_registry_state.pubkey(),
       sale,
@@ -302,6 +299,20 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
 async fn should_transfer_funds(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    secondary_market_state,
+    event_id,
+    seat_index,
+    event_organizer,
+    ticket_owner, // ticket buyer from primary market is the ticket owner
+    purchase_token,
+    ticket_type_index,
+    _,
+  ) = before_each(ctx).await;
+
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
     let sale = TicketSalePda::ticket_sale_state(
@@ -314,9 +325,11 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
     let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
     
-    let treasury_balance_before = secondary_market.get_ata_balance();
-    let event_organizer_balance_before = secondary_market.get_ata_balance();
-    let ticket_owner_balance_before = secondary_market.get_ata_balance();
+    let (
+      treasury_balance_before,
+      event_organizer_balance_before,
+      ticket_owner_balance_before,
+    ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
 
     let result = secondary_market_runner.fill_sell_listing(
       event_id,
@@ -331,11 +344,19 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
       &ticket_buyer,
       event_organizer.pubkey(),
     ).await;
-    
-    let treasury_balance_after = secondary_market.get_ata_balance();
-    let event_organizer_balance_after = secondary_market.get_ata_balance();
-    let ticket_owner_balance_after = secondary_market.get_ata_balance();
+    assert!(result.is_ok());
 
+    let (
+      treasury_balance_after,
+      event_organizer_balance_after,
+      ticket_owner_balance_after,
+    ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
+
+    // 5% goes to treasury and 5% to the event organizer
+    // The sell price is 1.1
+    assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055_f64));
+    assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055_f64));
+    assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99_f64));
   }
 }
 
