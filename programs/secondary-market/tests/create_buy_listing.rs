@@ -6,22 +6,8 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
-use solana_test_utils::{
-  spl::Spl,
-};
-use common::{
-  state::{
-    ticket_type::{TicketType},
-  },
-};
 use common_test::{
   test_context::TestContext,
-  ticket_sale::{
-    pda::{self as TicketSalePda},
-  },
-  ticket_nft::{
-    pda as TicketNftPda,
-  },
   secondary_market::{
     common::{init, setup},
     error::Error,
@@ -32,15 +18,8 @@ use common_test::{
 async fn before_each(ctx: &mut TestContext) -> (
   Keypair,
   Keypair,
-  Keypair,
-  Keypair,
   [u8; 32],
-  u32,
-  Keypair,
-  Keypair,
   Pubkey,
-  u8,
-  Vec<TicketType>,
 ) {
   let (
     event_registry_state,
@@ -58,7 +37,7 @@ async fn before_each(ctx: &mut TestContext) -> (
   let purchase_token = deposit_token;
   let ticket_type_index = 0;
 
-  let (ticket_types,) = setup(
+  let (_,) = setup(
     ctx,
     &event_organizer,
     &ticket_buyer,
@@ -88,16 +67,9 @@ async fn before_each(ctx: &mut TestContext) -> (
   
   (
     event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
     secondary_market_state,
     event_id,
-    seat_index,
-    event_organizer,
-    ticket_buyer,
     purchase_token,
-    ticket_type_index,
-    ticket_types,
   )
 }
 
@@ -106,31 +78,25 @@ async fn before_each(ctx: &mut TestContext) -> (
 async fn should_enforce_access_control(ctx: &mut TestContext) {
   let (
     event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
     secondary_market_state,
     event_id,
-    seat_index,
-    event_organizer,
-    ticket_buyer,
-    purchase_token,
-    ticket_type_index,
-    ticket_types,
+    _,
   ) = before_each(ctx).await;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let ticket_buyer = event_registry_runner.get_participant(3);
+  let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
 
   // should fail is wrong purchase token is provided
   let result = secondary_market_runner.create_buy_listing(
     event_id,
+    sol_to_lamports(1.1),
     secondary_market_state.pubkey(),
     event_registry_state.pubkey(),
-    sale,
-    seat_index,
-    ticket_nft_state.pubkey(),
     wrong_purchase_token,
-    treasury.pubkey(),
-    ticket_owner.pubkey(),
     &ticket_buyer,
-    event_organizer.pubkey(),
+    0,
   ).await;
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
