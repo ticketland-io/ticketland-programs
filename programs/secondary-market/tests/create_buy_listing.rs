@@ -140,3 +140,42 @@ async fn should_transfer_funds_to_listing_escrow(ctx: &mut TestContext) {
 
   assert_eq!(escrow_balance, sol_to_lamports(1.1));
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_create_buy_listing(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    event_id,
+    purchase_token,
+  ) = before_each(ctx).await;
+
+  let n_listing = 0;
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let ticket_buyer = event_registry_runner.get_participant(3);
+
+  // should fail is wrong purchase token is provided
+  let result = secondary_market_runner.create_buy_listing(
+    event_id,
+    sol_to_lamports(1.1),
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    purchase_token,
+    &ticket_buyer,
+    n_listing,
+  ).await;
+  assert!(result.is_ok());
+
+  {
+    let buy_listing = pda::buy_listing(&secondary_market_state.pubkey(), event_id, &ticket_buyer.pubkey(), n_listing).0;
+    let (_, listing_escrow_bump) = pda::listing_escrow(&secondary_market_state.pubkey(), event_id, &buy_listing);
+    
+    let mut pt = secondary_market_runner.pt.lock().await;
+    let buy_listing_data = pt.get_account::<secondary_market::account_data::buy_listing::BuyListing>(buy_listing).await;
+
+    assert_eq!(buy_listing_data.bumps.listing_escrow, listing_escrow_bump);
+    assert_eq!(buy_listing_data.bid_price, sol_to_lamports(1.1));
+  }
+}
