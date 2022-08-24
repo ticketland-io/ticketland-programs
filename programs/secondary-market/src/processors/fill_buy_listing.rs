@@ -41,7 +41,20 @@ use crate::{
     &ctx.accounts.event_organizer,
   )
 )]
-pub fn exec(ctx: Context<FillBuyListing>) -> Result<()> {
+pub fn exec(ctx: Context<FillBuyListing>, event_id: [u8; 32]) -> Result<()> {
+  let state_key = ctx.accounts.state.key();
+  let buy_listing = &ctx.accounts.buy_listing;
+  let buy_listing_key = buy_listing.key();
+
+  let seeds: &[&[u8]] = &[
+    b"listing_escrow",
+    state_key.as_ref(),
+    &event_id,
+    buy_listing_key.as_ref(),
+    &[buy_listing.bumps.listing_escrow]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+
   transfer_funds(
     ctx.accounts.buy_listing.bid_price,
     &ctx.accounts.state,
@@ -52,6 +65,7 @@ pub fn exec(ctx: Context<FillBuyListing>) -> Result<()> {
     ctx.accounts.event_organizer_purchase_token_ata.to_account_info(),
     ctx.accounts.ticket_owner_purchase_token_ata.to_account_info(),
     ctx.accounts.listing_escrow.to_account_info(),
+    Some(signer_seeds),
   )?;
 
   change_ticket_ownership(

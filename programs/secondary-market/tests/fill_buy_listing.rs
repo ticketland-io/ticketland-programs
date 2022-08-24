@@ -21,7 +21,6 @@ use common_test::{
   },
   secondary_market::{
     common::{init, setup},
-    error::Error,
     pda
   }
 };
@@ -503,4 +502,88 @@ async fn should_fail_if_wrong_treasury(ctx: &mut TestContext) {
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount);
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_transfer_funds_from_escrow_to_all_entities(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    event_organizer,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
+
+  let (
+    treasury_balance_before,
+    event_organizer_balance_before,
+    ticket_owner_balance_before,
+  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
+
+  let escrow_balance_before = secondary_market_runner.get_listing_escrow_balance(
+    secondary_market_state.pubkey(),
+    ticket_buyer.pubkey(),
+    event_id,
+    n_listing,
+    purchase_token,
+  ).await;
+
+  assert_eq!(escrow_balance_before, sol_to_lamports(1.1));
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  assert!(result.is_ok());
+
+  let (
+    treasury_balance_after,
+    event_organizer_balance_after,
+    ticket_owner_balance_after,
+  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
+  
+  // 5% goes to treasury and 5% to the event organizer
+  // The sell price is 1.1
+  assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055));
+  assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055));
+  assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99));
+
+  let escrow_balance_after = secondary_market_runner.get_listing_escrow_balance(
+    secondary_market_state.pubkey(),
+    ticket_buyer.pubkey(),
+    event_id,
+    n_listing,
+    purchase_token,
+  ).await;
+
+  assert_eq!(escrow_balance_after, sol_to_lamports(0_f64));
 }

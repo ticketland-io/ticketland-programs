@@ -162,8 +162,8 @@ use super::*;
 	pub fn fill_buy_listing(
 		ctx: Context<FillBuyListing>,
 		_n_listing: u16,
-		_event_id: [u8; 32],
+		event_id: [u8; 32],
 	) -> Result<()> {
-		processors::fill_buy_listing::exec(ctx)
+		processors::fill_buy_listing::exec(ctx, event_id)
 	}
 }

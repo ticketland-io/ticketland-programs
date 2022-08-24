@@ -336,7 +336,7 @@ impl Runner {
 
     let data = secondary_market::instruction::FillBuyListing {
       _n_listing: n_listing,
-      _event_id: event_id,
+      event_id,
     }.data();
 
     let ix = Instruction {

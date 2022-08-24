@@ -441,9 +441,9 @@ async fn should_transfer_funds(ctx: &mut TestContext) {
 
   // 5% goes to treasury and 5% to the event organizer
   // The sell price is 1.1
-  assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055_f64));
-  assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055_f64));
-  assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99_f64));
+  assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055));
+  assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055));
+  assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99));
 }
 
 #[test_context(TestContext)]

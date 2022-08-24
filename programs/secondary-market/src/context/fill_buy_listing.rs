@@ -87,6 +87,8 @@ pub struct FillBuyListing<'info> {
   
   /// CHECK: The account that will be the authority of the vault ATA that will be holding the escrowed funds for the purchase
   #[account(
+    mut,
+    close = ticket_buyer,
     seeds = [
       b"listing_escrow",
       state.key().as_ref(),
@@ -98,6 +100,8 @@ pub struct FillBuyListing<'info> {
   pub listing_escrow: AccountInfo<'info>,
 
   #[account(
+    mut,
+    close = ticket_buyer,
     associated_token::mint = purchase_token,
     associated_token::authority = listing_escrow,
   )]
@@ -106,7 +110,7 @@ pub struct FillBuyListing<'info> {
   /// CHECK: The ticket seller
   /// We already used ticket buyer in the buy_listing seeds above thus there is no need to do any
   /// further account checks.
-  #[account()]
+  #[account(mut)]
   pub ticket_buyer: AccountInfo<'info>,
 
   /// CHECK: The ticket metadata account.
@@ -121,6 +125,7 @@ pub struct FillBuyListing<'info> {
 
   /// The event organizer ATA that till be receiving the funds from the fees
   #[account(
+    mut,
     associated_token::mint = purchase_token,
     associated_token::authority = event_organizer,
   )]
@@ -128,6 +133,7 @@ pub struct FillBuyListing<'info> {
 
   /// The token token account that will be receiving the service fee from the resale
   #[account(
+    mut,
     associated_token::mint = purchase_token,
     associated_token::authority = treasury,
   )]

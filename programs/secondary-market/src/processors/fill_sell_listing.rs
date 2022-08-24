@@ -41,6 +41,7 @@ pub fn exec(ctx: Context<FillSellListing>) -> Result<()> {
     ctx.accounts.event_organizer_purchase_token_ata.to_account_info(),
     ctx.accounts.ticket_owner_purchase_token_ata.to_account_info(),
     ctx.accounts.ticket_buyer.to_account_info(),
+    None,
   )?;
 
   change_ticket_ownership(

@@ -17,6 +17,7 @@ fn transfer_token<'info>(
   to: AccountInfo<'info>,
   authority: AccountInfo<'info>,
   amount: u64,
+  signer_seeds: Option<&[&[&[u8]]]>,
 ) -> Result<()> {
   let cpi_accounts = Transfer::<'info> {
     from,
@@ -24,9 +25,14 @@ fn transfer_token<'info>(
     authority,
   };
   let cpi_program = token_program.to_account_info();
-  let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-  token::transfer(cpi_ctx, amount)
+  if let Some(signer_seeds) = signer_seeds {
+    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+    token::transfer(cpi_ctx, amount)
+  } else {
+    let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+    token::transfer(cpi_ctx, amount)
+  }
 }
 
 pub fn transfer_funds<'info>(
@@ -39,6 +45,7 @@ pub fn transfer_funds<'info>(
   event_organizer_purchase_token_ata: AccountInfo<'info>,
   ticket_owner_purchase_token_ata: AccountInfo<'info>,
   authority: AccountInfo<'info>,
+  signer_seeds: Option<&[&[&[u8]]]>,
 ) -> Result<()> {
   let service_fee_amount = price
   .safe_mul(state.protocol_fee as u64)?
@@ -60,6 +67,7 @@ pub fn transfer_funds<'info>(
       service_fee_ata.clone(),
       authority.clone(),
       service_fee_amount,
+      signer_seeds,
     )?;
   }
 
@@ -71,6 +79,7 @@ pub fn transfer_funds<'info>(
       event_organizer_purchase_token_ata.clone(),
       authority.clone(),
       event_organizer_amount,
+      signer_seeds,
     )?;
   }
 
@@ -82,6 +91,7 @@ pub fn transfer_funds<'info>(
       ticket_owner_purchase_token_ata.clone(),
       authority.clone(),
       seller_amount,
+      signer_seeds,
     )?;
   }
 
