@@ -409,3 +409,51 @@ async fn should_fail_if_wrong_purchase_token(ctx: &mut TestContext) {
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
+  let (
+    event_registry_state,
+    secondary_market_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_buyer,
+    ticket_owner,
+    _,
+    purchase_token,
+    event_id,
+    ticket_type_index,
+    n_listing,
+    seat_index,
+    _,
+  ) = before_each(ctx, sol_to_lamports(1.1)).await;
+
+  let sale = TicketSalePda::ticket_sale_state(
+    &ticket_sale_state.pubkey(),
+    ticket_type_index,
+    event_id,
+  ).0;
+
+  let event_registry_runner = &mut ctx.event_registry_runner;
+  let secondary_market_runner = &mut ctx.secondary_market_runner;
+  let treasury = event_registry_runner.get_participant(5);
+  let wrong_event_organizer = event_registry_runner.get_participant(6);
+
+  let result = secondary_market_runner.fill_buy_listing(
+    event_id,
+    secondary_market_state.pubkey(),
+    event_registry_state.pubkey(),
+    ticket_nft_state.pubkey(),
+    sale,
+    purchase_token,
+    treasury.pubkey(),
+    ticket_buyer.pubkey(),
+    wrong_event_organizer.pubkey(),
+    &ticket_owner,
+    n_listing,
+    seat_index,
+  ).await;
+  
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
+}
