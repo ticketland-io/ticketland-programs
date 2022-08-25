@@ -61,6 +61,5 @@ pub fn exec(
   let sell_listing = &mut ctx.accounts.sell_listing;
   sell_listing.ask_price = ask_price;
   sell_listing.ticket_metadata = ctx.accounts.ticket_metadata.key();
-  sell_listing.ticket_owner = ctx.accounts.ticket_owner.key();
   Ok(())
 }

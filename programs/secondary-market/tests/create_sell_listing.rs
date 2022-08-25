@@ -6,9 +6,6 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use solana_program_test::{tokio};
-use solana_test_utils::{
-  spl::Spl,
-};
 use common::{
   state::{
     ticket_type::{TicketType},
@@ -387,6 +384,5 @@ async fn should_create_sell_listing(ctx: &mut TestContext) {
 
     assert_eq!(sell_listing_data.ask_price, sol_to_lamports(1.099));
     assert_eq!(sell_listing_data.ticket_metadata, ticket_metadata);
-    assert_eq!(sell_listing_data.ticket_owner, ticket_buyer.pubkey());
   }
 }

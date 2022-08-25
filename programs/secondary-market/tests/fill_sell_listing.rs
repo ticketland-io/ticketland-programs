@@ -336,7 +336,7 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
     event_organizer.pubkey(),
   ).await;
 
-  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTicketSeller);
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
 }
 
 #[test_context(TestContext)]

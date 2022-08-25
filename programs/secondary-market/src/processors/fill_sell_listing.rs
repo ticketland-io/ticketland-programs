@@ -10,6 +10,7 @@ use crate::{
   acl::{
     sale_time_checks,
     sale_account,
+    only_ticket_metadata_owner,
     purchase_token,
     event_organizer,
   },
@@ -20,6 +21,10 @@ use crate::{
   sale_account::check(
     &ctx.accounts.ticket_metadata,
     &ctx.accounts.sale
+  )
+  only_ticket_metadata_owner::check(
+    &ctx.accounts.ticket_metadata,
+    &ctx.accounts.ticket_owner,
   )
   purchase_token::check(
     &ctx.accounts.event,

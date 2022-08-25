@@ -7,7 +7,4 @@ pub struct SellListing {
 
   /// The listing sell price
   pub ask_price: u64,
-
-  /// The account that sells the ticket
-  pub ticket_owner: Pubkey,
 }

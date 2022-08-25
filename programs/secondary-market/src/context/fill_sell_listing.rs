@@ -92,10 +92,7 @@ pub struct FillSellListing<'info> {
   pub purchase_token: Box<Account<'info, Mint>>,
     
   /// CHECK: The ticket seller
-  #[account(
-    mut,
-    constraint = ticket_owner.key() == sell_listing.ticket_owner @ ErrorCode::WrongTicketSeller
-  )]
+  #[account(mut)]
   pub ticket_owner: AccountInfo<'info>,
 
   /// The ticket owner ata that will receive the funds from the ticket sell

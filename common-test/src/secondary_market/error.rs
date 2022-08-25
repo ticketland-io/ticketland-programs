@@ -37,12 +37,11 @@ impl TryFrom<u32> for Error {
       3 => Ok(Error(secondary_market::utils::program_error::ErrorCode::PriceCap)),
       4 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer)),
       5 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken)),
-      6 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketSeller)),
-      7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketMetadata)),
-      8 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongSaleAccount)),
-      9 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketNftState)),
-      10 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner)),
-      11 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount)),
+      6 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketMetadata)),
+      7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongSaleAccount)),
+      8 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketNftState)),
+      9 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner)),
+      10 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount)),
       _ => Err(())
     }
   }
