@@ -22,3 +22,8 @@ export const nftAuthority = async (ticketNftState, ticketNftProgramId) => await 
   [utf8.encode('nft_authority'), ticketNftState.toBuffer()],
   ticketNftProgramId
 )
+
+export const secondaryMarketCpiAuthority = async (secondaryMarketState, secondaryMarketProgramId) => await PublicKey.findProgramAddress(
+  [utf8.encode('market:cpi_authority'), secondaryMarketState.toBuffer()],
+  secondaryMarketProgramId
+)

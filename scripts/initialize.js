@@ -109,10 +109,50 @@ const initializeTicketNft = async (ticketSaleState) => {
   return state.publicKey
 }
 
+const initializeSecondaryMarket = async (
+  deploymentConfig,
+  eventRegistryState,
+  ticketSaleState,
+  ticketNftState,
+) => {
+  const state = Keypair.generate()
+  const program = anchor.workspace.SecondaryMarket
+  const deployer = provider.wallet.publicKey
+
+  await program.rpc.initialize(
+    eventRegistryState,
+    anchor.workspace.EventRegistry.programId,
+    ticketSaleState,
+    anchor.workspace.TicketSale.programId,
+    ticketNftState,
+    anchor.workspace.TicketNft.programId,
+    deploymentConfig.secondaryMarket.treasury,
+    deploymentConfig.secondaryMarket.protocolFee,
+    {
+      accounts: {
+        state: state.publicKey,
+        cpiAuthority: (await pda.secondaryMarketCpiAuthority(state.publicKey, program.programId))[0],
+        deployer,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+      signers: [state, provider.wallet.payer]
+    }
+  )
+
+  return state.publicKey
+}
+
 export const main = async (deploymentConfig) => {
   const eventRegistryState = await initializeEventRegistry(deploymentConfig)
   const ticketSaleState = await initializeTicketSale(deploymentConfig, eventRegistryState)
   const ticketNftState = await initializeTicketNft(ticketSaleState)
+  const secondaryMarketState = await initializeSecondaryMarket(
+    deploymentConfig,
+    eventRegistryState,
+    ticketSaleState,
+    ticketNftState,
+  )
 
   await writeFile(
     `./deployments/event-registry-${process.env.ENV}.json`,
@@ -120,6 +160,7 @@ export const main = async (deploymentConfig) => {
       eventRegistryState: eventRegistryState.toBase58(),
       ticketSaleState: ticketSaleState.toBase58(),
       ticketNftState: ticketNftState.toBase58(),
+      secondaryMarketState: secondaryMarketState.toBase58(),
     }, null, 2)
   )
 }
