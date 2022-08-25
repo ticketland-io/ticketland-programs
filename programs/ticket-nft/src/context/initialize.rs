@@ -26,7 +26,6 @@ pub struct Initialize<'info> {
   )]
   pub nft_authority: AccountInfo<'info>,
 
-
   #[account(mut)]
   pub deployer: Signer<'info>,
   

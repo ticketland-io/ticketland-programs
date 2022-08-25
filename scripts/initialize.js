@@ -94,6 +94,7 @@ const initializeTicketNft = async (ticketSaleState) => {
   await program.rpc.initialize(
     ticketSaleState,
     anchor.workspace.TicketSale.programId,
+    secondary_market_state,
     {
       accounts: {
         state: state.publicKey,
@@ -116,6 +117,7 @@ const initializeSecondaryMarket = async (
   ticketNftState,
 ) => {
   const state = Keypair.generate()
+  const treasury = new PublicKey(deploymentConfig.secondaryMarket.treasury)
   const program = anchor.workspace.SecondaryMarket
   const deployer = provider.wallet.publicKey
 
@@ -126,8 +128,8 @@ const initializeSecondaryMarket = async (
     anchor.workspace.TicketSale.programId,
     ticketNftState,
     anchor.workspace.TicketNft.programId,
-    deploymentConfig.secondaryMarket.treasury,
-    deploymentConfig.secondaryMarket.protocolFee,
+    treasury,
+    new anchor.BN(deploymentConfig.secondaryMarket.protocolFee),
     {
       accounts: {
         state: state.publicKey,

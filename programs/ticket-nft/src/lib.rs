@@ -9,6 +9,7 @@ use crate::{
     initialize::*,
 		create_ticket::*,
 		transfer::*,
+		set_secondary_market::*,
   },
 };
 
@@ -24,17 +25,34 @@ pub mod ticket_nft {
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
+	/// * `ticket_sale_state` - The state of the ticket sale program
+	/// * `ticket_sale_program` - The program id of the ticket sale program
 	pub fn initialize(
 		ctx: Context<Initialize>,
 		ticket_sale_state: Pubkey,
 		ticket_sale_program: Pubkey,
-		secondary_market_state: Pubkey,
-		secondary_market_program: Pubkey,
 	) -> Result<()> {
     processors::initialize::exec(
 			ctx,
 			ticket_sale_state,
 			ticket_sale_program,
+		)
+	}
+
+	/// Stores the secondary market state and program id
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `secondary_market_state` - The state of the secondary market program
+	/// * `secondary_market_program` - The program id of the secondary market program
+	pub fn set_secondary_market(
+		ctx: Context<SetSecondaryMarket>,
+		secondary_market_state: Pubkey,
+		secondary_market_program: Pubkey,
+	) -> Result<()> {
+    processors::set_secondary_market::exec(
+			ctx,
 			secondary_market_state,
 			secondary_market_program,
 		)

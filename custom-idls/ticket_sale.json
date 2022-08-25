@@ -1,652 +1,683 @@
 {
-	"version": "0.1.0",
-	"name": "ticket_sale",
-	"instructions": [
-		{
-			"name": "initialize",
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "eventRegistryState",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventRegistryProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "deployer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "treasury",
-					"type": "publicKey"
-				}
-			]
-		},
-		{
-			"name": "initEventCapacity",
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventCapacity",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventRegistryCpiAuthority",
-					"isMut": true,
-					"isSigner": true
-				}
-			],
-			"args": [
-				{
-					"name": "cpiAuthorityBump",
-					"type": "u8"
-				},
-				{
-					"name": "eventId",
-					"type": {
-						"array": ["u8", 32]
-					}
-				},
-				{
-					"name": "nTickets",
-					"type": "u32"
-				}
-			]
-		},
-		{
-			"name": "createSale",
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "sale",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventRegistryCpiAuthority",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "cpiAuthorityBump",
-					"type": "u8"
-				},
-				{
-					"name": "ticketTypeIndex",
-					"type": "u8"
-				},
-				{
-					"name": "eventId",
-					"type": {
-						"array": ["u8", 32]
-					}
-				},
-				{
-					"name": "ticketType",
-					"type": {
-						"defined": "TicketType"
-					}
-				}
-			]
-		},
-		{
-			"name": "fixedPricePurchase",
-			"docs": [
-				"Allows user to purchase a ticket on a fixed price",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
-				"* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
-				"* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "event",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "sale",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventCapacity",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "purchaseToken",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizerPurchaseTokenAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL"
-					]
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "serviceFeeAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The token token account that will be receiving the service fee"
-					]
-				},
-				{
-					"name": "treasury",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketBuyerAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": ["The ticket buyer ATA from which funds will be sent"]
-				},
-				{
-					"name": "ticketBuyer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "ticketNftProgramState",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNft",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"We use AccountInfo instead of Account<'info, Mint> because the latter will check if the",
-						"account is initialized. However, this account will be initialized in the Ticket NFT program after",
-						"the CPI is done."
-					]
-				},
-				{
-					"name": "nftAuthority",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "ticketMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketMetaplexMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "masterEdition",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNftAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT",
-						"until the end of the event.",
-						"We use AccountInfo for the reason explained above. Also we can add these constraints.",
-						"",
-						"associated_token::mint = ticket_nft,",
-						"associated_token::authority = cpi_authority,",
-						"",
-						"If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is",
-						"not account yet; it will be created in the Ticket NFT Program"
-					]
-				},
-				{
-					"name": "eventNft",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventNftMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNftProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "tokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "associatedTokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "metadataProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "seatIndex",
-					"type": "u32"
-				},
-				{
-					"name": "seatName",
-					"type": "string"
-				},
-				{
-					"name": "merkleProof",
-					"type": {
-						"vec": {
-							"array": ["u8", 32]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "freePurchase",
-			"docs": [
-				"Allows user to purchase a ticket on a fixed price",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
-				"* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
-				"* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "event",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "sale",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventCapacity",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "ticketBuyer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "ticketNftProgramState",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNft",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"We use AccountInfo instead of Account<'info, Mint> because the latter will check if the",
-						"account is initialized. However, this account will be initialized in the Ticket NFT program after",
-						"the CPI is done."
-					]
-				},
-				{
-					"name": "nftAuthority",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "ticketMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "masterEdition",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketMetaplexMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNftAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT",
-						"until the end of the event.",
-						"We use AccountInfo for the reason explained above. Also we can add these constraints.",
-						"",
-						"associated_token::mint = ticket_nft,",
-						"associated_token::authority = cpi_authority,",
-						"",
-						"If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is",
-						"not account yet; it will be created in the Ticket NFT Program"
-					]
-				},
-				{
-					"name": "eventNft",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventNftMetadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketNftProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "tokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "associatedTokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "metadataProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "seatIndex",
-					"type": "u32"
-				},
-				{
-					"name": "seatName",
-					"type": "string"
-				},
-				{
-					"name": "merkleProof",
-					"type": {
-						"vec": {
-							"array": ["u8", 32]
-						}
-					}
-				}
-			]
-		}
-	],
-	"accounts": [
-		{
-			"name": "EventCapacity",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "eventId",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "isInitialized",
-						"type": "bool"
-					},
-					{
-						"name": "availableTickets",
-						"type": "u32"
-					},
-					{
-						"name": "seats",
-						"type": {
-							"array": ["u8", 12500]
-						}
-					}
-				]
-			}
-		},
-		{
-			"name": "Sale",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "bump",
-						"type": "u8"
-					},
-					{
-						"name": "eventId",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "ticketTypeIndex",
-						"type": "u8"
-					},
-					{
-						"name": "ticketType",
-						"type": {
-							"defined": "TicketType"
-						}
-					}
-				]
-			}
-		},
-		{
-			"name": "State",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "bumps",
-						"type": {
-							"defined": "InitBumps"
-						}
-					},
-					{
-						"name": "totalSold",
-						"type": "u64"
-					},
-					{
-						"name": "eventRegistryProgram",
-						"type": "publicKey"
-					},
-					{
-						"name": "eventRegistryState",
-						"type": "publicKey"
-					},
-					{
-						"name": "treasury",
-						"type": "publicKey"
-					},
-					{
-						"name": "deployer",
-						"type": "publicKey"
-					},
-					{
-						"name": "cpiAuthority",
-						"type": "publicKey"
-					}
-				]
-			}
-		},
-		{
-			"name": "Event",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "id",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "bumps",
-						"type": {
-							"defined": "EventBumps"
-						}
-					},
-					{
-						"name": "eventOrganizer",
-						"type": "publicKey"
-					},
-					{
-						"name": "eventCapacity",
-						"type": "publicKey"
-					},
-					{
-						"name": "nTickets",
-						"type": "u32"
-					},
-					{
-						"name": "startTime",
-						"type": "i64"
-					},
-					{
-						"name": "endTime",
-						"type": "i64"
-					},
-					{
-						"name": "currency",
-						"type": {
-							"defined": "Currency"
-						}
-					},
-					{
-						"name": "eventOrganizerPurchaseTokenAta",
-						"type": "publicKey"
-					},
-					{
-						"name": "ticketTypes",
-						"type": {
-							"vec": {
-								"defined": "TicketType"
-							}
-						}
-					}
-				]
-			}
-		}
-	],
-	"types": [
+  "version": "0.1.0",
+  "name": "ticket_sale",
+  "instructions": [
+    {
+      "name": "initialize",
+      "docs": [
+        "Initializes the state i.e. instance of a given program",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `treasury` - The ticketland.io treasury address"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "treasury",
+          "type": "publicKey"
+        },
+        {
+          "name": "eventRegistryState",
+          "type": "publicKey"
+        },
+        {
+          "name": "eventRegistryProgram",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "initEventCapacity",
+      "docs": [
+        "Initializes the event capacity account for a single event. This account will be used by all the",
+        "ticket sale when a purchase happens. This will be a CPI call from the event registry which will be",
+        "called before any ticket sale is created.",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `cpi_authority_bump` - The bump of the cpi authority account created in the event registry program",
+        "* `event_id` - The event id for which this sale is created for",
+        "* `n_tickets` - Total tickets for the given event"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventRegistryCpiAuthority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiAuthorityBump",
+          "type": "u8"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nTickets",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "createSale",
+      "docs": [
+        "Creates a new sale",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `cpi_authority_bump` - The bump of the cpi authority account created in the event registry program",
+        "* `ticket_type_index` - A unique index that will differentiate multiple sales of one single event. This is useful to",
+        "create unique sale PDAs",
+        "* `event_id` - The event id for which this sale is created for",
+        "* `ticket_type` - The ticket type that will be sold during this sale"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The newly created Sale"
+          ]
+        },
+        {
+          "name": "eventRegistryCpiAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "This is the user that calls the create event in the event registry program"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "cpiAuthorityBump",
+          "type": "u8"
+        },
+        {
+          "name": "ticketTypeIndex",
+          "type": "u8"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "ticketType",
+          "type": {
+            "defined": "TicketType"
+          }
+        }
+      ]
+    },
+    {
+      "name": "fixedPricePurchase",
+      "docs": [
+        "Allows user to purchase a ticket on a fixed price",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
+        "* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL"
+          ]
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serviceFeeAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The token token account that will be receiving the service fee",
+            "This is also stored in the event.currency account"
+          ]
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyerAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ticket buyer ATA from which funds will be sent"
+          ]
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNft",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "We use AccountInfo instead of Account<'info, Mint> because the latter will check if the",
+            "account is initialized. However, this account will be initialized in the Ticket NFT program after",
+            "the CPI is done."
+          ]
+        },
+        {
+          "name": "nftAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetaplexMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "masterEdition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT",
+            "until the end of the event.",
+            "We use AccountInfo for the reason explained above (ticket_nft account). Also we can add these constraints.",
+            "",
+            "associated_token::mint = ticket_nft,",
+            "associated_token::authority = cpi_authority,",
+            "",
+            "If we add them then Anchor would have to load the TokenAccount and check these constraints. However, the ticket_nft",
+            "account as explained earlier is not created yet; it will be created in the Ticket NFT Program",
+            "This is not a security concern because this account will be forwarded to the Ticket NFT Program via a CPI call",
+            "and the latter will check those constraints anyways."
+          ]
+        },
+        {
+          "name": "eventNft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "merkleProof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "freePurchase",
+      "docs": [
+        "Allows user to purchase a ticket on a fixed price",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
+        "* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNft",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "We use AccountInfo instead of Account<'info, Mint> because the latter will check if the",
+            "account is initialized. However, this account will be initialized in the Ticket NFT program after",
+            "the CPI is done."
+          ]
+        },
+        {
+          "name": "nftAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "masterEdition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetaplexMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT",
+            "until the end of the event.",
+            "We use AccountInfo for the reason explained above. Also we can add these constraints.",
+            "",
+            "associated_token::mint = ticket_nft,",
+            "associated_token::authority = cpi_authority,",
+            "",
+            "If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is",
+            "not account yet; it will be created in the Ticket NFT Program"
+          ]
+        },
+        {
+          "name": "eventNft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "merkleProof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EventCapacity",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "availableTickets",
+            "type": "u32"
+          },
+          {
+            "name": "seats",
+            "type": {
+              "array": [
+                "u8",
+                12500
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sale",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "eventId",
+            "docs": [
+              "The unique id of the event which this sale is part of"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "ticketTypeIndex",
+            "docs": [
+              "A unique index that will differentiate multiple sales of one single event"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "ticketType",
+            "docs": [
+              "The ticket type that decides the sale mechanism"
+            ],
+            "type": {
+              "defined": "TicketType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          },
+          {
+            "name": "totalSold",
+            "docs": [
+              "Total tickets sold for all events"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "eventRegistryProgram",
+            "docs": [
+              "The Event Registry Program"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "eventRegistryState",
+            "docs": [
+              "A State account of the Event Registry Program"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury",
+            "docs": [
+              "This is ticketland.io treasury address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "deployer",
+            "docs": [
+              "The deployer of this instance"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "cpiAuthority",
+            "docs": [
+              "The account that will be calling other programs"
+            ],
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
 		{
 			"name": "SaleType",
 			"type": {
@@ -799,82 +830,87 @@
 				]
 			}
 		}
-	],
-	"errors": [
-		{
-			"code": 6000,
-			"name": "OnlyDeployer",
-			"msg": "Only Deployer"
-		},
-		{
-			"code": 6001,
-			"name": "NotOwnedByThisProgram",
-			"msg": "Not owner by this program"
-		},
-		{
-			"code": 6002,
-			"name": "WrongEventAccount",
-			"msg": "Not event account"
-		},
-		{
-			"code": 6003,
-			"name": "WrongEventCapacityAccount",
-			"msg": "Wrong event capacity"
-		},
-		{
-			"code": 6004,
-			"name": "InvalidProof",
-			"msg": "Invalid Merkle proof"
-		},
-		{
-			"code": 6005,
-			"name": "TicketSoldOut",
-			"msg": "Invalid sold out"
-		},
-		{
-			"code": 6006,
-			"name": "SeatNotAvailable",
-			"msg": "Seat not available"
-		},
-		{
-			"code": 6007,
-			"name": "UnexpectedSaleAccount",
-			"msg": "Expected different sale account"
-		},
-		{
-			"code": 6008,
-			"name": "UnsupportedPurchaseToken",
-			"msg": "Purchase token is not supported"
-		},
-		{
-			"code": 6009,
-			"name": "WrongEventOrganizer",
-			"msg": "Wrong event organizer"
-		},
-		{
-			"code": 6010,
-			"name": "WrongTreasuryAccount",
-			"msg": "Wrong treasury account"
-		},
-		{
-			"code": 6011,
-			"name": "SaleNotStarted",
-			"msg": "Sale has not started"
-		},
-		{
-			"code": 6012,
-			"name": "WrongSolTreasury",
-			"msg": "Wrong event organizer Sol treasury"
-		},
-		{
-			"code": 6013,
-			"name": "WrongTicketNftProgram",
-			"msg": "Wrong Ticket NFT program"
-		},
-		{
-			"code": 6014,
-			"name": "WrongTicketNftProgramStateAccount",
-			"msg": "Wrong Ticket NFT program state account"
-		}
-	]
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyDeployer",
+      "msg": "Only Deployer"
+    },
+    {
+      "code": 6001,
+      "name": "NotOwnedByThisProgram",
+      "msg": "Not owner by this program"
+    },
+    {
+      "code": 6002,
+      "name": "WrongEventAccount",
+      "msg": "Not event account"
+    },
+    {
+      "code": 6003,
+      "name": "WrongEventCapacityAccount",
+      "msg": "Wrong event capacity"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidProof",
+      "msg": "Invalid Merkle proof"
+    },
+    {
+      "code": 6005,
+      "name": "TicketSoldOut",
+      "msg": "Invalid sold out"
+    },
+    {
+      "code": 6006,
+      "name": "SeatNotAvailable",
+      "msg": "Seat not available"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedSaleAccount",
+      "msg": "Expected different sale account"
+    },
+    {
+      "code": 6008,
+      "name": "UnsupportedPurchaseToken",
+      "msg": "Purchase token is not supported"
+    },
+    {
+      "code": 6009,
+      "name": "WrongEventOrganizer",
+      "msg": "Wrong event organizer"
+    },
+    {
+      "code": 6010,
+      "name": "WrongTreasuryAccount",
+      "msg": "Wrong treasury account"
+    },
+    {
+      "code": 6011,
+      "name": "SaleNotStarted",
+      "msg": "Sale has not started"
+    },
+    {
+      "code": 6012,
+      "name": "SaleFinished",
+      "msg": "Sale has finished"
+    },
+    {
+      "code": 6013,
+      "name": "WrongSolTreasury",
+      "msg": "Wrong event organizer Sol treasury"
+    },
+    {
+      "code": 6014,
+      "name": "WrongTicketNftProgram",
+      "msg": "Wrong Ticket NFT program"
+    },
+    {
+      "code": 6015,
+      "name": "WrongTicketNftProgramStateAccount",
+      "msg": "Wrong Ticket NFT program state account"
+    }
+  ]
 }
