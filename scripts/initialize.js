@@ -94,7 +94,6 @@ const initializeTicketNft = async (ticketSaleState) => {
   await program.rpc.initialize(
     ticketSaleState,
     anchor.workspace.TicketSale.programId,
-    secondary_market_state,
     {
       accounts: {
         state: state.publicKey,
@@ -145,6 +144,23 @@ const initializeSecondaryMarket = async (
   return state.publicKey
 }
 
+const setSecondaryMarket = async (ticketNftState, secondaryMarketState) => {
+  const program = anchor.workspace.TicketNft
+  const deployer = provider.wallet.publicKey
+
+  await program.rpc.setSecondaryMarket(
+    secondaryMarketState,
+    anchor.workspace.SecondaryMarket.programId,
+    {
+      accounts: {
+        state: ticketNftState,
+        deployer,
+      },
+      signers: [provider.wallet.payer]
+    }
+  )
+}
+
 export const main = async (deploymentConfig) => {
   const eventRegistryState = await initializeEventRegistry(deploymentConfig)
   const ticketSaleState = await initializeTicketSale(deploymentConfig, eventRegistryState)
@@ -155,6 +171,8 @@ export const main = async (deploymentConfig) => {
     ticketSaleState,
     ticketNftState,
   )
+
+  await setSecondaryMarket(ticketNftState, secondaryMarketState)
 
   await writeFile(
     `./deployments/event-registry-${process.env.ENV}.json`,

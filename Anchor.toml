@@ -5,16 +5,19 @@ seeds = false
 event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
 ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+secondary_market = "ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f"
 
 [programs.testnet]
 event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
 ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+secondary_market = "ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f"
 
 [programs.localnet]
 event_registry = "TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE"
 ticket_sale = "6banhWF9WKQk26NtgX6TqHNmAKgvX9aJmgaBvPmYCCK3"
 ticket_nft = "599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL"
+secondary_market = "ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f"
 
 [registry]
 url = "https://github.com/Apocentre/ticket-land-programs"
