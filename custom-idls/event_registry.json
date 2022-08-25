@@ -1,743 +1,766 @@
 {
-	"version": "0.1.0",
-	"name": "event_registry",
-	"instructions": [
-		{
-			"name": "initialize",
-			"docs": [
-				"Initializes the state i.e. instance of a given program",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `supported_currencies` - The list of currencies the current instant will support. These are the",
-				"currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to",
-				"create a new event",
-				"* `seller_fee_basis_points` - This will be attached to each event NFT metadata that is created. NFT tickets are",
-				"non-transferable. However, the same does not apply for the Event NFTs (i.e. Event NFT Collection). We envision event organizer",
-				"to want to sell Event NFTs in the future for charity purposes for example."
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "eventNftAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "deployer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "supportedCurrencies",
-					"type": {
-						"vec": {
-							"defined": "Currency"
-						}
-					}
-				},
-				{
-					"name": "sellerFeeBasisPoints",
-					"type": "u16"
-				}
-			]
-		},
-		{
-			"name": "createEvent",
-			"docs": [
-				"Allows anyone who has deposited the minimum deposit amount for the selected currency to create a new event.",
-				"This will create the Event NFT as well.",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `event_id` - The event id",
-				"* `start_time` - The Solana time that describes the start of the event",
-				"* `end_time` - The Solana time that describes the end of the event",
-				"* `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices"
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "event",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "depositToken",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "purchaseToken",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizerAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The deposit token ATA from which the event creation deposit will be transferred from"
-					]
-				},
-				{
-					"name": "eventOrganizerPurchaseTokenAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The ATA where the funds from selling the tickets will be transferred to"
-					]
-				},
-				{
-					"name": "fundManager",
-					"isMut": true,
-					"isSigner": false,
-					"docs": ["Each user will have his own PDA"]
-				},
-				{
-					"name": "fundManagerAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"The ATA that holds creators deposit in the given deposit token"
-					]
-				},
-				{
-					"name": "eventCapacity",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketSaleProgramState",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "ticketSaleProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "tokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "associatedTokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "eventId",
-					"type": {
-						"array": ["u8", 32]
-					}
-				},
-				{
-					"name": "nTickets",
-					"type": "u32"
-				},
-				{
-					"name": "startTime",
-					"type": "i64"
-				},
-				{
-					"name": "endTime",
-					"type": "i64"
-				},
-				{
-					"name": "ticketTypes",
-					"type": {
-						"vec": {
-							"defined": "TicketType"
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "createEventNft",
-			"docs": [
-				"This will create the Event NFT for the given event id.",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `event_id` - The event id",
-				"* `symbol` - The symbol that will be used in the Event NFT metadata",
-				"* `uri` - The uti that will be used in the Event NFT metadata"
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "event",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventNftAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventNft",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "organizerEventNftAta",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"This will be under the event organizer's control. However, the metadata will be controlled by the event_nft_authority"
-					]
-				},
-				{
-					"name": "metadata",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "masterEdition",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": true,
-					"isSigner": true
-				},
-				{
-					"name": "tokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "associatedTokenProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "metadataProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "eventId",
-					"type": {
-						"array": ["u8", 32]
-					}
-				},
-				{
-					"name": "name",
-					"type": "string"
-				},
-				{
-					"name": "symbol",
-					"type": "string"
-				},
-				{
-					"name": "uri",
-					"type": "string"
-				}
-			]
-		},
-		{
-			"name": "createTicketSale",
-			"docs": [
-				"Allows the creator of the event that is part of the accounts of this instruction to create a new ticket sale",
-				"for one of the ticket types defined when the event was created.",
-				"Note that the creator will have to call this as many ticket types as are defined in the ticket types list stored in t",
-				"the event account.",
-				"",
-				"# Arguments",
-				"",
-				"* `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the",
-				"ticket sale program to create unique PDAs as well as access to ticket_type data."
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "event",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "ticketSaleProgramState",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "ticketSaleState",
-					"isMut": true,
-					"isSigner": false,
-					"docs": [
-						"Note that we use AccountInfo which means that there will be no checks if the account indeed has the Sale",
-						"data. However, since this is will further be passed as a CPI account to the Ticket Sale, the latter will",
-						"do all the checks needed."
-					]
-				},
-				{
-					"name": "cpiAuthority",
-					"isMut": true,
-					"isSigner": false
-				},
-				{
-					"name": "eventOrganizer",
-					"isMut": true,
-					"isSigner": true,
-					"docs": ["This is the user that created the event earlier"]
-				},
-				{
-					"name": "ticketSaleProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "systemProgram",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "rent",
-					"isMut": false,
-					"isSigner": false
-				}
-			],
-			"args": [
-				{
-					"name": "ticketTypeIndex",
-					"type": "u8"
-				},
-				{
-					"name": "eventId",
-					"type": {
-						"array": ["u8", 32]
-					}
-				}
-			]
-		},
-		{
-			"name": "updateSupportedCurrencies",
-			"docs": [
-				"Allows the deployer to update the supported currencies",
-				"",
-				"# Arguments",
-				"",
-				"* `ctx` - The Anchor context holding the accounts",
-				"* `supported_currencies` - The list of currencies the current instant will support. These are the",
-				"currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to",
-				"create a new event"
-			],
-			"accounts": [
-				{
-					"name": "state",
-					"isMut": false,
-					"isSigner": false
-				},
-				{
-					"name": "deployer",
-					"isMut": true,
-					"isSigner": true
-				}
-			],
-			"args": [
-				{
-					"name": "supportedCurrencies",
-					"type": {
-						"vec": {
-							"defined": "Currency"
-						}
-					}
-				}
-			]
-		}
-	],
-	"accounts": [
-		{
-			"name": "State",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "bumps",
-						"type": {
-							"defined": "InitBumps"
-						}
-					},
-					{
-						"name": "nEvents",
-						"type": "u64"
-					},
-					{
-						"name": "sellerFeeBasisPoints",
-						"type": "u16"
-					},
-					{
-						"name": "cpiAuthority",
-						"type": "publicKey"
-					},
-					{
-						"name": "deployer",
-						"type": "publicKey"
-					},
-					{
-						"name": "supportedCurrencies",
-						"type": {
-							"vec": {
-								"defined": "Currency"
-							}
-						}
-					}
-				]
-			}
-		},
-		{
-			"name": "Event",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "id",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "bumps",
-						"type": {
-							"defined": "EventBumps"
-						}
-					},
-					{
-						"name": "eventOrganizer",
-						"type": "publicKey"
-					},
-					{
-						"name": "eventCapacity",
-						"type": "publicKey"
-					},
-					{
-						"name": "nTickets",
-						"type": "u32"
-					},
-					{
-						"name": "startTime",
-						"type": "i64"
-					},
-					{
-						"name": "endTime",
-						"type": "i64"
-					},
-					{
-						"name": "currency",
-						"type": {
-							"defined": "Currency"
-						}
-					},
-					{
-						"name": "eventOrganizerPurchaseTokenAta",
-						"type": "publicKey"
-					},
-					{
-						"name": "ticketTypes",
-						"type": {
-							"vec": {
-								"defined": "TicketType"
-							}
-						}
-					}
-				]
-			}
-		}
-	],
-	"types": [
-		{
-			"name": "SaleType",
-			"type": {
-				"kind": "enum",
-				"variants": [
-					{
-						"name": "Free"
-					},
-					{
-						"name": "FixedPrice",
-						"fields": [
-							{
-								"name": "amount",
-								"type": "u64"
-							}
-						]
-					},
-					{
-						"name": "Refundable",
-						"fields": [
-							{
-								"name": "amount",
-								"type": "u64"
-							}
-						]
-					},
-					{
-						"name": "DutchAuction",
-						"fields": [
-							{
-								"name": "start_price",
-								"type": "u64"
-							},
-							{
-								"name": "end_price",
-								"type": "u64"
-							},
-							{
-								"name": "curve_length",
-								"type": "u16"
-							},
-							{
-								"name": "drop_interval",
-								"type": "u16"
-							}
-						]
-					}
-				]
-			}
-		},
-		{
-			"name": "TicketType",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "n_tickets",
-						"type": "u32"
-					},
-					{
-						"name": "sale_type",
-						"type": {
-							"defined": "SaleType"
-						}
-					},
-					{
-						"name": "sale_start_time",
-						"type": "i64"
-					},
-					{
-						"name": "merkle_root",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "seat_range",
-						"type": {
-							"defined": "SeatRange"
-						}
-					}
-				]
-			}
-		},
-		{
-			"name": "Currency",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "mint_account",
-						"type": "publicKey"
-					},
-					{
-						"name": "treasury_ata",
-						"type": "publicKey"
-					},
-					{
-						"name": "deposit_amount",
-						"type": "u64"
-					},
-					{
-						"name": "service_fee",
-						"type": "u16"
-					}
-				]
-			}
-		},
-		{
-			"name": "InitBumps",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "eventNftAuthority",
-						"type": "u8"
-					},
-					{
-						"name": "cpiAuthority",
-						"type": "u8"
-					}
-				]
-			}
-		},
-		{
-			"name": "EventBumps",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "event",
-						"type": "u8"
-					},
-					{
-						"name": "event_nft",
-						"type": "u8"
-					}
-				]
-			}
-		},
-		{
-			"name": "SeatRange",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "l",
-						"type": "u32"
-					},
-					{
-						"name": "r",
-						"type": "u32"
-					}
-				]
-			}
-		}
-	],
-	"errors": [
-		{
-			"code": 6000,
-			"name": "OnlyDeployer",
-			"msg": "Only deployer"
-		},
-		{
-			"code": 6001,
-			"name": "TooManyCurrencies",
-			"msg": "Too many currencies"
-		},
-		{
-			"code": 6002,
-			"name": "TooManyTicketTypes",
-			"msg": "Too many ticket types"
-		},
-		{
-			"code": 6003,
-			"name": "UnsupportedDepositToken",
-			"msg": "Deposit token is not supported"
-		},
-		{
-			"code": 6004,
-			"name": "UnsupportedPurchaseToken",
-			"msg": "Purchase token is not supported"
-		},
-		{
-			"code": 6005,
-			"name": "NotEnoughDeposit",
-			"msg": "Not enough deposit"
-		},
-		{
-			"code": 6006,
-			"name": "InvalidMerkleProof",
-			"msg": "Invalid Merkle proof"
-		},
-		{
-			"code": 6007,
-			"name": "WrongTicketSaleProgramStateAccount",
-			"msg": "Wrong ticket sale program state account"
-		},
-		{
-			"code": 6008,
-			"name": "OnlyEventOrganizer",
-			"msg": "Only event organizer"
-		},
-		{
-			"code": 6009,
-			"name": "InvalidTicketTypeIndex",
-			"msg": "Invalid ticket type index"
-		},
-		{
-			"code": 6010,
-			"name": "WrongTicketTypeForIndex",
-			"msg": "Wrong ticket type for index"
-		},
-		{
-			"code": 6011,
-			"name": "TicketSaleMustBeOwner",
-			"msg": "Ticket sale must the the owner"
-		}
-	]
+  "version": "0.1.0",
+  "name": "event_registry",
+  "instructions": [
+    {
+      "name": "initialize",
+      "docs": [
+        "Initializes the state i.e. instance of a given program",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `supported_currencies` - The list of currencies the current instant will support. These are the",
+        "currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to",
+        "create a new event",
+        "* `seller_fee_basis_points` - This will be attached to each event NFT metadata that is created. NFT tickets are",
+        "non-transferable. However, the same does not apply for the Event NFTs (i.e. Event NFT Collection). We envision event organizer",
+        "to want to sell Event NFTs in the future for charity purposes for example."
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "eventNftAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "supportedCurrencies",
+          "type": {
+            "vec": {
+              "defined": "Currency"
+            }
+          }
+        },
+        {
+          "name": "sellerFeeBasisPoints",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "createEvent",
+      "docs": [
+        "Allows anyone who has deposited the minimum deposit amount for the selected currency to create a new event.",
+        "This will create the Event NFT as well.",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id",
+        "* `start_time` - The Solana time that describes the start of the event",
+        "* `end_time` - The Solana time that describes the end of the event",
+        "* `ticket_types` - The details of each ticket type. An event might have a lot of different ticket types and thus prices"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The deposit token ATA from which the event creation deposit will be transferred from"
+          ]
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA where the funds from selling the tickets will be transferred to"
+          ]
+        },
+        {
+          "name": "fundManager",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Each user will have his own PDA"
+          ]
+        },
+        {
+          "name": "fundManagerAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA that holds creators deposit in the given deposit token"
+          ]
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleProgramState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketSaleProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nTickets",
+          "type": "u32"
+        },
+        {
+          "name": "startTime",
+          "type": "i64"
+        },
+        {
+          "name": "endTime",
+          "type": "i64"
+        },
+        {
+          "name": "ticketTypes",
+          "type": {
+            "vec": {
+              "defined": "TicketType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "createEventNft",
+      "docs": [
+        "This will create the Event NFT for the given event id.",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id",
+        "* `symbol` - The symbol that will be used in the Event NFT metadata",
+        "* `uri` - The uti that will be used in the Event NFT metadata"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNft",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "organizerEventNftAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "This will be under the event organizer's control. However, the metadata will be controlled by the event_nft_authority"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "masterEdition",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createTicketSale",
+      "docs": [
+        "Allows the creator of the event that is part of the accounts of this instruction to create a new ticket sale",
+        "for one of the ticket types defined when the event was created.",
+        "Note that the creator will have to call this as many ticket types as are defined in the ticket types list stored in t",
+        "the event account.",
+        "",
+        "# Arguments",
+        "",
+        "* `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the",
+        "ticket sale program to create unique PDAs as well as access to ticket_type data."
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketSaleState",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Note that we use AccountInfo which means that there will be no checks if the account indeed has the Sale",
+            "data. However, since this is will further be passed as a CPI account to the Ticket Sale, the latter will",
+            "do all the checks needed."
+          ]
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "This is the user that created the event earlier"
+          ]
+        },
+        {
+          "name": "ticketSaleProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ticketTypeIndex",
+          "type": "u8"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateSupportedCurrencies",
+      "docs": [
+        "Allows the deployer to update the supported currencies",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `supported_currencies` - The list of currencies the current instant will support. These are the",
+        "currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to",
+        "create a new event"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "supportedCurrencies",
+          "type": {
+            "vec": {
+              "defined": "Currency"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          },
+          {
+            "name": "nEvents",
+            "type": "u64"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "deployer",
+            "type": "publicKey"
+          },
+          {
+            "name": "supportedCurrencies",
+            "type": {
+              "vec": {
+                "defined": "Currency"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Event",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "EventBumps"
+            }
+          },
+          {
+            "name": "eventOrganizer",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventCapacity",
+            "type": "publicKey"
+          },
+          {
+            "name": "nTickets",
+            "type": "u32"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "currency",
+            "type": {
+              "defined": "Currency"
+            }
+          },
+          {
+            "name": "eventOrganizerPurchaseTokenAta",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketTypes",
+            "type": {
+              "vec": {
+                "defined": "TicketType"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "SaleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "FixedPrice",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Refundable",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DutchAuction",
+            "fields": [
+              {
+                "name": "start_price",
+                "type": "u64"
+              },
+              {
+                "name": "end_price",
+                "type": "u64"
+              },
+              {
+                "name": "curve_length",
+                "type": "u16"
+              },
+              {
+                "name": "drop_interval",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TicketType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "n_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "sale_type",
+            "type": {
+              "defined": "SaleType"
+            }
+          },
+          {
+            "name": "sale_start_time",
+            "type": "i64"
+          },
+          {
+            "name": "sale_end_time",
+            "type": "i64"
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "seat_range",
+            "type": {
+              "defined": "SeatRange"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Currency",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_account",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury_ata",
+            "type": "publicKey"
+          },
+          {
+            "name": "deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "service_fee",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventNftAuthority",
+            "type": "u8"
+          },
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "u8"
+          },
+          {
+            "name": "event_nft",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SeatRange",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "l",
+            "type": "u32"
+          },
+          {
+            "name": "r",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyDeployer",
+      "msg": "Only deployer"
+    },
+    {
+      "code": 6001,
+      "name": "TooManyCurrencies",
+      "msg": "Too many currencies"
+    },
+    {
+      "code": 6002,
+      "name": "TooManyTicketTypes",
+      "msg": "Too many ticket types"
+    },
+    {
+      "code": 6003,
+      "name": "UnsupportedDepositToken",
+      "msg": "Deposit token is not supported"
+    },
+    {
+      "code": 6004,
+      "name": "UnsupportedPurchaseToken",
+      "msg": "Purchase token is not supported"
+    },
+    {
+      "code": 6005,
+      "name": "NotEnoughDeposit",
+      "msg": "Not enough deposit"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMerkleProof",
+      "msg": "Invalid Merkle proof"
+    },
+    {
+      "code": 6007,
+      "name": "WrongTicketSaleProgramStateAccount",
+      "msg": "Wrong ticket sale program state account"
+    },
+    {
+      "code": 6008,
+      "name": "OnlyEventOrganizer",
+      "msg": "Only event organizer"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidTicketTypeIndex",
+      "msg": "Invalid ticket type index"
+    },
+    {
+      "code": 6010,
+      "name": "WrongTicketTypeForIndex",
+      "msg": "Wrong ticket type for index"
+    },
+    {
+      "code": 6011,
+      "name": "TicketSaleMustBeOwner",
+      "msg": "Ticket sale must the the owner"
+    }
+  ]
 }

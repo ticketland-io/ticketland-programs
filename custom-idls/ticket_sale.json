@@ -805,6 +805,10 @@
 						"name": "sale_start_time",
 						"type": "i64"
 					},
+          {
+            "name": "sale_end_time",
+            "type": "i64"
+          },
 					{
 						"name": "merkle_root",
 						"type": {
