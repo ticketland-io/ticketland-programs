@@ -47,7 +47,6 @@ pub async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair)
   ticket_nft_runner.initialize(
     &ticket_nft_state,
     ticket_sale_state.pubkey(),
-    secondary_market_state.pubkey(),
   ).await;
 
   secondary_market_runner.initialize(
@@ -57,6 +56,11 @@ pub async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair)
     ticket_nft_state.pubkey(),
     treasury.pubkey(),
     500, // 5%
+  ).await;
+  // Set the secondary market state in the ticket nft program
+  ticket_nft_runner.set_secondary_market_state(
+    ticket_nft_state.pubkey(),
+    secondary_market_state.pubkey(),
   ).await;
 
   (

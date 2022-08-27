@@ -37,7 +37,6 @@ async fn should_initialize_ticket_nft(ctx: &mut TestContext) {
   ticket_nft_runner.initialize(
     &ticket_nft_state,
     ticket_sale_state.pubkey(),
-    secondary_market_state.pubkey(),
   ).await;
 
   let mut pt = ticket_nft_runner.pt.lock().await;

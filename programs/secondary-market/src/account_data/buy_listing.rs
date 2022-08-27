@@ -11,4 +11,7 @@ pub struct BuyListing {
 
   /// The price that buyer is willing to pay to purchase a ticket
   pub bid_price: u64,
+
+  /// The buyer that is creating this buy listing
+  pub buyer: Pubkey,
 }

@@ -76,7 +76,6 @@ async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
   ticket_nft_runner.initialize(
     &ticket_nft_state,
     ticket_sale_state.pubkey(),
-    secondary_market_state.pubkey(),
   ).await;
 
   (

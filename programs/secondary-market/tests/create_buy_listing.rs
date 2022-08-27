@@ -176,6 +176,7 @@ async fn should_create_buy_listing(ctx: &mut TestContext) {
     let buy_listing_data = pt.get_account::<secondary_market::account_data::buy_listing::BuyListing>(buy_listing).await;
 
     assert_eq!(buy_listing_data.bumps.listing_escrow, listing_escrow_bump);
+    assert_eq!(buy_listing_data.buyer, ticket_buyer.pubkey());
     assert_eq!(buy_listing_data.bid_price, sol_to_lamports(1.1));
   }
 }

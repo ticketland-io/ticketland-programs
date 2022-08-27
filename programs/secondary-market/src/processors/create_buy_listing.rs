@@ -56,6 +56,7 @@ pub fn exec(
   buy_listing.bumps = BuyListingBumps {
     listing_escrow: *ctx.bumps.get("listing_escrow").unwrap(),
   };
+  buy_listing.buyer = ctx.accounts.ticket_buyer.key();
   buy_listing.bid_price = bid_price;
 
   let buyer_data = &mut ctx.accounts.buyer_data;

@@ -34,7 +34,6 @@ async fn should_initialize_secondary_market(ctx: &mut TestContext) {
   ticket_nft_runner.initialize(
     &ticket_nft_state,
     ticket_sale_state.pubkey(),
-    secondary_market_state.pubkey(),
   ).await;
 
   let treasury = event_registry_runner.get_participant(5);

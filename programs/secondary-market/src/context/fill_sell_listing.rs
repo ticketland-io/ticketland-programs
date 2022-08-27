@@ -72,7 +72,7 @@ pub struct FillSellListing<'info> {
   #[account()]
   pub sale: AccountInfo<'info>,
 
-  /// CHECK: THe PDA that will be sending CPI to other programs i.e. TicketSale Program
+  /// CHECK: THe PDA that will be sending CPI to other programs
   #[account(
     seeds = [b"market:cpi_authority", state.key().as_ref()],
     bump = state.bumps.cpi_authority,

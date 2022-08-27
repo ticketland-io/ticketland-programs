@@ -49,7 +49,6 @@ impl Runner {
     &mut self,
     state: &Keypair,
     ticket_sale_state: Pubkey,
-    secondary_market_state: Pubkey,
   ) {
     let accounts = ticket_nft::accounts::Initialize {
       state: state.pubkey(),
@@ -62,6 +61,29 @@ impl Runner {
     let data = ticket_nft::instruction::Initialize {
       ticket_sale_state,
       ticket_sale_program: ticket_sale_program_id(),
+    }.data();
+
+    let ix = Instruction {
+      program_id: ticket_nft_program_id(),
+      accounts,
+      data,
+    };
+
+    let mut lock_pt = self.pt.lock().await;
+    assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
+  }
+
+  pub async fn set_secondary_market_state(
+    &mut self,
+    state: Pubkey,
+    secondary_market_state: Pubkey,
+  ) {
+    let accounts = ticket_nft::accounts::SetSecondaryMarket {
+      state,
+      deployer: self.deployer.pubkey(),
+    }.to_account_metas(None);
+
+    let data = ticket_nft::instruction::SetSecondaryMarket {
       secondary_market_state,
       secondary_market_program: secondary_market_program_id(),
     }.data();
@@ -73,6 +95,6 @@ impl Runner {
     };
 
     let mut lock_pt = self.pt.lock().await;
-    assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
+    assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer])).await.is_ok());
   }
 }
