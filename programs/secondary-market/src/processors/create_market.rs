@@ -1,14 +1,9 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
-use common::{
-  account_data::{
-    serialization::deser,
-  },
-};
 use crate::{
   context::create_market::*,
   account_data::{
-    event::Event, market::MarketBump,
+    market::*,
   },
   acl::{
     event_organizer,

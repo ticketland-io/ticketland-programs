@@ -5,11 +5,6 @@ pub mod processors;
 pub mod utils;
 
 use anchor_lang::prelude::*;
-use common::{
-	state::{
-		ticket_type::TicketType,
-	},
-};
 use crate::{
   context::{
     initialize::*,
@@ -75,13 +70,11 @@ pub mod ticket_sale {
 		_cpi_authority_bump: u8,
 		ticket_type_index: u8,
 		event_id: [u8; 32],
-		ticket_type: TicketType,
 	) -> Result<()> {
 		processors::create_sale::exec(
 			ctx,
 			ticket_type_index,
 			event_id,
-			ticket_type,
 		)
 	}
 

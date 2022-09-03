@@ -15,7 +15,6 @@ use crate::{
 		initialize::*,
 		create_event::*,
 		create_event_nft::*,
-		create_ticket_sale::*,
 		update_supported_currencies::*,
 	},
 };
