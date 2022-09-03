@@ -6,8 +6,17 @@ use common::{
 };
 use crate::{
   context::create_sale::CreateSale,
+  acl::{
+    event_organizer,
+  }, 
 };
 
+#[access_control(
+  event_organizer::check(
+    &ctx.accounts.event,
+    &ctx.accounts.event_organizer,
+  )
+)]
 pub fn exec(
   ctx: Context<CreateSale>,
   ticket_type_index: u8,
