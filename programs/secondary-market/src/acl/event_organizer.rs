@@ -21,7 +21,7 @@ pub fn check<'info>(
   let event: Event = deser(event.clone())?;
 
   // The provided event organizer account should be the same as the one stored in the event
-  require!(event_organizer.key() == event.event_organizer, ErrorCode::WrongEventOrganizer);
+  require!(event_organizer.key() == event.event_organizer, ErrorCode::OnlyEventOrganizer);
 
   Ok(())
 }

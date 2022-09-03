@@ -10,25 +10,23 @@ use crate::{
   account_data::{
     event::Event, market::MarketBump,
   },
-  utils::program_error::ErrorCode,
+  acl::{
+    event_organizer,
+  }, 
 };
 
-fn event_account_checks(ctx: &Context<CreateMarket>) -> Result<()> {
-  let event: Event = deser(ctx.accounts.event.clone())?;
-  
-  require!(event.event_organizer == ctx.accounts.event_organizer.key(), ErrorCode::OnlyEventOrganizer);
-
-  Ok(())
-}
-
+#[access_control(
+  event_organizer::check(
+    &ctx.accounts.event,
+    &ctx.accounts.event_organizer,
+  )
+)]
 pub fn exec(
   ctx: Context<CreateMarket>,
   event_id: [u8; 32],
   organizer_resale_fee: u16,
   resale_cap: u16,
 ) -> Result<()> {
-  event_account_checks(&ctx)?;
-
   let state = &mut ctx.accounts.state;
   state.n_markets =  state.n_markets.safe_add(1)?;
 
