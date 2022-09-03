@@ -258,7 +258,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       wrong_event_organizer.pubkey(),
     ).await;
 
-    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
+    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer);
   }
 
   // move to the end of sale

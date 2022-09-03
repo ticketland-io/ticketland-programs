@@ -316,90 +316,6 @@
       ]
     },
     {
-      "name": "createTicketSale",
-      "docs": [
-        "Allows the creator of the event that is part of the accounts of this instruction to create a new ticket sale",
-        "for one of the ticket types defined when the event was created.",
-        "Note that the creator will have to call this as many ticket types as are defined in the ticket types list stored in t",
-        "the event account.",
-        "",
-        "# Arguments",
-        "",
-        "* `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the",
-        "ticket sale program to create unique PDAs as well as access to ticket_type data."
-      ],
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "event",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ticketSaleProgramState",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ticketSaleState",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Note that we use AccountInfo which means that there will be no checks if the account indeed has the Sale",
-            "data. However, since this is will further be passed as a CPI account to the Ticket Sale, the latter will",
-            "do all the checks needed."
-          ]
-        },
-        {
-          "name": "cpiAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "eventOrganizer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "This is the user that created the event earlier"
-          ]
-        },
-        {
-          "name": "ticketSaleProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "ticketTypeIndex",
-          "type": "u8"
-        },
-        {
-          "name": "eventId",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "updateSupportedCurrencies",
       "docs": [
         "Allows the deployer to update the supported currencies",
@@ -700,67 +616,51 @@
         ]
       }
     }
-  ],
   "errors": [
-    {
-      "code": 6000,
-      "name": "OnlyDeployer",
-      "msg": "Only deployer"
-    },
-    {
-      "code": 6001,
-      "name": "TooManyCurrencies",
-      "msg": "Too many currencies"
-    },
-    {
-      "code": 6002,
-      "name": "TooManyTicketTypes",
-      "msg": "Too many ticket types"
-    },
-    {
-      "code": 6003,
-      "name": "UnsupportedDepositToken",
-      "msg": "Deposit token is not supported"
-    },
-    {
-      "code": 6004,
-      "name": "UnsupportedPurchaseToken",
-      "msg": "Purchase token is not supported"
-    },
-    {
-      "code": 6005,
-      "name": "NotEnoughDeposit",
-      "msg": "Not enough deposit"
-    },
-    {
-      "code": 6006,
-      "name": "InvalidMerkleProof",
-      "msg": "Invalid Merkle proof"
-    },
-    {
-      "code": 6007,
-      "name": "WrongTicketSaleProgramStateAccount",
-      "msg": "Wrong ticket sale program state account"
-    },
-    {
-      "code": 6008,
-      "name": "OnlyEventOrganizer",
-      "msg": "Only event organizer"
-    },
-    {
-      "code": 6009,
-      "name": "InvalidTicketTypeIndex",
-      "msg": "Invalid ticket type index"
-    },
-    {
-      "code": 6010,
-      "name": "WrongTicketTypeForIndex",
-      "msg": "Wrong ticket type for index"
-    },
-    {
-      "code": 6011,
-      "name": "TicketSaleMustBeOwner",
-      "msg": "Ticket sale must the the owner"
-    }
-  ]
-}
+      {
+        "code": 6000,
+        "name": "OnlyDeployer",
+        "msg": "Only deployer"
+      },
+      {
+        "code": 6001,
+        "name": "TooManyCurrencies",
+        "msg": "Too many currencies"
+      },
+      {
+        "code": 6002,
+        "name": "TooManyTicketTypes",
+        "msg": "Too many ticket types"
+      },
+      {
+        "code": 6003,
+        "name": "UnsupportedDepositToken",
+        "msg": "Deposit token is not supported"
+      },
+      {
+        "code": 6004,
+        "name": "UnsupportedPurchaseToken",
+        "msg": "Purchase token is not supported"
+      },
+      {
+        "code": 6005,
+        "name": "NotEnoughDeposit",
+        "msg": "Not enough deposit"
+      },
+      {
+        "code": 6006,
+        "name": "InvalidMerkleProof",
+        "msg": "Invalid Merkle proof"
+      },
+      {
+        "code": 6007,
+        "name": "WrongTicketSaleProgramStateAccount",
+        "msg": "Wrong ticket sale program state account"
+      },
+      {
+        "code": 6008,
+        "name": "TicketSaleMustBeOwner",
+        "msg": "Ticket sale must the the owner"
+      }
+    ]
+  }

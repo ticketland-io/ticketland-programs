@@ -458,7 +458,7 @@ async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
     seat_index,
   ).await;
   
-  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongEventOrganizer);
+  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer);
 }
 
 #[test_context(TestContext)]

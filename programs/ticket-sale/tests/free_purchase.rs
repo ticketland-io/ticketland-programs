@@ -181,11 +181,11 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
   ).await;
   
   // Create a new ticket sale for the first ticket type
-  let _ = event_registry_runner.create_ticket_sale(
+  let _ = ticket_sale_runner.create_sale(
+    ticket_sale_state.pubkey(),
     event_registry_state.pubkey(),
     event_id,
     &event_organizer,
-    ticket_sale_state.pubkey(),
     0, // ticket_type_index
   ).await;
 

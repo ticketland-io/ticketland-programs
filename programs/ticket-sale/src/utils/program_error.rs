@@ -12,8 +12,6 @@ pub enum ErrorCode {
   WrongEventCapacityAccount,
   #[msg("Invalid Merkle proof")]
   InvalidProof,
-  #[msg("Invalid ticket type index")]
-  InvalidTicketTypeIndex,
   #[msg("Invalid sold out")]
   TicketSoldOut,
   #[msg("Seat not available")]
@@ -30,10 +28,10 @@ pub enum ErrorCode {
   SaleNotStarted,
   #[msg("Sale has finished")]
   SaleFinished,
-  #[msg("Wrong event organizer Sol treasury")]
-  WrongSolTreasury,
   #[msg("Wrong Ticket NFT program")]
   WrongTicketNftProgram,
   #[msg("Wrong Ticket NFT program state account")]
-  WrongTicketNftProgramStateAccount
+  WrongTicketNftProgramStateAccount,
+  #[msg("Invalid ticket type index")]
+  InvalidTicketTypeIndex,
 }

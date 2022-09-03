@@ -113,11 +113,9 @@
         "# Arguments",
         "",
         "* `ctx` - The Anchor context holding the accounts",
-        "* `cpi_authority_bump` - The bump of the cpi authority account created in the event registry program",
         "* `ticket_type_index` - A unique index that will differentiate multiple sales of one single event. This is useful to",
         "create unique sale PDAs",
-        "* `event_id` - The event id for which this sale is created for",
-        "* `ticket_type` - The ticket type that will be sold during this sale"
+        "* `event_id` - The event id for which this sale is created for"
       ],
       "accounts": [
         {
@@ -126,17 +124,20 @@
           "isSigner": false
         },
         {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Constraints will be checked in the processor fn"
+          ]
+        },
+        {
           "name": "sale",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "The newly created Sale"
           ]
-        },
-        {
-          "name": "eventRegistryCpiAuthority",
-          "isMut": true,
-          "isSigner": true
         },
         {
           "name": "eventOrganizer",
@@ -159,10 +160,6 @@
       ],
       "args": [
         {
-          "name": "cpiAuthorityBump",
-          "type": "u8"
-        },
-        {
           "name": "ticketTypeIndex",
           "type": "u8"
         },
@@ -173,12 +170,6 @@
               "u8",
               32
             ]
-          }
-        },
-        {
-          "name": "ticketType",
-          "type": {
-            "defined": "TicketType"
           }
         }
       ]
@@ -677,221 +668,227 @@
       }
     },
     {
-			"name": "Event",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "id",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "bumps",
-						"type": {
-							"defined": "EventBumps"
-						}
-					},
-					{
-						"name": "eventOrganizer",
-						"type": "publicKey"
-					},
-					{
-						"name": "eventCapacity",
-						"type": "publicKey"
-					},
-					{
-						"name": "nTickets",
-						"type": "u32"
-					},
-					{
-						"name": "startTime",
-						"type": "i64"
-					},
-					{
-						"name": "endTime",
-						"type": "i64"
-					},
-					{
-						"name": "currency",
-						"type": {
-							"defined": "Currency"
-						}
-					},
-					{
-						"name": "eventOrganizerPurchaseTokenAta",
-						"type": "publicKey"
-					},
-					{
-						"name": "ticketTypes",
-						"type": {
-							"vec": {
-								"defined": "TicketType"
-							}
-						}
-					}
-				]
-			}
-		}
+      "name": "Event",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "EventBumps"
+            }
+          },
+          {
+            "name": "eventOrganizer",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventCapacity",
+            "type": "publicKey"
+          },
+          {
+            "name": "nTickets",
+            "type": "u32"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "currency",
+            "type": {
+              "defined": "Currency"
+            }
+          },
+          {
+            "name": "eventOrganizerPurchaseTokenAta",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketTypes",
+            "type": {
+              "vec": {
+                "defined": "TicketType"
+              }
+            }
+          }
+        ]
+      }
+    }
   ],
   "types": [
-		{
-			"name": "SaleType",
-			"type": {
-				"kind": "enum",
-				"variants": [
-					{
-						"name": "Free"
-					},
-					{
-						"name": "FixedPrice",
-						"fields": [
-							{
-								"name": "amount",
-								"type": "u64"
-							}
-						]
-					},
-					{
-						"name": "Refundable",
-						"fields": [
-							{
-								"name": "amount",
-								"type": "u64"
-							}
-						]
-					},
-					{
-						"name": "DutchAuction",
-						"fields": [
-							{
-								"name": "start_price",
-								"type": "u64"
-							},
-							{
-								"name": "end_price",
-								"type": "u64"
-							},
-							{
-								"name": "curve_length",
-								"type": "u16"
-							},
-							{
-								"name": "drop_interval",
-								"type": "u16"
-							}
-						]
-					}
-				]
-			}
-		},
-		{
-			"name": "TicketType",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "n_tickets",
-						"type": "u32"
-					},
-					{
-						"name": "sale_type",
-						"type": {
-							"defined": "SaleType"
-						}
-					},
-					{
-						"name": "sale_start_time",
-						"type": "i64"
-					},
+    {
+      "name": "SaleType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Free"
+          },
+          {
+            "name": "FixedPrice",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Refundable",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "DutchAuction",
+            "fields": [
+              {
+                "name": "start_price",
+                "type": "u64"
+              },
+              {
+                "name": "end_price",
+                "type": "u64"
+              },
+              {
+                "name": "curve_length",
+                "type": "u16"
+              },
+              {
+                "name": "drop_interval",
+                "type": "u16"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TicketType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "n_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "sale_type",
+            "type": {
+              "defined": "SaleType"
+            }
+          },
+          {
+            "name": "sale_start_time",
+            "type": "i64"
+          },
           {
             "name": "sale_end_time",
             "type": "i64"
           },
-					{
-						"name": "merkle_root",
-						"type": {
-							"array": ["u8", 32]
-						}
-					},
-					{
-						"name": "seat_range",
-						"type": {
-							"defined": "SeatRange"
-						}
-					}
-				]
-			}
-		},
-		{
-			"name": "Currency",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "mint_account",
-						"type": "publicKey"
-					},
-					{
-						"name": "treasury_ata",
-						"type": "publicKey"
-					},
-					{
-						"name": "deposit_amount",
-						"type": "u64"
-					},
-					{
-						"name": "service_fee",
-						"type": "u16"
-					}
-				]
-			}
-		},
-		{
-			"name": "InitBumps",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "cpiAuthority",
-						"type": "u8"
-					}
-				]
-			}
-		},
-		{
-			"name": "EventBumps",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "event",
-						"type": "u8"
-					},
-					{
-						"name": "event_nft",
-						"type": "u8"
-					}
-				]
-			}
-		},
-		{
-			"name": "SeatRange",
-			"type": {
-				"kind": "struct",
-				"fields": [
-					{
-						"name": "l",
-						"type": "u32"
-					},
-					{
-						"name": "r",
-						"type": "u32"
-					}
-				]
-			}
-		}
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "seat_range",
+            "type": {
+              "defined": "SeatRange"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Currency",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_account",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasury_ata",
+            "type": "publicKey"
+          },
+          {
+            "name": "deposit_amount",
+            "type": "u64"
+          },
+          {
+            "name": "service_fee",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EventBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "u8"
+          },
+          {
+            "name": "event_nft",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SeatRange",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "l",
+            "type": "u32"
+          },
+          {
+            "name": "r",
+            "type": "u32"
+          }
+        ]
+      }
+    }
   ],
   "errors": [
     {
@@ -921,48 +918,48 @@
     },
     {
       "code": 6005,
+      "name": "InvalidTicketTypeIndex",
+      "msg": "Invalid ticket type index"
+    },
+    {
+      "code": 6006,
       "name": "TicketSoldOut",
       "msg": "Invalid sold out"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "SeatNotAvailable",
       "msg": "Seat not available"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "UnexpectedSaleAccount",
       "msg": "Expected different sale account"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "UnsupportedPurchaseToken",
       "msg": "Purchase token is not supported"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "WrongEventOrganizer",
       "msg": "Wrong event organizer"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "WrongTreasuryAccount",
       "msg": "Wrong treasury account"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "SaleNotStarted",
       "msg": "Sale has not started"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "SaleFinished",
       "msg": "Sale has finished"
-    },
-    {
-      "code": 6013,
-      "name": "WrongSolTreasury",
-      "msg": "Wrong event organizer Sol treasury"
     },
     {
       "code": 6014,

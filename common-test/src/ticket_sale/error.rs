@@ -39,9 +39,9 @@ impl TryFrom<u32> for Error {
       10 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTreasuryAccount)),
       11 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SaleNotStarted)),
       12 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SaleFinished)),
-      13 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongSolTreasury)),
-      14 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgram)),
-      15 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgramStateAccount)),
+      13 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgram)),
+      14 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgramStateAccount)),
+      15 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
       _ => Err(())
     }
   }
