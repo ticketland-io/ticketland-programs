@@ -616,51 +616,52 @@
         ]
       }
     }
+  ],
   "errors": [
-      {
-        "code": 6000,
-        "name": "OnlyDeployer",
-        "msg": "Only deployer"
-      },
-      {
-        "code": 6001,
-        "name": "TooManyCurrencies",
-        "msg": "Too many currencies"
-      },
-      {
-        "code": 6002,
-        "name": "TooManyTicketTypes",
-        "msg": "Too many ticket types"
-      },
-      {
-        "code": 6003,
-        "name": "UnsupportedDepositToken",
-        "msg": "Deposit token is not supported"
-      },
-      {
-        "code": 6004,
-        "name": "UnsupportedPurchaseToken",
-        "msg": "Purchase token is not supported"
-      },
-      {
-        "code": 6005,
-        "name": "NotEnoughDeposit",
-        "msg": "Not enough deposit"
-      },
-      {
-        "code": 6006,
-        "name": "InvalidMerkleProof",
-        "msg": "Invalid Merkle proof"
-      },
-      {
-        "code": 6007,
-        "name": "WrongTicketSaleProgramStateAccount",
-        "msg": "Wrong ticket sale program state account"
-      },
-      {
-        "code": 6008,
-        "name": "TicketSaleMustBeOwner",
-        "msg": "Ticket sale must the the owner"
-      }
-    ]
-  }
+    {
+      "code": 6000,
+      "name": "OnlyDeployer",
+      "msg": "Only deployer"
+    },
+    {
+      "code": 6001,
+      "name": "TooManyCurrencies",
+      "msg": "Too many currencies"
+    },
+    {
+      "code": 6002,
+      "name": "TooManyTicketTypes",
+      "msg": "Too many ticket types"
+    },
+    {
+      "code": 6003,
+      "name": "UnsupportedDepositToken",
+      "msg": "Deposit token is not supported"
+    },
+    {
+      "code": 6004,
+      "name": "UnsupportedPurchaseToken",
+      "msg": "Purchase token is not supported"
+    },
+    {
+      "code": 6005,
+      "name": "NotEnoughDeposit",
+      "msg": "Not enough deposit"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMerkleProof",
+      "msg": "Invalid Merkle proof"
+    },
+    {
+      "code": 6007,
+      "name": "WrongTicketSaleProgramStateAccount",
+      "msg": "Wrong ticket sale program state account"
+    },
+    {
+      "code": 6008,
+      "name": "TicketSaleMustBeOwner",
+      "msg": "Ticket sale must the the owner"
+    }
+  ]
+}
