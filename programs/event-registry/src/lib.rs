@@ -99,26 +99,6 @@ use super::*;
 		)
 	}
 
-	/// Allows the creator of the event that is part of the accounts of this instruction to create a new ticket sale
-	/// for one of the ticket types defined when the event was created.
-	/// Note that the creator will have to call this as many ticket types as are defined in the ticket types list stored in t
-	/// the event account.
-	/// 
-	/// # Arguments
-	/// 
-	/// * `ticket_type_index` - The index of the array in the ticket types list stored in the event. This is useful for the
-	/// ticket sale program to create unique PDAs as well as access to ticket_type data.
-	pub fn create_ticket_sale(
-		ctx: Context<CreateTicketSale>,
-		ticket_type_index: u8,
-		_event_id: [u8; 32],
-	) -> Result<()> {
-		processors::create_ticket_sale::exec(
-			ctx,
-			ticket_type_index,
-		)
-	}
-
 	/// Allows the deployer to update the supported currencies
 	/// 
 	/// # Arguments
