@@ -18,8 +18,6 @@ pub enum ErrorCode {
   InvalidMerkleProof,
   #[msg("Wrong ticket sale program state account")]
   WrongTicketSaleProgramStateAccount,
-  #[msg("Wrong ticket type for index")]
-  WrongTicketTypeForIndex,
   #[msg("Ticket sale must the the owner")]
   TicketSaleMustBeOwner,
 }

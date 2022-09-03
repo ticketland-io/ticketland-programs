@@ -151,6 +151,44 @@ impl Runner {
     }
   }
 
+  pub async fn create_sale(
+    &self,
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    event_id: [u8; 32],
+    event_organizer: &Keypair,
+    ticket_type_index: u8,
+  ) -> AnchorResult<()> {
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let sale = TickerSalePda::ticket_sale_state(
+      &state,
+      ticket_type_index,
+      event_id,
+    ).0;
+
+    let accounts = ticket_sale::accounts::CreateSale {
+      state,
+      event,
+      sale,
+      event_organizer: event_organizer.pubkey(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = ticket_sale::instruction::CreateSale {
+      ticket_type_index,
+      event_id,
+    }.data();
+
+    let ix = Instruction {
+      program_id: ticket_sale::id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&event_organizer])).await
+  }
+
   pub async fn fixed_price_purchase(
     &mut self,
     ticket_buyer: &Keypair,

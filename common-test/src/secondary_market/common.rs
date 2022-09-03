@@ -152,11 +152,11 @@ pub async fn setup(
   assert!(result.is_ok());
 
   // Create a new ticket sale for the first ticket type
-  let result = event_registry_runner.create_ticket_sale(
+  let result = ticket_sale_runner.create_sale(
+    ticket_sale_state,
     event_registry_state,
     event_id,
     &event_organizer,
-    ticket_sale_state,
     ticket_type_index, // ticket_type_index
   ).await;
 

@@ -34,8 +34,6 @@ impl TryFrom<u32> for Error {
       5 => Ok(Error(event_registry::utils::program_error::ErrorCode::NotEnoughDeposit)),
       6 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidMerkleProof)),
       7 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketSaleProgramStateAccount)),
-      8 => Ok(Error(event_registry::utils::program_error::ErrorCode::OnlyEventOrganizer)),
-      9 => Ok(Error(event_registry::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
       11 => Ok(Error(event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner)),
       _ => Err(())
     }
