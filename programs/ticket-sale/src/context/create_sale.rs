@@ -3,7 +3,7 @@ use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
-    sale::{Sale, SPACE_MARGIN},
+    sale::Sale,
   },
 };
 
@@ -30,7 +30,7 @@ pub struct CreateSale<'info> {
   #[account(
     init,
     payer = event_organizer,
-    space = 8 + size_of::<Sale>() + SPACE_MARGIN,
+    space = 8 + size_of::<Sale>(),
     seeds = [
       b"sale",
       state.key().as_ref(),

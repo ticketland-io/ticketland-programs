@@ -17,7 +17,7 @@ pub struct CreateMarket<'info> {
   // The market account
   #[account(
     init,
-    space = 8 + size_of::<Market>() + market::SPACE_MARGIN,
+    space = 8 + size_of::<Market>(),
     payer = event_organizer,
     seeds = [
       b"market",

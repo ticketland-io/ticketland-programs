@@ -12,7 +12,7 @@ pub struct Initialize<'info> {
   #[account(
     init,
     payer = deployer,
-    space = 8 + size_of::<State>() + SPACE_MARGIN
+    space = 8 + size_of::<State>(),
   )]
   pub state: Account<'info, State>,
   

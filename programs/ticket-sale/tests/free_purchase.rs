@@ -128,7 +128,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = event_registry_runner.create_event_capacity_account().await;
+  let event_capacity = event_registry_runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = event_registry_runner.get_participant(1);
   let deposit_token = event_registry_runner.deposit_tokens[2];

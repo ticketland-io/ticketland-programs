@@ -6,9 +6,6 @@ use crate::{
   },
 };
 
-// Additional space in bytes (1kb) we want to allocate for potential future state expansion
-pub const SPACE_MARGIN: usize = 1000;
-
 pub const MAX_TICKET_TYPES: usize = 10;
 pub const MAX_SEAT_RANGES: usize = 10;
 

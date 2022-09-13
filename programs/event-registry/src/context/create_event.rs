@@ -6,7 +6,6 @@ use anchor_spl::{
 };
 use common::{
   account_data::event::{
-    SPACE_MARGIN,
     MAX_TICKET_TYPES,
   },
   state::ticket_type::TicketType,
@@ -34,7 +33,7 @@ pub struct CreateEvent<'info> {
   #[account(
     init,
     payer = event_organizer,
-    space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES) + SPACE_MARGIN,
+    space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES),
     seeds = [b"event", state.key().as_ref(), &event_id],
     bump
   )]

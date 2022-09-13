@@ -48,7 +48,6 @@ use common::{
 };
 use ticket_sale::account_data::event_capacity::{
   EventCapacity,
-  SPACE_MARGIN as event_capacity_space_margin,
 };
 
 async fn initialize_ticket_sale(
@@ -144,7 +143,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
@@ -265,7 +264,7 @@ async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(c
   let event_capacity;
   {
     let mut pt_lock = runner.pt.lock().await;
-    let space = 8 + std::mem::size_of::<EventCapacity>() + event_capacity_space_margin + (10_000 / 8) as usize + 8;
+    let space = 8 + std::mem::size_of::<EventCapacity>() + (10_000 / 8) as usize + 8;
     event_capacity = pt_lock.create_account(
       sol_to_lamports(1000_f64),
       space as u64, 
@@ -293,7 +292,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   let state = Keypair::new();
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   
   runner.initialize(
     &state,
@@ -345,7 +344,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
@@ -374,7 +373,7 @@ async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let state = Keypair::new();
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
@@ -412,7 +411,7 @@ async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = Keypair::new();
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
@@ -449,7 +448,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account().await;
+  let event_capacity = runner.create_event_capacity_account(10).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();

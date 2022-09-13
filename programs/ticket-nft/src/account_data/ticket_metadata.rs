@@ -1,9 +1,5 @@
 use anchor_lang::prelude::*;
 
-// Additional space in bytes (1kb) we want to allocate for potential future state expansion
-pub const SPACE_MARGIN: usize = 1000;
-
-
 /// A wrapper around the Metaplex metadata that includes additional custom data related to our
 /// ticketing system.
 #[account]

@@ -13,7 +13,7 @@ use anchor_metaplex::{
 use crate::{
   account_data::{
     state::*,
-    ticket_metadata::{TicketMetadata, SPACE_MARGIN},
+    ticket_metadata::TicketMetadata,
   },
 };
 
@@ -27,7 +27,7 @@ pub struct CreateTicket<'info> {
   #[account(
     init,
     payer = ticket_buyer,
-    space = 8 + size_of::<TicketMetadata>() + SPACE_MARGIN,
+    space = 8 + size_of::<TicketMetadata>(),
     seeds = [
       b"ticket_metadata",
       state.key().as_ref(),

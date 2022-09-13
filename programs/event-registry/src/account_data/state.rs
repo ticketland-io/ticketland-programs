@@ -5,9 +5,6 @@ use common::{
 
 pub const MAX_CURRENCY_SUPPORT: usize = 10;
 
-// Additional space in bytes (5kb) we want to allocate for potential future state expansion
-pub const SPACE_MARGIN: usize = 5000;
-
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub event_nft_authority: u8,

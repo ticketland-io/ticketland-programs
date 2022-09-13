@@ -15,7 +15,7 @@ pub struct Initialize<'info> {
   #[account(
     init,
     payer = deployer,
-    space = 8 + size_of::<State>() + size_of::<Currency>() * MAX_CURRENCY_SUPPORT + SPACE_MARGIN
+    space = 8 + size_of::<State>() + size_of::<Currency>() * MAX_CURRENCY_SUPPORT
   )]
   pub state: Account<'info, State>,
 
