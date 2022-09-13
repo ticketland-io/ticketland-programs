@@ -17,13 +17,13 @@ fn index_to_byte_and_bit(index: u32) -> (usize, usize, usize) {
 }
 
 /// Checks if the value at the given index is true or false
-pub fn is_set<const COUNT: usize>(index: u32, bitmap: &[u8; COUNT]) -> bool {
+pub fn is_set(index: u32, bitmap: &Vec<u8>) -> bool {
   let (byte, bit, _) = index_to_byte_and_bit(index);
 
   (bitmap[byte] >> bit) % 2 == 1
 } 
 
-pub fn flip_bit<const COUNT: usize>(index: u32, bitmap: &mut [u8; COUNT]) {
+pub fn flip_bit(index: u32, bitmap: &mut Vec<u8>) {
   let (byte, _, mask) = index_to_byte_and_bit(index);
   
   bitmap[byte] = (bitmap[byte] as usize ^ mask) as u8;

@@ -8,7 +8,7 @@ pub fn exec(
   event_id: [u8; 32],
   n_tickets: u32,
 ) -> Result<()> {
-  let event_capacity = &mut ctx.accounts.event_capacity.load_init()?;
+  let event_capacity = &mut ctx.accounts.event_capacity;
 
   if !event_capacity.is_initialized {
     event_capacity.event_id = event_id;

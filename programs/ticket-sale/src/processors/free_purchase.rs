@@ -10,7 +10,6 @@ use crate::context::free_purchase::FreePurchase;
 use crate::{
   account_data::{
     event::Event,
-    event_capacity::MAX_VENUE_CAPACITY,
   },
   acl::seat_validity,
   utils::program_error::ErrorCode,
@@ -109,12 +108,13 @@ pub fn exec(
   require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, ErrorCode::SaleFinished);
 
   // 3. Are there any available seats for this type of ticket
-  let event_capacity = &mut ctx.accounts.event_capacity.load_mut()?;
+  
+  let event_capacity = &ctx.accounts.event_capacity;
   require!(event_capacity.available_tickets > 0, ErrorCode::TicketSoldOut);
 
   // 4. Check that the seat_index is available
   require!(
-    !bitmap::is_set::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats),
+    !bitmap::is_set(seat_index, &event_capacity.seats),
     ErrorCode::SeatNotAvailable,
   );
 
@@ -122,7 +122,8 @@ pub fn exec(
   mint_ticket(&ctx, seat_index, seat_name)?;
 
   // 6. Update state
-  bitmap::flip_bit::<MAX_VENUE_CAPACITY>(seat_index, &mut event_capacity.seats);
+  let event_capacity = &mut ctx.accounts.event_capacity;
+  bitmap::flip_bit(seat_index, &mut event_capacity.seats);
   
   // - total tickets sold (Ticket Sale State account data)
   let state = &mut ctx.accounts.state;

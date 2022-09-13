@@ -18,7 +18,7 @@ pub struct InitEventCapacity<'info> {
     zero,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
-  pub event_capacity: AccountLoader<'info, EventCapacity>,
+  pub event_capacity: Account<'info, EventCapacity>,
 
   #[account(
     mut,
