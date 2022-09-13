@@ -77,7 +77,12 @@
         {
           "name": "eventCapacity",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Use this constraint if you want to create an account in a previous instruction and then initialize",
+            "it in your instruction instead of using init. This is necessary for accounts that are larger than",
+            "10 Kibibyte because those accounts cannot be created via a CPI (which is what init would do)."
+          ]
         },
         {
           "name": "eventRegistryCpiAuthority",
@@ -561,12 +566,7 @@
           },
           {
             "name": "seats",
-            "type": {
-              "array": [
-                "u8",
-                12500
-              ]
-            }
+            "type": "bytes"
           }
         ]
       }
@@ -918,58 +918,58 @@
     },
     {
       "code": 6005,
-      "name": "InvalidTicketTypeIndex",
-      "msg": "Invalid ticket type index"
+      "name": "TicketSoldOut",
+      "msg": "Ticket sold out"
     },
     {
       "code": 6006,
-      "name": "TicketSoldOut",
-      "msg": "Invalid sold out"
-    },
-    {
-      "code": 6007,
       "name": "SeatNotAvailable",
       "msg": "Seat not available"
     },
     {
-      "code": 6008,
+      "code": 6007,
       "name": "UnexpectedSaleAccount",
       "msg": "Expected different sale account"
     },
     {
-      "code": 6009,
+      "code": 6008,
       "name": "UnsupportedPurchaseToken",
       "msg": "Purchase token is not supported"
     },
     {
-      "code": 6010,
+      "code": 6009,
       "name": "WrongEventOrganizer",
       "msg": "Wrong event organizer"
     },
     {
-      "code": 6011,
+      "code": 6010,
       "name": "WrongTreasuryAccount",
       "msg": "Wrong treasury account"
     },
     {
-      "code": 6012,
+      "code": 6011,
       "name": "SaleNotStarted",
       "msg": "Sale has not started"
     },
     {
-      "code": 6013,
+      "code": 6012,
       "name": "SaleFinished",
       "msg": "Sale has finished"
     },
     {
-      "code": 6014,
+      "code": 6013,
       "name": "WrongTicketNftProgram",
       "msg": "Wrong Ticket NFT program"
     },
     {
-      "code": 6015,
+      "code": 6014,
       "name": "WrongTicketNftProgramStateAccount",
       "msg": "Wrong Ticket NFT program state account"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidTicketTypeIndex",
+      "msg": "Invalid ticket type index"
     }
   ]
 }
