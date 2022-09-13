@@ -66,7 +66,7 @@ pub struct FreePurchase<'info> {
     mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
-  pub event_capacity: Account<'info, EventCapacity>,
+  pub event_capacity: AccountInfo<'info>,
 
   /// CHECK: This is the event organizer of the event
   #[account()]

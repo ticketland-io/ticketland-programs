@@ -66,7 +66,7 @@ pub struct FixedPricePurchase<'info> {
     mut,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
-  pub event_capacity: Account<'info, EventCapacity>,
+  pub event_capacity: AccountInfo<'info>,
 
   /// CHECK: The deposit token should be one of the supported currencies
   #[account()]

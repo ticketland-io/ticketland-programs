@@ -3,13 +3,14 @@ use anchor_safe_math::SafeMath;
 use common::{
   utils::bitmap,
   account_data::{
-    serialization::deser,
+    serialization::{deser, deser_unchecked},
   },
 };
 use crate::context::free_purchase::FreePurchase;
 use crate::{
   account_data::{
     event::Event,
+    event_capacity::EventCapacity,
   },
   acl::seat_validity,
   utils::program_error::ErrorCode,
@@ -109,7 +110,7 @@ pub fn exec(
 
   // 3. Are there any available seats for this type of ticket
   
-  let event_capacity = &ctx.accounts.event_capacity;
+  let mut event_capacity: EventCapacity = deser_unchecked(ctx.accounts.event_capacity.clone())?;
   require!(event_capacity.available_tickets > 0, ErrorCode::TicketSoldOut);
 
   // 4. Check that the seat_index is available
@@ -122,7 +123,6 @@ pub fn exec(
   mint_ticket(&ctx, seat_index, seat_name)?;
 
   // 6. Update state
-  let event_capacity = &mut ctx.accounts.event_capacity;
   bitmap::flip_bit(seat_index, &mut event_capacity.seats);
   
   // - total tickets sold (Ticket Sale State account data)

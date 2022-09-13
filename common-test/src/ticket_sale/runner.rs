@@ -34,7 +34,6 @@ use anchor_metaplex::{
   },
 };
 use common::{
-  utils::bitmap,
   crypto::mt::{
     create_seat_leaf,
     get_null_leaf,
@@ -89,7 +88,7 @@ impl Runner {
 
   pub fn create_ticket_type_mt(&self, seat_indexes: Vec<(u32, u32)>, n_tickets: u32) -> MerkleTree {
     let null_leaf = get_null_leaf();
-    let mut seats = vec![null_leaf; bitmap::count_to_len(n_tickets)];
+    let mut seats = vec![null_leaf; n_tickets as usize];
 
     for seat_range in seat_indexes {
       for i in seat_range.0..seat_range.1 {
