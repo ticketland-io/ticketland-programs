@@ -1,8 +1,11 @@
 use anchor_lang::prelude::*;
 use crate::{
+  ID,
   account_data::{
     state::*,
+    event_capacity::EventCapacity,
   },
+  utils::program_error::ErrorCode,
 };
 #[derive(Accounts)]
 #[instruction(cpi_authority_bump: u8)]
@@ -11,7 +14,10 @@ pub struct InitEventCapacity<'info> {
   pub state: Account<'info, State>,
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
-  #[account(mut)]
+  #[account(
+    mut,
+    constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
+  )]
   pub event_capacity: AccountInfo<'info>,
 
   #[account(
