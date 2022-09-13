@@ -3,7 +3,7 @@ use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
-    market::{self, Market},
+    market::Market,
   },
 };
 

@@ -16,6 +16,18 @@ fn index_to_byte_and_bit(index: u32) -> (usize, usize, usize) {
   (byte, bit, mask)
 }
 
+pub fn count_to_len(index: u32) -> usize {
+  PreciseNumber::new(index.into())
+  .unwrap()
+  .checked_div(&PreciseNumber::new(8).unwrap())
+  .unwrap()
+  .ceiling()
+  .unwrap()
+  .to_imprecise()
+  .unwrap() as usize
+}
+
+
 /// Checks if the value at the given index is true or false
 pub fn is_set(index: u32, bitmap: &Vec<u8>) -> bool {
   let (byte, bit, _) = index_to_byte_and_bit(index);

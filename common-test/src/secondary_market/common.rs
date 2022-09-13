@@ -86,12 +86,12 @@ pub async fn setup(
 ) -> (Vec<TicketType>,) {
   let event_registry_runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = event_registry_runner.create_event_capacity_account().await;
+  let event_capacity = event_registry_runner.create_event_capacity_account(10.0).await;
 
   // ticket type 1 includes seats 0, 1, 2, 5, 6, 7
-  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)]);
+  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)], 10);
   // ticket type 2 includes seats 3, 4, 8, 9
-  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)]);
+  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)], 10);
 
   let ticket_types;
   {

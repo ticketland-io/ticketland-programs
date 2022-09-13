@@ -201,9 +201,9 @@ impl Runner {
     assert!(lock_pt.process_transaction(&[ix], Some(&[&self.deployer, &state])).await.is_ok());
   }
 
-  pub async fn create_event_capacity_account(&mut self, n_tickets: u32) -> Pubkey {
+  pub async fn create_event_capacity_account(&mut self, n_tickets: f64) -> Pubkey {
     let mut pt_lock = self.pt.lock().await;
-    let space = 8 + std::mem::size_of::<EventCapacity>() + 8 + (n_tickets / 8) as usize ;
+    let space = 8 + std::mem::size_of::<EventCapacity>() + 8 + (n_tickets / 8_f64).ceil() as usize;
     
     pt_lock.create_account(
       sol_to_lamports(1000_f64),

@@ -34,13 +34,11 @@ use anchor_metaplex::{
   },
 };
 use common::{
+  utils::bitmap,
   crypto::mt::{
     create_seat_leaf,
     get_null_leaf,
   },
-};
-use ticket_sale::{
-  account_data::event_capacity::MAX_VENUE_CAPACITY,
 };
 use crate::{
   event_registry::{
@@ -89,9 +87,9 @@ impl Runner {
     format!("Seat-{}", seat_index)
   }
 
-  pub fn create_ticket_type_mt(&self, seat_indexes: Vec<(u32, u32)>,) -> MerkleTree {
+  pub fn create_ticket_type_mt(&self, seat_indexes: Vec<(u32, u32)>, n_tickets: u32) -> MerkleTree {
     let null_leaf = get_null_leaf();
-    let mut seats = [null_leaf; MAX_VENUE_CAPACITY];
+    let mut seats = vec![null_leaf; bitmap::count_to_len(n_tickets)];
 
     for seat_range in seat_indexes {
       for i in seat_range.0..seat_range.1 {
