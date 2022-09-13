@@ -14,11 +14,14 @@ pub struct InitEventCapacity<'info> {
   pub state: Account<'info, State>,
 
   /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  /// Use this constraint if you want to create an account in a previous instruction and then initialize 
+  /// it in your instruction instead of using init. This is necessary for accounts that are larger than 
+  /// 10 Kibibyte because those accounts cannot be created via a CPI (which is what init would do).
   #[account(
-    mut,
+    zero,
     constraint = EventCapacity::owner() == ID @ ErrorCode::NotOwnedByThisProgram,
   )]
-  pub event_capacity: AccountInfo<'info>,
+  pub event_capacity: Account<'info, EventCapacity>,
 
   #[account(
     mut,

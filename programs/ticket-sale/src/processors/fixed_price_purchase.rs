@@ -4,7 +4,7 @@ use anchor_safe_math::SafeMath;
 use common::{
   utils::bitmap,
   account_data::{
-    serialization::{deser, deser_unchecked},
+    serialization::deser,
   },
   state::{
     sale_type::*,
@@ -14,7 +14,6 @@ use crate::{
   context::fixed_price_purchase::*,
   account_data::{
     event::Event,
-    event_capacity::EventCapacity,
   },
   acl::seat_validity,
   utils::program_error::ErrorCode,
@@ -163,7 +162,7 @@ pub fn exec(
   require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, ErrorCode::SaleFinished);
 
   // 3. Are there any available seats for this type of ticket
-  let mut event_capacity: EventCapacity = deser_unchecked(ctx.accounts.event_capacity.clone())?;
+  let event_capacity = &ctx.accounts.event_capacity;
   require!(event_capacity.available_tickets > 0, ErrorCode::TicketSoldOut);
 
   // 4. Check that the seat_index is available
@@ -179,6 +178,7 @@ pub fn exec(
   mint_ticket(&ctx, price_sold, seat_index, seat_name)?;
 
   // 7. Update state
+  let event_capacity = &mut ctx.accounts.event_capacity;
   bitmap::flip_bit(seat_index, &mut event_capacity.seats);
 
   // - total tickets sold (Ticket Sale State account data)
