@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use common::{
   utils::bitmap,
   account_data::{
-    serialization::deser,
+    serialization::deser_unchecked,
   },
 };
 use crate::{
@@ -15,7 +15,7 @@ pub fn exec(
   event_id: [u8; 32],
   n_tickets: u32,
 ) -> Result<()> {
-  let mut event_capacity: EventCapacity = deser(ctx.accounts.event_capacity.clone())?;
+  let mut event_capacity: EventCapacity = deser_unchecked(ctx.accounts.event_capacity.clone())?;
 
   if !event_capacity.is_initialized {
     event_capacity.event_id = event_id;
