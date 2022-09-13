@@ -252,268 +252,268 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   }
 }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let state = Keypair::new();
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_fail_if_event_capacity_is_not_owned_by_the_ticket_sale_program(ctx: &mut TestContext) {
+//   let runner = &mut ctx.event_registry_runner;
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let state = Keypair::new();
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = runner.get_participant(1);
   
-  let event_capacity;
-  {
-    let mut pt_lock = runner.pt.lock().await;
-    let space = 8 + std::mem::size_of::<EventCapacity>() + (10_000 / 8) as usize + 8;
-    event_capacity = pt_lock.create_account(
-      sol_to_lamports(1000_f64),
-      space as u64, 
-      &system_program::ID, // the owner must be the ticket sale program
-    ).await.pubkey();
-  }
+//   let event_capacity;
+//   {
+//     let mut pt_lock = runner.pt.lock().await;
+//     let space = 8 + std::mem::size_of::<EventCapacity>() + (10_000 / 8) as usize + 8;
+//     event_capacity = pt_lock.create_account(
+//       sol_to_lamports(1000_f64),
+//       space as u64, 
+//       &system_program::ID, // the owner must be the ticket sale program
+//     ).await.pubkey();
+//   }
 
-  let result = custom_create_event(
-    false,
-    runner,
-    ticket_sale_runner,
-    &state,
-    event_capacity,
-    event_id,
-    &event_organizer,
-    0,
-  ).await;
+//   let result = custom_create_event(
+//     false,
+//     runner,
+//     ticket_sale_runner,
+//     &state,
+//     event_capacity,
+//     event_id,
+//     &event_organizer,
+//     0,
+//   ).await;
 
-  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner);
-}
+//   Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner);
+// }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
-  let state = Keypair::new();
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
+//   let state = Keypair::new();
+//   let runner = &mut ctx.event_registry_runner;
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let event_capacity = runner.create_event_capacity_account(10.0).await;
   
-  runner.initialize(
-    &state,
-		1_000, // 10%
-  ).await;
+//   runner.initialize(
+//     &state,
+// 		1_000, // 10%
+//   ).await;
 
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
-  let deposit_token = runner.deposit_tokens[0];
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = runner.get_participant(1);
+//   let deposit_token = runner.deposit_tokens[0];
 
-  // Create more that 10 ticket types which is the current limit
-  let mut ticket_types = vec![];
+//   // Create more that 10 ticket types which is the current limit
+//   let mut ticket_types = vec![];
 
-  for i in 0..11 {
-    ticket_types.push(
-      TicketType {
-        n_tickets: 1000,
-        sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
-        sale_start_time: 50,
-        sale_end_time: 100,
-        merkle_root: [0; 32],
-        seat_range: SeatRange {l: i * 10_000, r: i * 10_000 + 9999},
-      }
-    )
-  }
+//   for i in 0..11 {
+//     ticket_types.push(
+//       TicketType {
+//         n_tickets: 1000,
+//         sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
+//         sale_start_time: 50,
+//         sale_end_time: 100,
+//         merkle_root: [0; 32],
+//         seat_range: SeatRange {l: i * 10_000, r: i * 10_000 + 9999},
+//       }
+//     )
+//   }
 
-  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
+//   let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
 
-  let result = runner.create_event(
-    state.pubkey(),
-    event_capacity,
-    ticket_sale_program_state,
-    event_id,
-    deposit_token,
-    deposit_token,
-    &event_organizer,
-    100_000,
-    100,
-		1000,
-		ticket_types.clone(),
-  ).await;
+//   let result = runner.create_event(
+//     state.pubkey(),
+//     event_capacity,
+//     ticket_sale_program_state,
+//     event_id,
+//     deposit_token,
+//     deposit_token,
+//     &event_organizer,
+//     100_000,
+//     100,
+// 		1000,
+// 		ticket_types.clone(),
+//   ).await;
 
-  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TooManyTicketTypes);
-}
+//   Error::assert_err(result, event_registry::utils::program_error::ErrorCode::TooManyTicketTypes);
+// }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContext) {
+//   let runner = &mut ctx.event_registry_runner;
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let state = Keypair::new();
+//   let event_capacity = runner.create_event_capacity_account(10.0).await;
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = runner.get_participant(1);
   
-  let _ = custom_create_event(
-    false,
-    runner,
-    ticket_sale_runner,
-    &state,
-    event_capacity,
-    event_id,
-    &event_organizer,
-    0,
-  ).await;
+//   let _ = custom_create_event(
+//     false,
+//     runner,
+//     ticket_sale_runner,
+//     &state,
+//     event_capacity,
+//     event_id,
+//     &event_organizer,
+//     0,
+//   ).await;
 
-  let deposit_token = runner.deposit_tokens[0];
-  let event = pda::event(&state.pubkey(), event_id).0;
-  let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
-  let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
+//   let deposit_token = runner.deposit_tokens[0];
+//   let event = pda::event(&state.pubkey(), event_id).0;
+//   let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
+//   let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
 
-  assert_eq!(runner.spl.get_token_account(fund_manager_ata).await.amount, to_base(1000, 6));
-}
+//   assert_eq!(runner.spl.get_token_account(fund_manager_ata).await.amount, to_base(1000, 6));
+// }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let state = Keypair::new();
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_not_allow_user_control_fund_manager_ata(ctx: &mut TestContext) {
+//   let runner = &mut ctx.event_registry_runner;
+//   let state = Keypair::new();
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let event_capacity = runner.create_event_capacity_account(10.0).await;
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = runner.get_participant(1);
   
-  let _ = custom_create_event(
-    false,
-    runner,
-    ticket_sale_runner,
-    &state,
-    event_capacity,
-    event_id,
-    &event_organizer,
-    0,
-  ).await;
+//   let _ = custom_create_event(
+//     false,
+//     runner,
+//     ticket_sale_runner,
+//     &state,
+//     event_capacity,
+//     event_id,
+//     &event_organizer,
+//     0,
+//   ).await;
 
-  let deposit_token = runner.deposit_tokens[0];
-  let event = pda::event(&state.pubkey(), event_id).0;
-  let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
-  let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
-  let event_organizer_ata = pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token);
+//   let deposit_token = runner.deposit_tokens[0];
+//   let event = pda::event(&state.pubkey(), event_id).0;
+//   let fund_manager = pda::fund_manager(&state.pubkey(), &event, &event_organizer.pubkey()).0;
+//   let fund_manager_ata = pda::fund_manager_ata(&fund_manager, &deposit_token);
+//   let event_organizer_ata = pda::event_organizer_ata(&event_organizer.pubkey(), &deposit_token);
 
-  // Organizer tries to transfer the funds from the fund manager ata
-  let result = runner.spl.transfer(
-    &fund_manager_ata, 
-    &event_organizer_ata,
-    &event_organizer,
-    to_base(1000, 6),
-  ).await;
+//   // Organizer tries to transfer the funds from the fund manager ata
+//   let result = runner.spl.transfer(
+//     &fund_manager_ata, 
+//     &event_organizer_ata,
+//     &event_organizer,
+//     to_base(1000, 6),
+//   ).await;
 
-  assert!(!result.is_ok());
-}
+//   assert!(!result.is_ok());
+// }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = Keypair::new();
-  let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_fail_if_event_organizer_has_not_enough_balance_to_deposit(ctx: &mut TestContext) {
+//   let runner = &mut ctx.event_registry_runner;
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let state = Keypair::new();
+//   let event_capacity = runner.create_event_capacity_account(10.0).await;
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = Keypair::new();
+//   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
 
-  runner.initialize(
-    &state,
-		1_000, // 10%
-  ).await;
+//   runner.initialize(
+//     &state,
+// 		1_000, // 10%
+//   ).await;
 
-  runner.spl.airdrop(
-    &runner.deposit_tokens[0],
-    &runner.deposit_token_authorities[0],
-    &vec![event_organizer],
-    to_base(999, 6), // 1 less than the min deposit amount
-  ).await;
+//   runner.spl.airdrop(
+//     &runner.deposit_tokens[0],
+//     &runner.deposit_token_authorities[0],
+//     &vec![event_organizer],
+//     to_base(999, 6), // 1 less than the min deposit amount
+//   ).await;
 
-  let result = custom_create_event(
-    true,
-    runner,
-    ticket_sale_runner,
-    &state,
-    event_capacity,
-    event_id,
-    &event_organizer_clone,
-    0,
-  ).await;
+//   let result = custom_create_event(
+//     true,
+//     runner,
+//     ticket_sale_runner,
+//     &state,
+//     event_capacity,
+//     event_id,
+//     &event_organizer_clone,
+//     0,
+//   ).await;
 
-  assert!(!result.is_ok());
-}
+//   assert!(!result.is_ok());
+// }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
-  let runner = &mut ctx.event_registry_runner;
-  let ticket_sale_runner = &mut ctx.ticket_sale_runner;
-  let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
-  let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
-  let event_organizer = runner.get_participant(1);
-  let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
+//   let runner = &mut ctx.event_registry_runner;
+//   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
+//   let state = Keypair::new();
+//   let event_capacity = runner.create_event_capacity_account(10.0).await;
+//   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
+//   let event_organizer = runner.get_participant(1);
+//   let event_organizer_clone = Keypair::from_bytes(event_organizer.to_bytes().as_ref()).unwrap();
 
-  // create a new token that is not part of the supported currencies
-  let mint_token = Keypair::new();
-  let authority = Keypair::new();
+//   // create a new token that is not part of the supported currencies
+//   let mint_token = Keypair::new();
+//   let authority = Keypair::new();
 
-  runner.spl.create_mint(
-    &mint_token,
-    &authority.pubkey(),
-    None,
-    6
-  ).await;
+//   runner.spl.create_mint(
+//     &mint_token,
+//     &authority.pubkey(),
+//     None,
+//     6
+//   ).await;
 
-  runner.spl.airdrop(
-    &mint_token.pubkey(),
-    &authority,
-    &vec![event_organizer],
-    to_base(1_000_000, 6),
-  ).await;
+//   runner.spl.airdrop(
+//     &mint_token.pubkey(),
+//     &authority,
+//     &vec![event_organizer],
+//     to_base(1_000_000, 6),
+//   ).await;
 
-  let ticket_types = vec![
-    TicketType {
-      n_tickets: 1000,
-      sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
-      sale_start_time: 50,
-      sale_end_time: 100,
-      merkle_root: [0; 32],
-      seat_range: SeatRange {l: 0, r: 10_000},
-    },
-    TicketType {
-      n_tickets: 1000,
-      sale_type: SaleType::DutchAuction {
-        start_price: 150,
-        end_price: 110,
-        curve_length: 200 * 60,
-        drop_interval: 20 * 60,
-      },
-      sale_start_time: 50,
-      sale_end_time: 100,
-      merkle_root: [0; 32],
-      seat_range: SeatRange {l: 10_001, r: 20_000},
-    },
-  ];
+//   let ticket_types = vec![
+//     TicketType {
+//       n_tickets: 1000,
+//       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
+//       sale_start_time: 50,
+//       sale_end_time: 100,
+//       merkle_root: [0; 32],
+//       seat_range: SeatRange {l: 0, r: 10_000},
+//     },
+//     TicketType {
+//       n_tickets: 1000,
+//       sale_type: SaleType::DutchAuction {
+//         start_price: 150,
+//         end_price: 110,
+//         curve_length: 200 * 60,
+//         drop_interval: 20 * 60,
+//       },
+//       sale_start_time: 50,
+//       sale_end_time: 100,
+//       merkle_root: [0; 32],
+//       seat_range: SeatRange {l: 10_001, r: 20_000},
+//     },
+//   ];
 
-  runner.initialize(
-    &state,
-    1_000, // 10%
-  ).await;
+//   runner.initialize(
+//     &state,
+//     1_000, // 10%
+//   ).await;
 
-  let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
-  let result = runner.create_event(
-    state.pubkey(),
-    event_capacity,
-    ticket_sale_program_state,
-    event_id,
-    mint_token.pubkey(),
-    mint_token.pubkey(),
-    &event_organizer_clone,
-    100_000,
-    100,
-		1000,
-		ticket_types.clone(),
-  ).await;
+//   let ticket_sale_program_state = initialize_ticket_sale(ticket_sale_runner, state.pubkey()).await;
+//   let result = runner.create_event(
+//     state.pubkey(),
+//     event_capacity,
+//     ticket_sale_program_state,
+//     event_id,
+//     mint_token.pubkey(),
+//     mint_token.pubkey(),
+//     &event_organizer_clone,
+//     100_000,
+//     100,
+// 		1000,
+// 		ticket_types.clone(),
+//   ).await;
 
-  Error::assert_err(result, event_registry::utils::program_error::ErrorCode::UnsupportedDepositToken);
-}
+//   Error::assert_err(result, event_registry::utils::program_error::ErrorCode::UnsupportedDepositToken);
+// }

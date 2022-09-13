@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use crate::{
   account_data::{
     state::*,
-    event_capacity::EventCapacity,
   },
 };
 #[derive(Accounts)]
@@ -11,9 +10,9 @@ pub struct InitEventCapacity<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
-  /// The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
+  /// CHECK: The account that will hold the seats bitmap. It cannot be PDA due to space limitations.
   #[account(mut)]
-  pub event_capacity: Account<'info, EventCapacity>,
+  pub event_capacity: AccountInfo<'info>,
 
   #[account(
     mut,
