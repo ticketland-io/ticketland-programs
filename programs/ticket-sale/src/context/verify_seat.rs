@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-#[instruction(seat_index: u32)]
+#[instruction(seat_index: u32, seat_name: String)]
 pub struct VerifySeat<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
