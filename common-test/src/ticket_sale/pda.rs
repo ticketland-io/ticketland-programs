@@ -28,11 +28,11 @@ pub fn cpi_authority(state: &Pubkey) -> (Pubkey, u8) {
   )
 }
 
-pub fn seat_verification(state: &Pubkey, seat_index: u32, seat_name: &String) -> (Pubkey, u8) {
+pub fn seat_verification(sale: &Pubkey, seat_index: u32, seat_name: &String) -> (Pubkey, u8) {
   Pubkey::find_program_address(
     &[
       b"seat_verification",
-      state.as_ref(),
+      sale.as_ref(),
       seat_index.to_string().as_ref(),
       seat_name.as_ref(),  
     ],

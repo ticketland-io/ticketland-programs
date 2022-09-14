@@ -31,7 +31,7 @@ pub struct VerifySeat<'info> {
     space = 8 + size_of::<SeatVerification>(),
     seeds = [
       b"seat_verification",
-      state.key().as_ref(),
+      sale.key().as_ref(),
       seat_index.to_string().as_ref(),
       seat_name.as_ref(),
     ],
