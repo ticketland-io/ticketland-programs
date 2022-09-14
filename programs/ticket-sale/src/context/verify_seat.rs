@@ -15,7 +15,6 @@ pub struct VerifySeat<'info> {
   pub state: Account<'info, State>,
 
   #[account(
-    mut,
     seeds = [
       b"sale",
       state.key().as_ref(),
@@ -29,11 +28,12 @@ pub struct VerifySeat<'info> {
   #[account(
     init,
     payer = ticket_buyer,
-    space = 9 + size_of::<SeatVerification>(),
+    space = 8 + size_of::<SeatVerification>(),
     seeds = [
       b"seat_verification",
-      seat_index.to_string().as_bytes(),
-      seat_name.as_bytes(),
+      state.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
     ],
     bump,
   )]

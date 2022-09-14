@@ -12,6 +12,7 @@ use crate::{
 		create_sale::*,
 		fixed_price_purchase::*,
 		free_purchase::*,
+		verify_seat::*,
   },
 };
 
@@ -72,6 +73,32 @@ pub mod ticket_sale {
 			ctx,
 			ticket_type_index,
 			event_id,
+		)
+	}
+
+	/// This is the first ix user should call before buying a ticket. The reason we use this is purely due to Solana
+	/// Tx size limitation which is currently 1232 bytes. This causes an issue when we have a lot of tickets for an event
+	/// which results in longer merkle proofs which cause the tx to exceed the aforementioned size limit.
+	/// Solana will ultimately implement Tx v2 https://docs.solana.com/proposals/transactions-v2 which will allow to circumvent
+	/// such limitations. However, for the time being we need to use this multiple-step process.
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
+	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
+	/// * `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount
+	pub fn verify_seat(
+		ctx: Context<VerifySeat>,
+		seat_index: u32,
+		seat_name: String,
+		merkle_proof: Vec<[u8; 32]>,
+	) -> Result<()> {
+		processors::verify_seat::exec(
+			ctx,
+			seat_index,
+			seat_name,
+			merkle_proof,
 		)
 	}
 
