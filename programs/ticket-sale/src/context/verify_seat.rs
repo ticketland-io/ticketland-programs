@@ -1,8 +1,10 @@
 use anchor_lang::prelude::*;
+use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
     sale::*,
+    seat_verification::*,
   },
 };
 
@@ -10,7 +12,7 @@ use crate::{
 #[instruction(seat_index: u32, seat_name: String)]
 pub struct VerifySeat<'info> {
   #[account(mut)]
-  pub state: Box<Account<'info, State>>,
+  pub state: Account<'info, State>,
 
   #[account(
     mut,
@@ -22,5 +24,24 @@ pub struct VerifySeat<'info> {
     ],
     bump = sale.bump,
   )]
-  pub sale: Box<Account<'info, Sale>>,
+  pub sale: Account<'info, Sale>,
+
+  #[account(
+    init,
+    payer = ticket_buyer,
+    space = 9 + size_of::<SeatVerification>(),
+    seeds = [
+      b"seat_verification",
+      seat_index.to_string().as_bytes(),
+      seat_name.as_bytes(),
+    ],
+    bump,
+  )]
+  pub seat_verification: Account<'info, SeatVerification>,
+
+  #[account(mut)]
+  pub ticket_buyer: Signer<'info>,
+
+  pub system_program: Program<'info, System>,
+  pub rent: Sysvar<'info, Rent>,
 }
