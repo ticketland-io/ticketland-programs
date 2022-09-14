@@ -180,6 +180,76 @@
       ]
     },
     {
+      "name": "verifySeat",
+      "docs": [
+        "This is the first ix user should call before buying a ticket. The reason we use this is purely due to Solana",
+        "Tx size limitation which is currently 1232 bytes. This causes an issue when we have a lot of tickets for an event",
+        "which results in longer merkle proofs which cause the tx to exceed the aforementioned size limit.",
+        "Solana will ultimately implement Tx v2 https://docs.solana.com/proposals/transactions-v2 which will allow to circumvent",
+        "such limitations. However, for the time being we need to use this multiple-step process.",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
+        "* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatVerification",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "merkleProof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "fixedPricePurchase",
       "docs": [
         "Allows user to purchase a ticket on a fixed price",
@@ -188,8 +258,7 @@
         "",
         "* `ctx` - The Anchor context holding the accounts",
         "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
-        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
-        "* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT"
       ],
       "accounts": [
         {
@@ -364,17 +433,6 @@
         {
           "name": "seatName",
           "type": "string"
-        },
-        {
-          "name": "merkleProof",
-          "type": {
-            "vec": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          }
         }
       ]
     },
@@ -387,8 +445,7 @@
         "",
         "* `ctx` - The Anchor context holding the accounts",
         "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
-        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
-        "* `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount"
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT"
       ],
       "accounts": [
         {
@@ -526,17 +583,6 @@
         {
           "name": "seatName",
           "type": "string"
-        },
-        {
-          "name": "merkleProof",
-          "type": {
-            "vec": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          }
         }
       ]
     }
@@ -607,6 +653,18 @@
             "type": {
               "defined": "TicketType"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SeatVerification",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "verified",
+            "type": "bool"
           }
         ]
       }
