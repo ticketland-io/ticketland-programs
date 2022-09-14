@@ -1,19 +1,19 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, MintTo};
 use anchor_metaplex::{
-  CreateMetadata,
-  CreateMasterEdition,
-  create_metadata,
-  create_master_edition,
   mpl_token_metadata::state::{Metadata},
 };
+use common::{
+  utils::string::puffed_out_string,
+};
 use crate::{
+  account_data::ticket_metadata::{MAX_NAME_LENGTH},
   context::create_ticket::CreateTicket,
 };
 
 /// Will mint a new NFT token and transfer it to the ticket_nft_ata controlled by the PDA ticket_sale_cpi_authority
 /// owned by the Ticket sale program
-fn mint_edition_token(ctx: &Context<CreateTicket>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
+fn mint_ticket_nft(ctx: &Context<CreateTicket>, signer_seeds: &[&[&[u8]]]) -> Result<()> {
   let cpi_accounts = MintTo {
     mint: ctx.accounts.nft.to_account_info(),
     to: ctx.accounts.ticket_nft_ata.to_account_info(),
@@ -26,58 +26,6 @@ fn mint_edition_token(ctx: &Context<CreateTicket>, signer_seeds: &[&[&[u8]]]) ->
   token::mint_to(cpi_ctx, 1)
 }
 
-/// Create the Metaplex metadata
-fn create_nft_metadata(
-  ctx: &Context<CreateTicket>,
-  signer_seeds: &[&[&[u8]]],
-  name: String,
-) -> Result<()> {
-  let event_nft_metadata = Metadata::from_account_info(&ctx.accounts.event_nft_metadata)?;
-
-  let cpi_accounts = CreateMetadata {
-    mint: *ctx.accounts.nft.clone(),
-    mint_authority: ctx.accounts.nft_authority.to_account_info(),
-    metadata_account: ctx.accounts.metadata.clone(),
-    payer: ctx.accounts.ticket_buyer.to_account_info(),
-    update_authority: ctx.accounts.nft_authority.clone(),
-    system_program: ctx.accounts.system_program.to_account_info(),
-    rent: ctx.accounts.rent.to_account_info(),
-  };
-
-  create_metadata(
-    cpi_accounts,
-    signer_seeds,
-    name,
-    event_nft_metadata.data.symbol.trim_matches(char::from(0)).to_owned(),
-    event_nft_metadata.data.uri.trim_matches(char::from(0)).to_owned(),
-    None,
-    0,
-    true,
-    false,
-    None,
-    None,
-  )?;
-
-  let cpi_accounts = CreateMasterEdition {
-    edition: ctx.accounts.master_edition.clone(),
-    mint: *ctx.accounts.nft.clone(),
-    mint_authority: ctx.accounts.nft_authority.clone(),
-    metadata_account: ctx.accounts.metadata.clone(),
-    payer: ctx.accounts.ticket_buyer.to_account_info(),
-    update_authority: ctx.accounts.nft_authority.to_account_info(),
-    system_program: ctx.accounts.system_program.to_account_info(),
-    rent: ctx.accounts.rent.to_account_info(),
-  };
-
-  create_master_edition(
-    cpi_accounts,
-    signer_seeds,
-    Some(0),
-  )?;
-
-  Ok(())
-}
-
 pub fn exec(
   ctx: Context<CreateTicket>,
   event_id: [u8; 32],
@@ -87,12 +35,17 @@ pub fn exec(
   name: String,
 ) -> Result<()> {  
   let ticket_metadata = &mut ctx.accounts.ticket_metadata;
+  let event_nft_metadata = Metadata::from_account_info(&ctx.accounts.event_nft_metadata)?;
 
+  ticket_metadata.mint = ctx.accounts.nft.key();
+  ticket_metadata.collection = ctx.accounts.event_nft_metadata.key();
+  ticket_metadata.name = puffed_out_string(&name, MAX_NAME_LENGTH);
+  ticket_metadata.symbol = event_nft_metadata.data.symbol;
+  ticket_metadata.uri = event_nft_metadata.data.uri;
   ticket_metadata.event_id = event_id;
   ticket_metadata.seat_index = seat_index;
   ticket_metadata.sale = sale;
   ticket_metadata.price_sold = price_sold;
-  ticket_metadata.metadata = ctx.accounts.metadata.key();
   ticket_metadata.owner = ctx.accounts.ticket_buyer.key();
   ticket_metadata.attended = false;
 
@@ -105,8 +58,7 @@ pub fn exec(
   ];
   let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
 
-  mint_edition_token(&ctx, signer_seeds)?;
-  create_nft_metadata(&ctx, signer_seeds, name)?;
+  mint_ticket_nft(&ctx, signer_seeds)?;
 
   Ok(())
 }

@@ -1,9 +1,35 @@
 use anchor_lang::prelude::*;
 
+pub const MAX_NAME_LENGTH: usize = 32;
+
+// Symbol and URI do not have an explicit max length in our program. This is because we copy those values from the
+// Event NFT which is a Metaplex metadata account that does enforce max lengths already. In essence, it is indirectly applied
+pub const MAX_SYMBOL_LENGTH: usize = 10;
+pub const MAX_URI_LENGTH: usize = 200;
+
+pub const ADDITIONAL_SIZE: usize = MAX_NAME_LENGTH
+  + MAX_SYMBOL_LENGTH
+  + MAX_URI_LENGTH;
+
 /// A wrapper around the Metaplex metadata that includes additional custom data related to our
 /// ticketing system.
 #[account]
 pub struct TicketMetadata {
+  /// The actual token Mint account
+  pub mint: Pubkey,
+
+  /// The Event NFT that this NFT belongs to
+  pub collection: Pubkey,
+
+  /// The name of the asset
+  pub name: String,
+
+  /// The symbol for the asset
+  pub symbol: String,
+  
+  /// URI pointing to JSON representing the asset
+  pub uri: String,
+
   /// Indicated if the owner of this ticket attended the event
   pub attended: bool,
   
@@ -24,7 +50,4 @@ pub struct TicketMetadata {
 
   /// The original owner of the Ticket NFT
   pub owner: Pubkey,
-
-  /// The metaplex metadata associated with this NFT
-  pub metadata: Pubkey,
 }

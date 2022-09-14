@@ -29,7 +29,6 @@ use anchor_metaplex::{
   mpl_token_metadata::{
     pda::{
       find_metadata_account,
-      find_master_edition_account,
     },
   },
 };
@@ -197,7 +196,7 @@ impl Runner {
     merkle_proof: Vec<[u8; 32]>,
   ) -> AnchorResult<()> {
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
-    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
+    let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
 
     let accounts = ticket_sale::accounts::VerifySeat {
       state: ticket_sale_state,
@@ -236,7 +235,8 @@ impl Runner {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
-    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
+    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
+    let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
 
     let accounts = ticket_sale::accounts::FixedPricePurchase {
       state: ticket_sale_state,
@@ -256,13 +256,10 @@ impl Runner {
       ticket_nft,
       nft_authority: TicketNftPda::nft_authority(&ticket_nft_program_state).0,
       ticket_metadata: TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0,
-      master_edition: find_master_edition_account(&ticket_nft).0,
-      ticket_metaplex_metadata: find_metadata_account(&ticket_nft).0,
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
       ticket_nft_program: ticket_nft_program_id(),
-      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
       system_program: system_program::ID,
@@ -296,7 +293,8 @@ impl Runner {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
-    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
+    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
+    let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
 
     let accounts = ticket_sale::accounts::FreePurchase {
       state: ticket_sale_state,
@@ -311,13 +309,10 @@ impl Runner {
       ticket_nft,
       nft_authority: TicketNftPda::nft_authority(&ticket_nft_program_state).0,
       ticket_metadata: TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0,
-      master_edition: find_master_edition_account(&ticket_nft).0,
-      ticket_metaplex_metadata: find_metadata_account(&ticket_nft).0,
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
       ticket_nft_program: ticket_nft_program_id(),
-      metadata_program: anchor_metaplex::mpl_token_metadata::ID,
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
       system_program: system_program::ID,
