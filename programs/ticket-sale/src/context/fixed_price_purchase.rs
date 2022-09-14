@@ -42,6 +42,8 @@ pub struct FixedPricePurchase<'info> {
   pub event: AccountInfo<'info>,
 
   #[account(
+    mut,
+    close = ticket_buyer,
     seeds = [
       b"seat_verification",
       state.key().as_ref(),

@@ -367,3 +367,63 @@ async fn should_fail_if_seat_was_not_verified(ctx: &mut TestContext) {
   // Fails with Anchor Error Code: AccountNotInitialized. Error Number: 3012
   assert!(!result.is_ok());
 }
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
+  let (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    mt_type_1,
+    event_capacity,
+  ) = setup(ctx).await;
+
+  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+  // move to the start of sale
+  {
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+  }
+
+  let seat_index = 0;
+  // verify the seat
+  {
+    let result = ctx.ticket_sale_runner.verify_seat(
+      &ticket_buyer,
+      ticket_sale_state.pubkey(),
+      event_id,
+      0, // ticket_type_index
+      seat_index,
+      TicketSaleRunner::dummy_seat_name(0),
+      mt_type_1.proof(&[0]), // proof path for leaf 0
+    ).await;
+
+    assert!(result.is_ok());
+  }
+
+  let result = ctx.ticket_sale_runner.free_purchase(
+    &ticket_buyer,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    event_capacity,
+    event_organizer.pubkey(),
+    ticket_nft_state.pubkey(),
+    event_id,
+    0, // ticket_type_index
+    seat_index,
+		TicketSaleRunner::dummy_seat_name(0),
+  ).await;
+
+  assert!(result.is_ok());
+
+  let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state.pubkey(), seat_index, &TicketSaleRunner::dummy_seat_name(0)).0;
+  let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+  let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
+  assert!(account.is_none());
+
+}

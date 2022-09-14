@@ -170,7 +170,7 @@ pub async fn setup(
 
   // verify the seat
   {
-    let result = ticket_sale_runner.verify_seat(
+    let _ = ticket_sale_runner.verify_seat(
       &ticket_buyer,
       ticket_sale_state,
       event_id,
@@ -179,8 +179,6 @@ pub async fn setup(
       TicketSaleRunner::dummy_seat_name(0),
       mt_type_1.proof(&[0]), // proof path for leaf 0
     ).await;
-
-    assert!(result.is_ok());
   }
 
   // Purchase a new ticket from the primary market
