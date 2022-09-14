@@ -362,16 +362,6 @@
           "isSigner": false
         },
         {
-          "name": "ticketMetaplexMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "masterEdition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "ticketNftAta",
           "isMut": true,
           "isSigner": false,
@@ -411,11 +401,6 @@
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -519,16 +504,6 @@
           "isSigner": false
         },
         {
-          "name": "masterEdition",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ticketMetaplexMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "ticketNftAta",
           "isMut": true,
           "isSigner": false,
@@ -566,11 +541,6 @@
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataProgram",
           "isMut": false,
           "isSigner": false
         },
