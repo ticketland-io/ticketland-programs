@@ -365,7 +365,5 @@ async fn should_fail_if_seat_was_not_verified(ctx: &mut TestContext) {
   ).await;
 
   // Fails with Anchor Error Code: AccountNotInitialized. Error Number: 3012
-  // Error::assert_err(result, ticket_sale::utils::program_error::ErrorCode::SeatNotVerified);
-
   assert!(!result.is_ok());
 }

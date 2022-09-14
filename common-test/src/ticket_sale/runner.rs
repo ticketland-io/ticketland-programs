@@ -39,7 +39,6 @@ use common::{
     get_null_leaf,
   },
 };
-use ticket_sale::account_data::seat_verification;
 use crate::{
   event_registry::{
     pda as EventRegistryPda,
