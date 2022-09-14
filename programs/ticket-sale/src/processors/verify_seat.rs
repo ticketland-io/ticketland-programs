@@ -18,6 +18,8 @@ pub fn exec(
   merkle_proof: Vec<[u8; 32]>,
 ) -> Result<()> {
   let seat_verification = &mut ctx.accounts.seat_verification;
+  
+  seat_verification.bump = *ctx.bumps.get("seat_verification").unwrap();
   seat_verification.verified = true;
 
   Ok(())
