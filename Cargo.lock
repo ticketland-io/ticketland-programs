@@ -4418,6 +4418,7 @@ dependencies = [
  "anchor-metaplex",
  "anchor-safe-math",
  "anchor-spl",
+ "common",
  "common-test",
  "mpl-token-metadata",
  "solana-program-test",

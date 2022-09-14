@@ -272,6 +272,11 @@
           "isSigner": false
         },
         {
+          "name": "seatVerification",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "sale",
           "isMut": true,
           "isSigner": false
@@ -456,6 +461,11 @@
         {
           "name": "event",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatVerification",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -662,6 +672,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
           {
             "name": "verified",
             "type": "bool"
@@ -1028,6 +1042,11 @@
       "code": 6015,
       "name": "InvalidTicketTypeIndex",
       "msg": "Invalid ticket type index"
+    },
+    {
+      "code": 6016,
+      "name": "SeatNotVerified",
+      "msg": "Seat was not verified"
     }
   ]
 }

@@ -39,6 +39,7 @@ use common_test::{
   test_context::TestContext,
   event_registry::{
     runner::Runner as EventRegistryRunner,
+    pda as EventRegistryPda,
   },
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
@@ -296,13 +297,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
   {
     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     let nft_authority = TicketNftPda::nft_authority(&ticket_nft_state.pubkey()).0;
-    let ticket_nft_data = pt.context.banks_client.get_account(ticket_nft).await.unwrap().unwrap();
-    let ticket_nft_data = TokenMint::try_deserialize_unchecked(&mut &ticket_nft_data.data[..]).unwrap();
-    
-    // mint authority is transferred to the master edition when the latter is created
-    let master_edition = find_master_edition_account(&ticket_nft).0;
-    assert_eq!(ticket_nft_data.mint_authority.unwrap(), master_edition);
-    assert_eq!(ticket_nft_data.supply, 1);
 
     // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA
     // controlled by the ticket sale program.
@@ -314,19 +308,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     assert_eq!(ticket_nft_ata_data.mint, ticket_nft);
     assert_eq!(ticket_nft_ata_data.owner, ticket_sale_cpi_authority);
     assert_eq!(ticket_nft_ata_data.amount, 1);
-
-    // metaplex
-    let metadata = find_metadata_account(&ticket_nft).0;
-    let account = pt.context.banks_client.get_account(metadata).await.unwrap().unwrap();
-    let metadata = meta_deser(&mut &account.data[..]).unwrap();
-
-    assert_eq!(metadata.update_authority, nft_authority);
-    assert_eq!(metadata.mint, ticket_nft);
-    assert_eq!(metadata.collection, None);
-    assert_eq!(metadata.data.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
-    assert_eq!(metadata.data.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
-    assert_eq!(metadata.data.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
-    assert_eq!(metadata.data.seller_fee_basis_points, 0);
   }
 
   // Check out custom Ticket Metadata
@@ -336,9 +317,14 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
     let metaplex_metadata = find_metadata_account(&ticket_nft).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state.pubkey(), 0, event_id).0;
+    let event_nft = EventRegistryPda::event_nft(&event_registry_state.pubkey(), event_id).0;
 
+    assert_eq!(ticket_metadata.mint, ticket_nft);
+    assert_eq!(ticket_metadata.collection, find_metadata_account(&event_nft).0);
+    assert_eq!(ticket_metadata.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
+    assert_eq!(ticket_metadata.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
+    assert_eq!(ticket_metadata.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
     assert_eq!(ticket_metadata.event_id, event_id);
-    assert_eq!(ticket_metadata.metadata, metaplex_metadata);
     assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
     assert_eq!(ticket_metadata.seat_index, seat_index);
     assert_eq!(ticket_metadata.price_sold, sol_to_lamports(1_f64));

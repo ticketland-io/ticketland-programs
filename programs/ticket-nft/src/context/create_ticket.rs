@@ -4,16 +4,10 @@ use anchor_spl::{
   token::{Mint, Token, TokenAccount},
   associated_token::AssociatedToken,
 };
-use anchor_metaplex::{
-  mpl_token_metadata::{
-    ID as metadata_id,
-    state::{PREFIX},
-  }
-};
 use crate::{
   account_data::{
     state::*,
-    ticket_metadata::TicketMetadata,
+    ticket_metadata::{self, TicketMetadata},
   },
 };
 
@@ -27,7 +21,7 @@ pub struct CreateTicket<'info> {
   #[account(
     init,
     payer = ticket_buyer,
-    space = 8 + size_of::<TicketMetadata>(),
+    space = 8 + size_of::<TicketMetadata>() + ticket_metadata::ADDITIONAL_SIZE,
     seeds = [
       b"ticket_metadata",
       state.key().as_ref(),
@@ -65,24 +59,6 @@ pub struct CreateTicket<'info> {
   #[account()]
   pub event_nft_metadata: AccountInfo<'info>,
 
-  /// CHECK: The metaplex metadata account that will be initialized in the processor
-  #[account(
-    mut,
-    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), nft.key().as_ref()],
-    seeds::program = metadata_id,
-    bump,
-  )]
-  pub metadata: AccountInfo<'info>,
-
-  /// CHECK: The NFT master edition account
-  #[account(
-    mut,
-    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), nft.key().as_ref(), "edition".as_bytes()],
-    seeds::program = metadata_id,
-    bump,
-  )]
-  pub master_edition: AccountInfo<'info>,
-
   /// The ATA that is a PDA controlled by the Ticket sale program and will be the owner of the Ticket NFT
   /// until the end of the event.
   #[account(
@@ -107,8 +83,6 @@ pub struct CreateTicket<'info> {
 
   associated_token_program: Program<'info, AssociatedToken>,
   pub token_program: Program<'info, Token>,
-  /// CHECK: The metadata program
-  pub metadata_program: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }

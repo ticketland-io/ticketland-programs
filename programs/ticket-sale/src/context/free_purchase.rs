@@ -137,24 +137,6 @@ pub struct FreePurchase<'info> {
   )]
   pub ticket_metadata: AccountInfo<'info>,
 
-  /// CHECK: The NFT master edition account
-  #[account(
-    mut,
-    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), ticket_nft.key().as_ref(), "edition".as_bytes()],
-    seeds::program = metadata_id,
-    bump,
-  )]
-  pub master_edition: AccountInfo<'info>,
-
-  /// CHECK: The metaplex metadata account that will be initialized in the processor
-  #[account(
-    mut,
-    seeds = [PREFIX.as_bytes(), metadata_id.as_ref(), ticket_nft.key().as_ref()],
-    seeds::program = metadata_id,
-    bump,
-  )]
-  pub ticket_metaplex_metadata: AccountInfo<'info>,
-
   /// CHECK:
   /// The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT
   /// until the end of the event.
@@ -189,8 +171,6 @@ pub struct FreePurchase<'info> {
 
   pub token_program: Program<'info, Token>,
   pub associated_token_program: Program<'info, AssociatedToken>,
-  /// CHECK: The metadata program
-  pub metadata_program: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
   pub rent: Sysvar<'info, Rent>,
 }
