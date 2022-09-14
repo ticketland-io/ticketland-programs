@@ -143,7 +143,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
+  let event_capacity = runner.create_event_capacity_account(100_000.0).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   
@@ -344,7 +344,7 @@ async fn should_transfer_deposit_amount_to_fund_manager_ata(ctx: &mut TestContex
   let runner = &mut ctx.event_registry_runner;
   let ticket_sale_runner = &mut ctx.ticket_sale_runner;
   let state = Keypair::new();
-  let event_capacity = runner.create_event_capacity_account(10.0).await;
+  let event_capacity = runner.create_event_capacity_account(100_000.0).await;
   let event_id: [u8; 32] = "85ac6394e04a4b3c8ccd7e2772cb14b4".to_owned().into_bytes().try_into().unwrap();
   let event_organizer = runner.get_participant(1);
   

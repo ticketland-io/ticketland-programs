@@ -18,12 +18,13 @@ use crate::{
     state::*,
     event_capacity::*,
     sale::*,
+    seat_verification::*,
   },
   utils::program_error::ErrorCode,
 };
 
 #[derive(Accounts)]
-#[instruction(seat_index: u32)]
+#[instruction(seat_index: u32, seat_name: String)]
 pub struct FixedPricePurchase<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
@@ -39,6 +40,20 @@ pub struct FixedPricePurchase<'info> {
     seeds::program = state.event_registry_program,
   )]
   pub event: AccountInfo<'info>,
+
+  #[account(
+    mut,
+    close = ticket_buyer,
+    seeds = [
+      b"seat_verification",
+      state.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
+    ],
+    bump = seat_verification.bump,
+    constraint = seat_verification.verified @ ErrorCode::SeatNotVerified,
+  )]
+  pub seat_verification: Account<'info, SeatVerification>,
 
   #[account(
     mut,

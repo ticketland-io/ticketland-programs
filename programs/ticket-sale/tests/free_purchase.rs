@@ -8,7 +8,7 @@ use anchor_lang::{
 use test_context::{test_context, futures};
 use solana_test_utils::{
   spl::Spl,
-  serialization::deser_zero_account,
+  merkle_tree::MerkleTree,
 };
 use solana_sdk::{
   signature::{Signer, Keypair},
@@ -47,7 +47,7 @@ use common_test::{
   },
 };
 use ticket_sale::{
-  account_data::event_capacity::{EventCapacity, MAX_VENUE_CAPACITY},
+  account_data::event_capacity::EventCapacity,
 };
 
 async fn init(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair) {
@@ -117,9 +117,7 @@ async fn custom_create_event(
   ).await;
 }
 
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestContext) {
+async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Vec<TicketType>, [u8; 32], MerkleTree, Pubkey)  {
   let (
     event_registry_state,
     ticket_sale_state,
@@ -134,9 +132,9 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
   let deposit_token = event_registry_runner.deposit_tokens[2];
 
   // ticket type 1 includes seats 0, 1, 2, 5, 6, 7
-  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)]);
+  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)], 10);
   // ticket type 3 includes seats 3, 4, 8, 9
-  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)]);
+  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)], 10);
 
   let ticket_types;
   
@@ -189,16 +187,57 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     0, // ticket_type_index
   ).await;
 
-  let ticket_buyer = event_registry_runner.get_participant(2);
+  (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    mt_type_1,
+    event_capacity,
+  )
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestContext) {
+  let (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    mt_type_1,
+    event_capacity,
+  ) = setup(ctx).await;
+
+  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
 
   // move to the start of sale
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
   }
 
   let seat_index = 0;
-  let result = ticket_sale_runner.free_purchase(
+  // verify the seat
+  {
+    let result = ctx.ticket_sale_runner.verify_seat(
+      &ticket_buyer,
+      ticket_sale_state.pubkey(),
+      event_id,
+      0, // ticket_type_index
+      seat_index,
+      TicketSaleRunner::dummy_seat_name(0),
+      mt_type_1.proof(&[0]), // proof path for leaf 0
+    ).await;
+
+    assert!(result.is_ok());
+  }
+
+  let result = ctx.ticket_sale_runner.free_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
@@ -209,7 +248,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     0, // ticket_type_index
     seat_index,
 		TicketSaleRunner::dummy_seat_name(0),
-		mt_type_1.proof(&[0]), // proof path for leaf 0
   ).await;
 
   assert!(result.is_ok());
@@ -218,7 +256,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   // ticket nft Mint account and Metaplex metadata
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     let nft_authority = TicketNftPda::nft_authority(&ticket_nft_state.pubkey()).0;
     let ticket_nft_data = pt.context.banks_client.get_account(ticket_nft).await.unwrap().unwrap();
     let ticket_nft_data = TokenMint::try_deserialize_unchecked(&mut &ticket_nft_data.data[..]).unwrap();
@@ -255,7 +293,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   // Check out custom Ticket Metadata
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
     let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
     let metaplex_metadata = find_metadata_account(&ticket_nft).0;
@@ -272,7 +310,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   // Ticket sale state is updated
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     let ticket_metadata = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
 
     assert_eq!(ticket_metadata.total_sold, 1);
@@ -280,14 +318,112 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
 
   // Event capacity is updated
   {
-    let mut pt = ticket_sale_runner.pt.lock().await;
-    let event_capacity = pt.context.banks_client.get_account(event_capacity).await.unwrap().unwrap();
-    let event_capacity = deser_zero_account::<EventCapacity>(&event_capacity.data);
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    let event_capacity = pt.get_account::<EventCapacity>(event_capacity).await;
     let available_tickets = event_capacity.available_tickets;
 
-    assert!(bitmap::is_set::<MAX_VENUE_CAPACITY>(seat_index, &event_capacity.seats));
+    assert!(bitmap::is_set(seat_index, &event_capacity.seats));
     assert_eq!(available_tickets, 9);
     assert_eq!(event_capacity.is_initialized, true);
     assert_eq!(event_capacity.event_id, event_id);
   }
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_seat_was_not_verified(ctx: &mut TestContext) {
+  let (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    _,
+    event_capacity,
+  ) = setup(ctx).await;
+
+  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+  // move to the start of sale
+  {
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+  }
+
+  let result = ctx.ticket_sale_runner.free_purchase(
+    &ticket_buyer,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    event_capacity,
+    event_organizer.pubkey(),
+    ticket_nft_state.pubkey(),
+    event_id,
+    0, // ticket_type_index
+    0,
+		TicketSaleRunner::dummy_seat_name(0),
+  ).await;
+
+  // Fails with Anchor Error Code: AccountNotInitialized. Error Number: 3012
+  assert!(!result.is_ok());
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
+  let (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    mt_type_1,
+    event_capacity,
+  ) = setup(ctx).await;
+
+  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+  // move to the start of sale
+  {
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+  }
+
+  let seat_index = 0;
+  // verify the seat
+  {
+    let result = ctx.ticket_sale_runner.verify_seat(
+      &ticket_buyer,
+      ticket_sale_state.pubkey(),
+      event_id,
+      0, // ticket_type_index
+      seat_index,
+      TicketSaleRunner::dummy_seat_name(0),
+      mt_type_1.proof(&[0]), // proof path for leaf 0
+    ).await;
+
+    assert!(result.is_ok());
+  }
+
+  let result = ctx.ticket_sale_runner.free_purchase(
+    &ticket_buyer,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    event_capacity,
+    event_organizer.pubkey(),
+    ticket_nft_state.pubkey(),
+    event_id,
+    0, // ticket_type_index
+    seat_index,
+		TicketSaleRunner::dummy_seat_name(0),
+  ).await;
+
+  assert!(result.is_ok());
+
+  let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state.pubkey(), seat_index, &TicketSaleRunner::dummy_seat_name(0)).0;
+  let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+  let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
+  assert!(account.is_none());
+
 }

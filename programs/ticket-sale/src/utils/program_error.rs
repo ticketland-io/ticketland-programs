@@ -34,4 +34,6 @@ pub enum ErrorCode {
   WrongTicketNftProgramStateAccount,
   #[msg("Invalid ticket type index")]
   InvalidTicketTypeIndex,
+  #[msg("Seat was not verified")]
+  SeatNotVerified,
 }

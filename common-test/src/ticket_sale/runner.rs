@@ -186,6 +186,39 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&event_organizer])).await
   }
 
+  pub async fn verify_seat(
+    &mut self,
+    ticket_buyer: &Keypair,
+    ticket_sale_state: Pubkey,
+    event_id: [u8; 32],
+    ticket_type_index: u8,
+    seat_index: u32,
+		seat_name: String,
+    merkle_proof: Vec<[u8; 32]>,
+  ) -> AnchorResult<()> {
+    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
+    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
+
+    let accounts = ticket_sale::accounts::VerifySeat {
+      state: ticket_sale_state,
+      sale,
+      seat_verification,
+      ticket_buyer: ticket_buyer.pubkey(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = ticket_sale::instruction::VerifySeat {seat_index, seat_name, merkle_proof}.data();
+
+    let ix = Instruction {
+      program_id: ticket_sale_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
+
   pub async fn fixed_price_purchase(
     &mut self,
     ticket_buyer: &Keypair,
@@ -199,14 +232,15 @@ impl Runner {
     ticket_type_index: u8,
     seat_index: u32,
 		seat_name: String,
-		merkle_proof: Vec<[u8; 32]>,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
+    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
 
     let accounts = ticket_sale::accounts::FixedPricePurchase {
       state: ticket_sale_state,
+      seat_verification,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
       sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
       cpi_authority,
@@ -235,7 +269,7 @@ impl Runner {
       rent: Rent::id(),
     }.to_account_metas(None);
 
-    let data = ticket_sale::instruction::FixedPricePurchase {seat_index, seat_name, merkle_proof}.data();
+    let data = ticket_sale::instruction::FixedPricePurchase {seat_index, seat_name}.data();
 
     let ix = Instruction {
       program_id: ticket_sale_program_id(),
@@ -258,14 +292,15 @@ impl Runner {
     ticket_type_index: u8,
     seat_index: u32,
 		seat_name: String,
-		merkle_proof: Vec<[u8; 32]>,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
+    let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state, seat_index, &seat_name).0;
 
     let accounts = ticket_sale::accounts::FreePurchase {
       state: ticket_sale_state,
+      seat_verification,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
       sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
       cpi_authority,
@@ -289,7 +324,7 @@ impl Runner {
       rent: Rent::id(),
     }.to_account_metas(None);
 
-    let data = ticket_sale::instruction::FreePurchase {seat_index, seat_name, merkle_proof}.data();
+    let data = ticket_sale::instruction::FreePurchase {seat_index, seat_name}.data();
 
     let ix = Instruction {
       program_id: ticket_sale_program_id(),

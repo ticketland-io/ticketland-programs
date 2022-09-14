@@ -168,6 +168,19 @@ pub async fn setup(
     pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
   }
 
+  // verify the seat
+  {
+    let _ = ticket_sale_runner.verify_seat(
+      &ticket_buyer,
+      ticket_sale_state,
+      event_id,
+      ticket_type_index,
+      seat_index,
+      TicketSaleRunner::dummy_seat_name(0),
+      mt_type_1.proof(&[0]), // proof path for leaf 0
+    ).await;
+  }
+
   // Purchase a new ticket from the primary market
   let result = ticket_sale_runner.fixed_price_purchase(
     &ticket_buyer,
@@ -181,7 +194,6 @@ pub async fn setup(
     ticket_type_index, // ticket_type_index
     seat_index,
     TicketSaleRunner::dummy_seat_name(0),
-    mt_type_1.proof(&[0]), // proof path for leaf 0
   ).await;
   
     assert!(result.is_ok());

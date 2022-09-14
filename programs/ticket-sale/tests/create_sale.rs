@@ -66,9 +66,9 @@ async fn custom_create_event(
   deposit_token: Pubkey,
 ) -> Vec<TicketType> {
   // ticket type 1 includes seats 0, 1, 2, 5, 6, 7
-  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)]);
+  let mt_type_1 = ticket_sale_runner.create_ticket_type_mt(vec![(0, 2), (5, 7)], 10);
   // ticket type 3 includes seats 3, 4, 8, 9
-  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)]);
+  let mt_type_2 = ticket_sale_runner.create_ticket_type_mt(vec![(3, 4), (8, 9)], 10);
 
   let ticket_types;
   

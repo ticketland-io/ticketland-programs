@@ -11,7 +11,6 @@ use crate::{
   account_data::{
     event::Event,
   },
-  acl::seat_validity,
   utils::program_error::ErrorCode,
 };
 
@@ -84,44 +83,36 @@ fn account_checks(ctx: &Context<FreePurchase>, event: &Event) -> Result<()>  {
   Ok(())
 }
 
-// 1. Make sure that the given params belong to the Sale's ticket_type sparse MT
-#[access_control(seat_validity::verify(
-  ctx.accounts.sale.ticket_type.merkle_root,
-  merkle_proof,
-  seat_index,
-  &seat_name,
-))]
 pub fn exec(
   ctx: Context<FreePurchase>,
   seat_index: u32,
   seat_name: String,
-  merkle_proof: Vec<[u8; 32]>,
 ) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
 
   account_checks(&ctx, &event)?;
 
-  // 2. Has sale started?
+  // 1. Has sale started?
   let sale = &ctx.accounts.sale;
   // TODO: Use an oracle to get the current time
   require!(Clock::get().unwrap().unix_timestamp >= sale.ticket_type.sale_start_time, ErrorCode::SaleNotStarted);
   require!(Clock::get().unwrap().unix_timestamp <= sale.ticket_type.sale_end_time, ErrorCode::SaleFinished);
 
-  // 3. Are there any available seats for this type of ticket
+  // 2. Are there any available seats for this type of ticket
   
   let event_capacity = &ctx.accounts.event_capacity;
   require!(event_capacity.available_tickets > 0, ErrorCode::TicketSoldOut);
 
-  // 4. Check that the seat_index is available
+  // 3. Check that the seat_index is available
   require!(
     !bitmap::is_set(seat_index, &event_capacity.seats),
     ErrorCode::SeatNotAvailable,
   );
 
-  // 5. CPI to Ticket NFT program to mint the ticket
+  // 4. CPI to Ticket NFT program to mint the ticket
   mint_ticket(&ctx, seat_index, seat_name)?;
 
-  // 6. Update state
+  // 5. Update state
   let event_capacity = &mut ctx.accounts.event_capacity;
   bitmap::flip_bit(seat_index, &mut event_capacity.seats);
   
