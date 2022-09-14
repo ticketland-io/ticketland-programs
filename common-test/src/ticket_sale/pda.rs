@@ -27,3 +27,15 @@ pub fn cpi_authority(state: &Pubkey) -> (Pubkey, u8) {
     &ticket_sale_program_id(),
   )
 }
+
+pub fn seat_verification(state: &Pubkey, seat_index: u32, seat_name: String) -> (Pubkey, u8) {
+  Pubkey::find_program_address(
+    &[
+      b"seat_verification",
+      state.as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),  
+    ],
+    &ticket_sale_program_id(),
+  )
+}
