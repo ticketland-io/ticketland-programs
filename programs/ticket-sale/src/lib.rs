@@ -109,18 +109,15 @@ pub mod ticket_sale {
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
 	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
-	/// * `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount
 	pub fn fixed_price_purchase(
 		ctx: Context<FixedPricePurchase>,
 		seat_index: u32,
 		seat_name: String,
-		merkle_proof: Vec<[u8; 32]>,
 	) -> Result<()> {
 		processors::fixed_price_purchase::exec(
 			ctx,
 			seat_index,
 			seat_name,
-			merkle_proof,
 		)
 	}
 
@@ -131,18 +128,15 @@ pub mod ticket_sale {
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
 	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
-	/// * `merkle_proof` - The proof that will make sure that user does not buy a seat of a higher type by paying lower amount
 	pub fn free_purchase(
 		ctx: Context<FreePurchase>,
 		seat_index: u32,
 		seat_name: String,
-		merkle_proof: Vec<[u8; 32]>,
 	) -> Result<()> {
 		processors::free_purchase::exec(
 			ctx,
 			seat_index,
 			seat_name,
-			merkle_proof,
 		)
 	}
 }
