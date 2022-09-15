@@ -170,6 +170,10 @@ impl Runner {
     pt.process_transaction(instructions, signers).await.map_err(Into::into)
   }
 
+  pub fn get_uri_operators(&self) -> Vec<Pubkey> {
+    vec![self.get_participant(5).pubkey(), self.get_participant(6).pubkey()]
+  }
+
   pub async fn initialize(
     &mut self,
     state: &Keypair,
@@ -188,6 +192,7 @@ impl Runner {
 
     let data = event_registry::instruction::Initialize {
       supported_currencies: self.supported_currencies.clone(),
+      uri_update_operators: self.get_uri_operators(),
       seller_fee_basis_points,
     }.data();
 
