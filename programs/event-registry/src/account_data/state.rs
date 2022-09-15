@@ -4,6 +4,7 @@ use common::{
 };
 
 pub const MAX_CURRENCY_SUPPORT: usize = 10;
+pub const MAX_URI_UPDATE_OPERATORS: usize = 10;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
@@ -20,4 +21,5 @@ pub struct State {
   pub cpi_authority: Pubkey,
   pub deployer: Pubkey,
   pub supported_currencies: Vec<Currency>,
+  pub uri_update_operators: Vec<Pubkey>,
 }

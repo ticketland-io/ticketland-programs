@@ -20,4 +20,6 @@ pub enum ErrorCode {
   WrongTicketSaleProgramStateAccount,
   #[msg("Ticket sale must the the owner")]
   TicketSaleMustBeOwner,
+  #[msg("Only URI update operator")]
+  OnlyUriUpdateOperator,
 }
