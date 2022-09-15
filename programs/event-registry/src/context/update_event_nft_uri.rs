@@ -33,7 +33,7 @@ pub struct UpdateEventNftUri<'info> {
     seeds::program = metadata_id,
     bump,
   )]
-  pub metadata: AccountInfo<'info>,
+  pub event_nft_metadata: AccountInfo<'info>,
 
   #[account(
     mut,

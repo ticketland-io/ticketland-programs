@@ -16,6 +16,7 @@ use crate::{
 		create_event::*,
 		create_event_nft::*,
 		update_supported_currencies::*,
+		update_event_nft_uri::*,
 	},
 };
 
@@ -116,6 +117,24 @@ use super::*;
 		processors::update_supported_currencies::exec(
 			ctx,
 			supported_currencies,
+		)
+	}
+
+	/// Allows one of the uri update operators to update the metadata uri of the given event_nft
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `event_nft` - The event nft whose metadata uri will be updated
+	/// * `new_uri` - The new uri
+	pub fn update_event_nft_uri(
+		ctx: Context<UpdateEventNftUri>,
+		_event_nft: Pubkey,
+		new_uri: String,
+	) -> Result<()> {
+		processors::update_event_nft_uri::exec(
+			ctx,
+			new_uri,
 		)
 	}
 }
