@@ -32,17 +32,20 @@ use super::*;
 	/// * `supported_currencies` - The list of currencies the current instant will support. These are the
 	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to 
 	/// create a new event
+	/// * `uri_update_operators` - The list of accounts that can update the Event NFT metadata uri
 	/// * `seller_fee_basis_points` - This will be attached to each event NFT metadata that is created. NFT tickets are
 	/// non-transferable. However, the same does not apply for the Event NFTs (i.e. Event NFT Collection). We envision event organizer
 	/// to want to sell Event NFTs in the future for charity purposes for example.
 	pub fn initialize(
 		ctx: Context<Initialize>,
 		supported_currencies: Vec<Currency>,
+		uri_update_operators: Vec<Pubkey>,
 		seller_fee_basis_points: u16,
 	) -> Result<()> {
 		processors::initialize::exec(
 			ctx,
 			supported_currencies,
+			uri_update_operators,
 			seller_fee_basis_points,
 		)
 	}

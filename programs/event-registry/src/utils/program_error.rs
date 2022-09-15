@@ -22,4 +22,6 @@ pub enum ErrorCode {
   TicketSaleMustBeOwner,
   #[msg("Only URI update operator")]
   OnlyUriUpdateOperator,
+  #[msg("Too many uri update operators")]
+  TooManyUriUpdateOperators,
 }

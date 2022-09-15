@@ -36,6 +36,7 @@ impl TryFrom<u32> for Error {
       7 => Ok(Error(event_registry::utils::program_error::ErrorCode::WrongTicketSaleProgramStateAccount)),
       8 => Ok(Error(event_registry::utils::program_error::ErrorCode::TicketSaleMustBeOwner)),
       9 => Ok(Error(event_registry::utils::program_error::ErrorCode::OnlyUriUpdateOperator)),
+      10 => Ok(Error(event_registry::utils::program_error::ErrorCode::TooManyUriUpdateOperators)),
       _ => Err(())
     }
   }
