@@ -42,8 +42,11 @@ const initializeEventRegistry = async (deploymentConfig) => {
     }]
   }, [])
 
+  const uriUpdateOperators = deploymentConfig.uriUpdateOperators.map(pk => new PublicKey(pk))
+
   await program.rpc.initialize(
     supportedCurrencies,
+    uriUpdateOperators,
     new anchor.BN(deploymentConfig.sellerFeeBasisPoint),
     {
       accounts: {

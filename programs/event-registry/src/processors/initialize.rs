@@ -5,15 +5,17 @@ use common::{
 use crate::{
   utils::program_error::ErrorCode,
   context::initialize::Initialize, 
-  account_data::state::{InitBumps, MAX_CURRENCY_SUPPORT},
+  account_data::state::{InitBumps, MAX_CURRENCY_SUPPORT, MAX_URI_UPDATE_OPERATORS},
 };
 
 pub fn exec(
   ctx: Context<Initialize>,
   supported_currencies: Vec<Currency>,
+  uri_update_operators: Vec<Pubkey>,
   seller_fee_basis_points: u16,
 ) -> Result<()> {
   require!(supported_currencies.len() <= MAX_CURRENCY_SUPPORT, ErrorCode::TooManyCurrencies);
+  require!(uri_update_operators.len() <= MAX_URI_UPDATE_OPERATORS, ErrorCode::TooManyUriUpdateOperators);
   
   let state = &mut ctx.accounts.state;
 
@@ -21,10 +23,11 @@ pub fn exec(
     event_nft_authority: *ctx.bumps.get("event_nft_authority").unwrap(),
     cpi_authority: *ctx.bumps.get("cpi_authority").unwrap(),
   };
-  state.supported_currencies = supported_currencies;
   state.cpi_authority = ctx.accounts.cpi_authority.key();
   state.deployer = ctx.accounts.deployer.key();
   state.seller_fee_basis_points = seller_fee_basis_points;
-
+  state.supported_currencies = supported_currencies;
+  state.uri_update_operators = uri_update_operators;
+  
   Ok(())
 }
