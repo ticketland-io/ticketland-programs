@@ -13,6 +13,7 @@
         "* `supported_currencies` - The list of currencies the current instant will support. These are the",
         "currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to",
         "create a new event",
+        "* `uri_update_operators` - The list of accounts that can update the Event NFT metadata uri",
         "* `seller_fee_basis_points` - This will be attached to each event NFT metadata that is created. NFT tickets are",
         "non-transferable. However, the same does not apply for the Event NFTs (i.e. Event NFT Collection). We envision event organizer",
         "to want to sell Event NFTs in the future for charity purposes for example."
@@ -56,6 +57,12 @@
             "vec": {
               "defined": "Currency"
             }
+          }
+        },
+        {
+          "name": "uriUpdateOperators",
+          "type": {
+            "vec": "publicKey"
           }
         },
         {
@@ -349,6 +356,55 @@
           }
         }
       ]
+    },
+    {
+      "name": "updateEventNftUri",
+      "docs": [
+        "Allows one of the uri update operators to update the metadata uri of the given event_nft",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_nft` - The event nft whose metadata uri will be updated",
+        "* `new_uri` - The new uri"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "uriUpdateOperator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventNft",
+          "type": "publicKey"
+        },
+        {
+          "name": "newUri",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -385,6 +441,12 @@
               "vec": {
                 "defined": "Currency"
               }
+            }
+          },
+          {
+            "name": "uriUpdateOperators",
+            "type": {
+              "vec": "publicKey"
             }
           }
         ]
@@ -662,6 +724,16 @@
       "code": 6008,
       "name": "TicketSaleMustBeOwner",
       "msg": "Ticket sale must the the owner"
+    },
+    {
+      "code": 6009,
+      "name": "OnlyUriUpdateOperator",
+      "msg": "Only URI update operator"
+    },
+    {
+      "code": 6010,
+      "name": "TooManyUriUpdateOperators",
+      "msg": "Too many uri update operators"
     }
   ]
 }

@@ -15,7 +15,7 @@ use crate::{
 #[derive(Accounts)]
 #[instruction(event_nft: Pubkey)]
 pub struct UpdateEventNftUri<'info> {
-  #[account(mut)]
+  #[account()]
   pub state: Box<Account<'info, State>>,
 
   /// CHECK: The authority of the event nfts
