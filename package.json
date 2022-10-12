@@ -1,5 +1,6 @@
 {
 	"type": "module",
+	"license": "BUSL-1.1",
 	"scripts": {
 		"test-validator": "./scripts/test-validator.sh",
 		"airdrop": "./scripts/airdrop.sh",

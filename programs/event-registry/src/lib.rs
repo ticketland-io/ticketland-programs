@@ -26,12 +26,12 @@ declare_id!("TGfdMZj2HoSwdFR5zUAKr8H72XYJ85GQ7my5yZTHGKE");
 pub mod event_registry {
 use super::*;
 	/// Initializes the state i.e. instance of a given program
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `supported_currencies` - The list of currencies the current instant will support. These are the
-	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to 
+	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to
 	/// create a new event
 	/// * `uri_update_operators` - The list of accounts that can update the Event NFT metadata uri
 	/// * `seller_fee_basis_points` - This will be attached to each event NFT metadata that is created. NFT tickets are
@@ -53,9 +53,9 @@ use super::*;
 
 	/// Allows anyone who has deposited the minimum deposit amount for the selected currency to create a new event.
 	/// This will create the Event NFT as well.
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `event_id` - The event id
 	/// * `start_time` - The Solana time that describes the start of the event
@@ -80,9 +80,9 @@ use super::*;
 	}
 
 	/// This will create the Event NFT for the given event id.
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `event_id` - The event id
 	/// * `symbol` - The symbol that will be used in the Event NFT metadata
@@ -103,12 +103,12 @@ use super::*;
 	}
 
 	/// Allows the deployer to update the supported currencies
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `supported_currencies` - The list of currencies the current instant will support. These are the
-	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to 
+	/// currencies that will be used to pay for the service fee as well as to lock a given amount in order to be able to
 	/// create a new event
 	pub fn update_supported_currencies(
 		ctx: Context<UpdateSupportedCurrencies>,
@@ -121,9 +121,9 @@ use super::*;
 	}
 
 	/// Allows one of the uri update operators to update the metadata uri of the given event_nft
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `event_nft` - The event nft whose metadata uri will be updated
 	/// * `new_uri` - The new uri
