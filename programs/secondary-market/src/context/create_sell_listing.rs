@@ -48,7 +48,6 @@ pub struct CreateSellListing<'info> {
   )]
   pub market: Box<Account<'info, Market>>,
   
-
   // The sell listing account
   // Note we don't include the ticket_owner in the PDA because this account will be closed when this listing is filled.
   // Thus, the new owner can further list it for sell. The account pubkey will be the same in both cases.
