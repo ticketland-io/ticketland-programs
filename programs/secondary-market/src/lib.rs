@@ -12,6 +12,7 @@ use crate::{
 		create_sell_listing::*,
 		create_buy_listing::*,
 		fill_sell_listing::*,
+    operator_fill_sell_listing::*,
 		fill_buy_listing::*,
   },
 };
@@ -91,7 +92,7 @@ use super::*;
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `event_id` - The event id for which the secondary market is created for
-	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
+	/// * `_ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
 	///                  signer of this tx
 	/// * `ask_price` - The  price a ticket will be sold. It must be
 	///                 lower than (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
@@ -114,8 +115,6 @@ use super::*;
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `event_id` - The event id for which the secondary market is created for
-	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
-	///                  signer of this tx
 	/// * `bid_price` - The  price at which the user is willing to buy a ticket. Note that during the settlemt the following must be true
 	///                 bid_price <= (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000
 	pub fn create_buy_listing(
@@ -138,8 +137,6 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
-	///                  signer of this tx
 	/// * `event_id` - The event id for which the secondary market is created for
 	pub fn fill_sell_listing(
 		ctx: Context<FillSellListing>,
@@ -159,14 +156,14 @@ use super::*;
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
-	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
-	///                  signer of this tx
 	/// * `event_id` - The event id for which the secondary market is created for
+  /// * `recipient` - The recipient account that will be the new owner of the ticket
 	pub fn operator_fill_sell_listing(
 		ctx: Context<OperatorFillSellListing>,
 		_event_id: [u8; 32],
+    recipient: Pubkey,
 	) -> Result<()> {
-		processors::operator_fill_sell_listing::exec(ctx)
+		processors::operator_fill_sell_listing::exec(ctx, recipient)
 	}
 
 	/// It will:

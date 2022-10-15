@@ -377,6 +377,7 @@ impl Runner {
       event_nft_metadata: find_metadata_account(&event_nft).0,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
       system_program: system_program::ID,
       rent: Rent::id(),
     }.to_account_metas(None);
