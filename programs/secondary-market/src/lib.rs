@@ -148,6 +148,27 @@ use super::*;
 		processors::fill_sell_listing::exec(ctx)
 	}
 
+  /// Allows an operator to fill a sell listing on user's behalf
+  /// 
+  /// It will:
+	/// - transfer funds from the buyer to the seller ATA
+	/// - transfer the service fees to the ticket land treasury
+	/// - transfer the event organizer fees
+	/// - close the SellListing account since it's not needed anymore
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the
+	///                  signer of this tx
+	/// * `event_id` - The event id for which the secondary market is created for
+	pub fn operator_fill_sell_listing(
+		ctx: Context<OperatorFillSellListing>,
+		_event_id: [u8; 32],
+	) -> Result<()> {
+		processors::operator_fill_sell_listing::exec(ctx)
+	}
+
 	/// It will:
 	/// - transfer funds from the buy listing escrow ata to the seller's ATA
 	/// - transfer the service fees to the ticket land treasury
