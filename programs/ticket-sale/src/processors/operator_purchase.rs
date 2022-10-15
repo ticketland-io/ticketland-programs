@@ -13,6 +13,7 @@ use crate::{
   account_data::{
     event::Event,
   },
+  utils::program_error::ErrorCode,
   context::operator_purchase::OperatorPurchase,
 };
 use super::common_purchase::{
@@ -34,7 +35,7 @@ pub fn exec(
   };
 
   expand_pre_checks!(ctx, event, seat_index);
-  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
+  expand_mint_ticket!(ctx, recipient, price_sold, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 
   Ok(())

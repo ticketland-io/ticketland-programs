@@ -77,11 +77,12 @@ pub fn exec(
   seat_name: String,
 ) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
+  let recipient = ctx.accounts.ticket_buyer.key();
   require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
 
   expand_pre_checks!(ctx, event, seat_index);
   let price_sold = transfer_funds(&ctx, &event)?;
-  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
+  expand_mint_ticket!(ctx, recipient, price_sold, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 
   Ok(())

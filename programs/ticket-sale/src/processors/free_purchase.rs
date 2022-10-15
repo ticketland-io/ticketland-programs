@@ -22,9 +22,10 @@ pub fn exec(
   seat_name: String,
 ) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
+  let recipient = ctx.accounts.ticket_buyer.key();
 
   expand_pre_checks!(ctx, event, seat_index);
-  expand_mint_ticket!(ctx, 0_u64, seat_index, seat_name);
+  expand_mint_ticket!(ctx, recipient, 0_u64, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 
   Ok(())

@@ -43,7 +43,7 @@ pub struct OperatorPurchase<'info> {
 
   #[account(
     mut,
-    close = operator,
+    close = ticket_buyer,
     seeds = [
       b"seat_verification",
       sale.key().as_ref(),
@@ -89,9 +89,9 @@ pub struct OperatorPurchase<'info> {
 
   #[account(
     mut,
-    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+    constraint = state.mint_operators.iter().any(|m| *m == ticket_buyer.key()) @ ErrorCode::OnlyMintOperator,
   )]
-  pub operator: Signer<'info>,
+  pub ticket_buyer: Signer<'info>,
 
   // ------ These account are needed for the CPI to the Ticket NFT program ------
 

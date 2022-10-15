@@ -11,8 +11,6 @@ use common::{
   utils::bitmap,
 };
 use crate::{
-  context::fixed_price_purchase::*,
-  context::free_purchase::*,
   account_data::{
     state::State,
     event::Event,
@@ -37,8 +35,9 @@ macro_rules! expand_pre_checks {
 
 #[macro_export]
 macro_rules! expand_mint_ticket {
-  ($ctx:ident, $price_sold:expr, $seat_index:ident,  $seat_name:ident) => {
+  ($ctx:ident, $recipient:ident, $price_sold:expr, $seat_index:ident,  $seat_name:ident) => {
     super::common_purchase::mint_ticket(
+      $recipient,
       $price_sold,
       $seat_index,
       $seat_name,
@@ -114,6 +113,7 @@ pub fn pre_checks<'info>(
 }
 
 pub fn mint_ticket<'info>(
+  recipient: Pubkey,
   price_sold: u64,
   seat_index: u32,
   seat_name: String,
@@ -164,7 +164,7 @@ pub fn mint_ticket<'info>(
     sale.ticket_type_index,
 		sale.event_id,
     seat_index,
-    ticket_buyer.key(),
+    recipient,
     sale.key(),
     price_sold,
 		seat_name,
