@@ -1,5 +1,12 @@
 use anchor_lang::prelude::*;
 use anchor_safe_math::SafeMath;
+use anchor_spl::{
+  token::{Token},
+  associated_token::AssociatedToken,
+};
+use ticket_nft::{
+  program::TicketNft,
+};
 use common::{
   utils::bitmap,
 };
@@ -43,7 +50,7 @@ fn account_checks(
   Ok(())
 }
 
-pub fn pre_checks<'info>(
+fn pre_checks<'info>(
   sale: &Box<Account<'info, Sale>>,
   event_capacity: &Account<'info, EventCapacity>,
   seat_index: u32,
@@ -87,6 +94,126 @@ pub fn free_purchase_pre_checks(ctx: &Context<FreePurchase>, event: &Event, seat
     ctx.accounts.sale.event_id,
   )?;
   pre_checks(&ctx.accounts.sale, &ctx.accounts.event_capacity, seat_index)?;
+
+  Ok(())
+}
+
+fn mint_ticket<'info>(
+  price_sold: u64,
+  seat_index: u32,
+  seat_name: String,
+  state: &Box<Account<'info, State>>,
+  sale: &Box<Account<'info, Sale>>,
+  ticket_nft_program: &Program<'info, TicketNft>,
+  ticket_nft_program_state: &AccountInfo<'info>,
+  ticket_metadata: &AccountInfo<'info>,
+  nft_authority: &AccountInfo<'info>,
+  ticket_nft: &AccountInfo<'info>,
+  event_nft_metadata: &AccountInfo<'info>,
+  ticket_nft_ata: &AccountInfo<'info>,
+  cpi_authority: &AccountInfo<'info>,
+  ticket_buyer: &Signer<'info>,
+  token_program: &Program<'info, Token>,
+  associated_token_program: &Program<'info, AssociatedToken>,
+  system_program: &Program<'info, System>,
+  rent: &Sysvar<'info, Rent>,
+) -> Result<()> {
+  let cpi_program = ticket_nft_program.to_account_info();
+  let cpi_accounts = ticket_nft::cpi::accounts::CreateTicket {
+    state: ticket_nft_program_state.to_account_info(),
+    ticket_metadata: ticket_metadata.to_account_info(),
+    nft_authority: nft_authority.to_account_info(),
+    nft: ticket_nft.to_account_info(),
+    event_nft_metadata: event_nft_metadata.to_account_info(),
+    ticket_nft_ata: ticket_nft_ata.to_account_info(),
+    ticket_sale_cpi_authority: cpi_authority.to_account_info(),
+    ticket_buyer: ticket_buyer.to_account_info(),
+    token_program: token_program.to_account_info(),
+    associated_token_program: associated_token_program.to_account_info(),
+    system_program: system_program.to_account_info(),
+    rent: rent.to_account_info(),
+  };
+  
+  let state_key = state.key();
+  let seeds: &[&[u8]] = &[
+    b"ticket_sale:cpi_authority", state_key.as_ref(),
+    &[state.bumps.cpi_authority]
+  ];
+  let signer_seeds:&[&[&[u8]]] = &[&seeds[..]];
+
+  let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
+
+  ticket_nft::cpi::create_ticket(
+    cpi_ctx,
+		state.bumps.cpi_authority,
+    sale.ticket_type_index,
+		sale.event_id,
+    seat_index,
+    ticket_buyer.key(),
+    sale.key(),
+    price_sold,
+		seat_name,
+  )?;
+
+  Ok(())
+}
+
+pub fn fixed_price_purchase_mint_ticket(
+  ctx: &Context<FixedPricePurchase>,
+  price_sold: u64,
+  seat_index: u32,
+  seat_name: String
+) -> Result<()> {
+  mint_ticket(
+    price_sold,
+    seat_index,
+    seat_name,
+    &ctx.accounts.state,
+    &ctx.accounts.sale,
+    &ctx.accounts.ticket_nft_program,
+    &ctx.accounts.ticket_nft_program_state,
+    &ctx.accounts.ticket_metadata,
+    &ctx.accounts.nft_authority,
+    &ctx.accounts.ticket_nft,
+    &ctx.accounts.event_nft_metadata,
+    &ctx.accounts.ticket_nft_ata,
+    &ctx.accounts.cpi_authority,
+    &ctx.accounts.ticket_buyer,
+    &ctx.accounts.token_program,
+    &ctx.accounts.associated_token_program,
+    &ctx.accounts.system_program,
+    &ctx.accounts.rent,
+  )?;
+
+  Ok(())
+}
+
+pub fn free_purchase_mint_ticket(
+  ctx: &Context<FreePurchase>,
+  price_sold: u64,
+  seat_index: u32,
+  seat_name: String
+) -> Result<()> {
+  mint_ticket(
+    price_sold,
+    seat_index,
+    seat_name,
+    &ctx.accounts.state,
+    &ctx.accounts.sale,
+    &ctx.accounts.ticket_nft_program,
+    &ctx.accounts.ticket_nft_program_state,
+    &ctx.accounts.ticket_metadata,
+    &ctx.accounts.nft_authority,
+    &ctx.accounts.ticket_nft,
+    &ctx.accounts.event_nft_metadata,
+    &ctx.accounts.ticket_nft_ata,
+    &ctx.accounts.cpi_authority,
+    &ctx.accounts.ticket_buyer,
+    &ctx.accounts.token_program,
+    &ctx.accounts.associated_token_program,
+    &ctx.accounts.system_program,
+    &ctx.accounts.rent,
+  )?;
 
   Ok(())
 }
