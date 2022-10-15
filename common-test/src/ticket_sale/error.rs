@@ -43,6 +43,7 @@ impl TryFrom<u32> for Error {
       14 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::WrongTicketNftProgramStateAccount)),
       15 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::InvalidTicketTypeIndex)),
       16 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::SeatNotVerified)),
+      17 => Ok(Error(ticket_sale::utils::program_error::ErrorCode::OnlyMintOperator)),
       _ => Err(())
     }
   }

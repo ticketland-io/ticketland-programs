@@ -28,13 +28,17 @@ pub mod ticket_sale {
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `treasury` - The ticketland.io treasury address
+  /// * `event_registry_state` - The event registry program state
+  /// * `event_registry_program` - The event registry program address
+  /// * `mint_operators` - The list of all operators that can mint tickets
 	pub fn initialize(
 		ctx: Context<Initialize>,
 		treasury: Pubkey,
 		event_registry_state: Pubkey,
 		event_registry_program: Pubkey,
+    mint_operators: Vec<Pubkey>,
 	) -> Result<()> {
-    processors::initialize::exec(ctx, treasury, event_registry_state, event_registry_program)
+    processors::initialize::exec(ctx, treasury, event_registry_state, event_registry_program, mint_operators)
 	}
 
 	/// Initializes the event capacity account for a single event. This account will be used by all the

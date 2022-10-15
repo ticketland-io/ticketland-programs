@@ -87,7 +87,10 @@ pub struct OperatorPurchase<'info> {
   #[account()]
   pub event_organizer: AccountInfo<'info>,
 
-  #[account(mut)]
+  #[account(
+    mut,
+    constraint = state.mint_operators.iter().any(|m| m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
   pub operator: Signer<'info>,
 
   // ------ These account are needed for the CPI to the Ticket NFT program ------
