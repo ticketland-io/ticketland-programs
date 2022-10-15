@@ -98,6 +98,7 @@ fn mint_ticket(ctx: &Context<FixedPricePurchase>, price_sold: u64, seat_index: u
   ticket_nft::cpi::create_ticket(
     cpi_ctx,
 		ctx.accounts.state.bumps.cpi_authority,
+    ctx.accounts.sale.ticket_type_index,
 		ctx.accounts.sale.event_id,
     seat_index,
     ctx.accounts.sale.key(),

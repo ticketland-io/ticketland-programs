@@ -146,7 +146,8 @@ pub struct FixedPricePurchase<'info> {
       b"ticket_nft",
       ticket_nft_program_state.key().as_ref(),
       seat_index.to_string().as_ref(),
-      &sale.event_id
+      &sale.event_id,
+      sale.ticket_type_index.to_string().as_ref(),
     ],
     bump,
     seeds::program = ticket_nft_program.key(),
