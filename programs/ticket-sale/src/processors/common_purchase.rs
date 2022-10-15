@@ -22,6 +22,18 @@ use crate::{
   utils::program_error::ErrorCode,
 };
 
+macro_rules! expand_pre_checks {
+  ($ctx:ident, $event:ident, $seat_index:ident) => {
+    account_checks(
+      $ctx.accounts.event_organizer.key(),
+      $ctx.accounts.event_capacity.key(),
+      $event,
+      $ctx.accounts.sale.event_id,
+    )?;
+    pre_checks(&$ctx.accounts.sale, &$ctx.accounts.event_capacity, $seat_index)?;
+  }
+}
+
 /// The main issue stems from the fact that we can't have the following account in the FixedPricePurchase context
 ///  
 /// `pub event: Box<Account<'info, Event>>`
@@ -75,25 +87,12 @@ fn pre_checks<'info>(
 
 pub fn fixed_price_purchase_pre_checks(ctx: &Context<FixedPricePurchase>, event: &Event, seat_index: u32) -> Result<()> {
   require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
-  account_checks(
-    ctx.accounts.event_organizer.key(),
-    ctx.accounts.event_capacity.key(),
-    &event,
-    ctx.accounts.sale.event_id,
-  )?;
-  pre_checks(&ctx.accounts.sale, &ctx.accounts.event_capacity, seat_index)?;
-
+  expand_pre_checks!(ctx, event, seat_index);
   Ok(())
 }
 
 pub fn free_purchase_pre_checks(ctx: &Context<FreePurchase>, event: &Event, seat_index: u32) -> Result<()> {
-  account_checks(
-    ctx.accounts.event_organizer.key(),
-    ctx.accounts.event_capacity.key(),
-    &event,
-    ctx.accounts.sale.event_id,
-  )?;
-  pre_checks(&ctx.accounts.sale, &ctx.accounts.event_capacity, seat_index)?;
+  expand_pre_checks!(ctx, event, seat_index);
 
   Ok(())
 }
