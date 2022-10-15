@@ -8,6 +8,7 @@ use anchor_lang::{
 use anchor_spl::token::{Token};
 use solana_test_utils::{
   program_test::ProgramTest,
+  test_account::{TestAccount},
   spl_associated_token_account,
   spl::Spl,
 };
@@ -38,6 +39,7 @@ use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,
+  pub test_account: TestAccount,
   pub spl: Spl,
   pub deployer: Keypair,
 }
@@ -46,10 +48,12 @@ impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
     let spl = Spl::new(Arc::clone(&pt));
+    let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
 
     Self {
       pt: Arc::clone(&pt),
+      test_account,
       spl,
       deployer,
     }
@@ -157,7 +161,6 @@ impl Runner {
     seat_index: u32,
     ticket_type_index: u8,
     ticket_nft_program_state: Pubkey,
-    purchase_token: Pubkey,
     ticket_owner: &Keypair,
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
@@ -173,8 +176,6 @@ impl Runner {
       market,
       sell_listing,
       ticket_metadata,
-      purchase_token,
-      ticket_owner_purchase_token_ata: Spl::get_associated_token_address(&ticket_owner.pubkey(), &purchase_token),
       ticket_owner: ticket_owner.pubkey(),
 
       token_program: Token::id(),
@@ -264,11 +265,9 @@ impl Runner {
     seat_index: u32,
     ticket_type_index: u8,
     ticket_nft_program_state: Pubkey,
-    treasury: Pubkey,
     ticket_owner: Pubkey,
     ticket_buyer: &Keypair,
     recipient: Pubkey,
-    event_organizer: Pubkey,
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
     let event = EventRegistryPda::event(&event_registry_state, event_id).0;
