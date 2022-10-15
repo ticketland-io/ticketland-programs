@@ -246,6 +246,56 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
   }
 
+  pub async fn operator_fill_sell_listing(
+    &self,
+    event_id: [u8; 32],
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    sale: Pubkey,
+    seat_index: u32,
+    ticket_type_index: u8,
+    ticket_nft_program_state: Pubkey,
+    treasury: Pubkey,
+    ticket_owner: Pubkey,
+    ticket_buyer: &Keypair,
+    recipient: Pubkey,
+    event_organizer: Pubkey,
+  ) -> AnchorResult<()> {
+    let market = pda::market(&state, event_id).0;
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
+
+    let accounts = secondary_market::accounts::OperatorFillSellListing {
+      state,
+      ticket_nft_program_state,
+      sell_listing,
+      event,
+      market,
+      sale,
+      cpi_authority: pda::cpi_authority(&state).0,
+      ticket_metadata,
+      ticket_owner,
+      ticket_buyer: ticket_buyer.pubkey(),
+      ticket_nft_program: ticket_nft_program_id(),
+      token_program: Token::id(),
+    }.to_account_metas(None);
+
+    let data = secondary_market::instruction::OperatorFillSellListing {
+      _event_id: event_id,
+      recipient,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
+
   pub async fn create_buy_listing(
     &self,
     event_id: [u8; 32],
