@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+pub const MAX_MINT_OPERATORS: usize = 10;
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub cpi_authority: u8,
@@ -26,4 +28,7 @@ pub struct State {
 
   /// The account that will be calling other programs
   pub cpi_authority: Pubkey, 
+
+  /// The list of all operators that can mint tickets
+  pub mint_operators: Vec<Pubkey>,
 }

@@ -32,6 +32,7 @@ pub fn exec(
   sale: Pubkey,
   price_sold: u64,
   seat_index: u32,
+  recipient: Pubkey,
   name: String,
 ) -> Result<()> {  
   let ticket_metadata = &mut ctx.accounts.ticket_metadata;
@@ -46,7 +47,7 @@ pub fn exec(
   ticket_metadata.seat_index = seat_index;
   ticket_metadata.sale = sale;
   ticket_metadata.price_sold = price_sold;
-  ticket_metadata.owner = ctx.accounts.ticket_buyer.key();
+  ticket_metadata.owner = recipient;
   ticket_metadata.attended = false;
 
   let state = &mut ctx.accounts.state;

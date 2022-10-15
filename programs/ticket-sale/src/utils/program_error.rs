@@ -36,4 +36,6 @@ pub enum ErrorCode {
   InvalidTicketTypeIndex,
   #[msg("Seat was not verified")]
   SeatNotVerified,
+  #[msg("Not a mint operator")]
+  OnlyMintOperator,
 }

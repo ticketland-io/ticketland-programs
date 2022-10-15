@@ -9,6 +9,7 @@ pub fn exec(
   treasury: Pubkey,
   event_registry_state: Pubkey,
   event_registry_program: Pubkey,
+  mint_operators: Vec<Pubkey>,
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
@@ -20,8 +21,9 @@ pub fn exec(
   state.event_registry_program = event_registry_program;
   state.event_registry_state = event_registry_state;
   state.treasury = treasury;
-  state.cpi_authority = ctx.accounts.cpi_authority.key();
   state.deployer = ctx.accounts.deployer.key();
+  state.cpi_authority = ctx.accounts.cpi_authority.key();
+  state.mint_operators = mint_operators;
 
   Ok(())
 }
