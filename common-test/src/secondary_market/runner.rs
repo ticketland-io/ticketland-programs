@@ -64,6 +64,14 @@ impl Runner {
     pt.process_transaction(instructions, signers).await.map_err(Into::into)
   }
 
+  pub fn get_participant(&self, index: usize) -> Keypair {
+    Keypair::from_bytes(self.test_account.participants[index].to_bytes().as_ref()).unwrap()
+  }
+  
+  pub fn get_operators(&self) -> Vec<Pubkey> {
+    vec![self.get_participant(7).pubkey(), self.get_participant(8).pubkey()]
+  }
+
   pub async fn initialize(
     &mut self,
     state: &Keypair,
@@ -89,7 +97,8 @@ impl Runner {
       ticket_nft_state,
       ticket_nft_program: ticket_nft_program_id(),
       treasury,
-      protocol_fee
+      protocol_fee,
+      operators: self.get_operators(),
     }.data();
 
     let ix = Instruction {
