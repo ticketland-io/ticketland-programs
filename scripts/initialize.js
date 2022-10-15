@@ -124,6 +124,7 @@ const initializeSecondaryMarket = async (
   const treasury = new PublicKey(deploymentConfig.secondaryMarket.treasury)
   const program = anchor.workspace.SecondaryMarket
   const deployer = provider.wallet.publicKey
+  const operators = deploymentConfig.secondaryMarketOperators.map(pk => new PublicKey(pk))
 
   await program.rpc.initialize(
     eventRegistryState,
@@ -134,6 +135,7 @@ const initializeSecondaryMarket = async (
     anchor.workspace.TicketNft.programId,
     treasury,
     new anchor.BN(deploymentConfig.secondaryMarket.protocolFee),
+    operators,
     {
       accounts: {
         state: state.publicKey,
