@@ -22,21 +22,23 @@ use crate::{
   utils::program_error::ErrorCode,
 };
 
+#[macro_export]
 macro_rules! expand_pre_checks {
   ($ctx:ident, $event:ident, $seat_index:ident) => {
-    account_checks(
+    super::common_purchase::account_checks(
       $ctx.accounts.event_organizer.key(),
       $ctx.accounts.event_capacity.key(),
-      $event,
+      &$event,
       $ctx.accounts.sale.event_id,
     )?;
-    pre_checks(&$ctx.accounts.sale, &$ctx.accounts.event_capacity, $seat_index)?;
+    super::common_purchase::pre_checks(&$ctx.accounts.sale, &$ctx.accounts.event_capacity, $seat_index)?;
   }
 }
 
+#[macro_export]
 macro_rules! expand_mint_ticket {
-  ($ctx:ident, $price_sold:ident, $seat_index:ident,  $seat_name:ident) => {
-    mint_ticket(
+  ($ctx:ident, $price_sold:expr, $seat_index:ident,  $seat_name:ident) => {
+    super::common_purchase::mint_ticket(
       $price_sold,
       $seat_index,
       $seat_name,
@@ -75,7 +77,7 @@ macro_rules! expand_mint_ticket {
 /// 
 /// Also not that we don't have to check if ctx.accounts.event.owner == &state.event_registry_program
 /// because we already have this constraint in the PDA seeds::program = state.event_registry_program
-fn account_checks(
+pub fn account_checks(
   event_organizer: Pubkey,
   event_capacity: Pubkey,
   event: &Event,
@@ -88,7 +90,7 @@ fn account_checks(
   Ok(())
 }
 
-fn pre_checks<'info>(
+pub fn pre_checks<'info>(
   sale: &Box<Account<'info, Sale>>,
   event_capacity: &Account<'info, EventCapacity>,
   seat_index: u32,
@@ -111,19 +113,7 @@ fn pre_checks<'info>(
   Ok(())
 }
 
-pub fn fixed_price_purchase_pre_checks(ctx: &Context<FixedPricePurchase>, event: &Event, seat_index: u32) -> Result<()> {
-  require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
-  expand_pre_checks!(ctx, event, seat_index);
-  Ok(())
-}
-
-pub fn free_purchase_pre_checks(ctx: &Context<FreePurchase>, event: &Event, seat_index: u32) -> Result<()> {
-  expand_pre_checks!(ctx, event, seat_index);
-
-  Ok(())
-}
-
-fn mint_ticket<'info>(
+pub fn mint_ticket<'info>(
   price_sold: u64,
   seat_index: u32,
   seat_name: String,
@@ -179,28 +169,6 @@ fn mint_ticket<'info>(
     price_sold,
 		seat_name,
   )?;
-
-  Ok(())
-}
-
-pub fn fixed_price_purchase_mint_ticket(
-  ctx: &Context<FixedPricePurchase>,
-  price_sold: u64,
-  seat_index: u32,
-  seat_name: String
-) -> Result<()> {
-  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
-
-  Ok(())
-}
-
-pub fn free_purchase_mint_ticket(
-  ctx: &Context<FreePurchase>,
-  price_sold: u64,
-  seat_index: u32,
-  seat_name: String
-) -> Result<()> {
-  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
 
   Ok(())
 }

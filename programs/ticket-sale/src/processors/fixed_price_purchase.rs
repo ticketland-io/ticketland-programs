@@ -9,6 +9,8 @@ use common::{
   },
 };
 use crate::{
+  expand_pre_checks,
+  expand_mint_ticket,
   context::fixed_price_purchase::*,
   account_data::{
     event::Event,
@@ -16,9 +18,7 @@ use crate::{
   utils::program_error::ErrorCode,
 };
 use super::common_purchase::{
-  fixed_price_purchase_pre_checks,
   post_checks,
-  fixed_price_purchase_mint_ticket,
 };
 
 fn transfer_token<'info>(
@@ -77,10 +77,11 @@ pub fn exec(
   seat_name: String,
 ) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
+  require!(event.currency.mint_account == ctx.accounts.purchase_token.key(), ErrorCode::UnsupportedPurchaseToken);
 
-  fixed_price_purchase_pre_checks(&ctx, &event, seat_index)?;
+  expand_pre_checks!(ctx, event, seat_index);
   let price_sold = transfer_funds(&ctx, &event)?;
-  fixed_price_purchase_mint_ticket(&ctx, price_sold, seat_index, seat_name)?;
+  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 
   Ok(())

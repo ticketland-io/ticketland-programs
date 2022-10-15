@@ -3,17 +3,20 @@ use common::{
   account_data::{
     serialization::deser,
   },
+  state::{
+    sale_type::*,
+  },
 };
 use crate::{
+  expand_pre_checks,
+  expand_mint_ticket,
   account_data::{
     event::Event,
   },
   context::operator_purchase::OperatorPurchase,
 };
 use super::common_purchase::{
-  free_purchase_pre_checks,
   post_checks,
-  free_purchase_mint_ticket,
 };
 
 pub fn exec(
@@ -23,9 +26,15 @@ pub fn exec(
   recipient: Pubkey,
 ) -> Result<()> {
   let event: Event = deser(ctx.accounts.event.clone())?;
+  let ticket_type = &ctx.accounts.sale.ticket_type;
+  let price_sold = if let SaleType::FixedPrice {amount} = ticket_type.sale_type {
+    amount
+  } else {
+    return Err(ErrorCode::UnexpectedSaleAccount.into());
+  };
 
-  free_purchase_pre_checks(&ctx, &event, seat_index)?;
-  free_purchase_mint_ticket(&ctx, 0_u64, seat_index, seat_name)?;
+  expand_pre_checks!(ctx, event, seat_index);
+  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 
   Ok(())

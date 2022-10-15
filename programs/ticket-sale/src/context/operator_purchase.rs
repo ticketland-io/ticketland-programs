@@ -89,7 +89,7 @@ pub struct OperatorPurchase<'info> {
 
   #[account(
     mut,
-    constraint = state.mint_operators.iter().any(|m| m == operator.key()) @ ErrorCode::OnlyMintOperator,
+    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
   )]
   pub operator: Signer<'info>,
 
