@@ -168,6 +168,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       purchase_token,
       &ticket_buyer,
@@ -195,6 +196,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       purchase_token,
       &ticket_buyer,
@@ -229,6 +231,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       purchase_token,
       &ticket_buyer,
@@ -276,6 +279,7 @@ async fn should_only_be_called_by_the_ticket_owner(ctx: &mut TestContext) {
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       purchase_token,
       &wrong_ticket_owner, 
@@ -323,6 +327,7 @@ async fn should_fail_if_given_purchase_account_does_not_match_event(ctx: &mut Te
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       wrong_purchase_token,
       &ticket_buyer, 
@@ -366,6 +371,7 @@ async fn should_create_sell_listing(ctx: &mut TestContext) {
       event_registry_state.pubkey(),
       sale,
       seat_index,
+      ticket_type_index,
       ticket_nft_state.pubkey(),
       purchase_token,
       &ticket_buyer, 
@@ -374,7 +380,7 @@ async fn should_create_sell_listing(ctx: &mut TestContext) {
   }
 
   {
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
     let sell_listing = pda::sell_listing(&secondary_market_state.pubkey(), event_id, &ticket_metadata).0;
 

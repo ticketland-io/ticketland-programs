@@ -233,7 +233,7 @@ impl Runner {
 		seat_name: String,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
@@ -291,7 +291,7 @@ impl Runner {
 		seat_name: String,
   ) -> AnchorResult<()> {
     let cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;

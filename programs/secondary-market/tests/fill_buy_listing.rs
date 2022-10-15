@@ -170,6 +170,7 @@ async fn should_fail_if_sale_ended(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   Error::assert_ticket_sale_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
@@ -253,6 +254,7 @@ async fn should_fail_if_sale_account_is_wrong(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
@@ -301,6 +303,7 @@ async fn should_fail_if_not_ticket_metadata_owner(ctx: &mut TestContext) {
     &wrong_ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
@@ -348,6 +351,7 @@ async fn should_fail_if_price_cap_exceed(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   // The buy listing has an ask price of 1.11 but the ticket was initially sold for 1 SOL
@@ -408,6 +412,7 @@ async fn should_fail_if_wrong_purchase_token(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
@@ -456,6 +461,7 @@ async fn should_fail_if_wrong_event_organizer(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer);
@@ -503,6 +509,7 @@ async fn should_fail_if_wrong_treasury(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount);
@@ -566,6 +573,7 @@ async fn should_transfer_funds_from_escrow_to_all_entities(ctx: &mut TestContext
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   assert!(result.is_ok());
 
@@ -624,11 +632,12 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   assert!(result.is_ok());
 
   {
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
 
     let mut pt = secondary_market_runner.pt.lock().await;
@@ -680,6 +689,7 @@ async fn should_close_the_listing_and_escrow_ata_accounts(ctx: &mut TestContext)
     &ticket_owner,
     n_listing,
     seat_index,
+    ticket_type_index,
   ).await;
   assert!(result.is_ok());
 
