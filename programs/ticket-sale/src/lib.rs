@@ -12,6 +12,7 @@ use crate::{
 		create_sale::*,
 		fixed_price_purchase::*,
 		free_purchase::*,
+    operator_purchase::*,
 		verify_seat::*,
   },
 };
@@ -125,7 +126,7 @@ pub mod ticket_sale {
 		)
 	}
 
-	/// Allows user to purchase a ticket on a fixed price
+	/// Allows user to purchase a ticket for free
 	/// 
 	/// # Arguments
 	/// 
@@ -141,6 +142,28 @@ pub mod ticket_sale {
 			ctx,
 			seat_index,
 			seat_name,
+		)
+	}
+
+  /// Allows a mint operator to mint a new ticket to the recipient account
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
+	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
+  /// * `recipient` - The recipient account that will receive the ticket NFT
+	pub fn operator_purchase(
+		ctx: Context<OperatorPurchase>,
+		seat_index: u32,
+		seat_name: String,
+    recipient: Pubkey,
+	) -> Result<()> {
+		processors::operator_purchase::exec(
+			ctx,
+			seat_index,
+			seat_name,
+      recipient,
 		)
 	}
 }
