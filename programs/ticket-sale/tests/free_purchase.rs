@@ -236,6 +236,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     assert!(result.is_ok());
   }
 
+  let ticket_type_index = 0;
   let result = ctx.ticket_sale_runner.free_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
@@ -244,14 +245,14 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     event_organizer.pubkey(),
     ticket_nft_state.pubkey(),
     event_id,
-    0, // ticket_type_index
+    ticket_type_index,
     seat_index,
 		TicketSaleRunner::dummy_seat_name(0),
   ).await;
 
   assert!(result.is_ok());
 
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
 
   // ticket nft Mint account
   {

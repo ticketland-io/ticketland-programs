@@ -146,13 +146,14 @@ impl Runner {
     event_registry_state: Pubkey,
     sale: Pubkey,
     seat_index: u32,
+    ticket_type_index: u8,
     ticket_nft_program_state: Pubkey,
     purchase_token: Pubkey,
     ticket_owner: &Keypair,
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
     let event = EventRegistryPda::event(&event_registry_state, event_id).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
 
@@ -195,6 +196,7 @@ impl Runner {
     event_registry_state: Pubkey,
     sale: Pubkey,
     seat_index: u32,
+    ticket_type_index: u8,
     ticket_nft_program_state: Pubkey,
     purchase_token: Pubkey,
     treasury: Pubkey,
@@ -204,7 +206,7 @@ impl Runner {
   ) -> AnchorResult<()> {
     let market = pda::market(&state, event_id).0;
     let event = EventRegistryPda::event(&event_registry_state, event_id).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
 
@@ -302,12 +304,13 @@ impl Runner {
     ticket_owner: &Keypair,
     n_listing: u16,
     seat_index: u32,
+    ticket_type_index: u8,
   ) -> AnchorResult<()> {
     let event = EventRegistryPda::event(&event_registry_state, event_id).0;
     let market = pda::market(&state, event_id).0;
     let buy_listing = pda::buy_listing(&state, event_id, &ticket_buyer, n_listing).0;
     let listing_escrow = pda::listing_escrow(&state, event_id, &buy_listing).0;
-    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
 
     let accounts = secondary_market::accounts::FillBuyListing {

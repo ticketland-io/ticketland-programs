@@ -16,14 +16,12 @@ use solana_sdk::{
   native_token::sol_to_lamports,
 };
 use anchor_spl::{
-  token::{Mint as TokenMint, TokenAccount},
+  token::{TokenAccount},
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
-    deser::meta_deser,
     pda::{
       find_metadata_account,
-      find_master_edition_account,
     },
   },
 };
@@ -241,13 +239,14 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
   }
 
   let seat_index = 0;
+  let ticket_type_index = 0;
   // verify the seat
   {
     let result = ctx.ticket_sale_runner.verify_seat(
       &ticket_buyer,
       ticket_sale_state.pubkey(),
       event_id,
-      0, // ticket_type_index
+      ticket_type_index,
       seat_index,
       TicketSaleRunner::dummy_seat_name(0),
       mt_type_1.proof(&[0]), // proof path for leaf 0
@@ -265,7 +264,7 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     event_organizer.pubkey(),
     ticket_nft_state.pubkey(),
     event_id,
-    0, // ticket_type_index
+    ticket_type_index,
     seat_index,
 		TicketSaleRunner::dummy_seat_name(0),
   ).await;
@@ -291,12 +290,11 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     assert_eq!(treasury_funds_after - treasury_funds_before, sol_to_lamports(0.05_f64));
   }
 
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id).0;
+  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
 
   // ticket nft Mint account and Metaplex metadata
   {
     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    let nft_authority = TicketNftPda::nft_authority(&ticket_nft_state.pubkey()).0;
 
     // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA
     // controlled by the ticket sale program.
@@ -315,7 +313,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_on_fixed_price_using_wrapp
     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
     let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
-    let metaplex_metadata = find_metadata_account(&ticket_nft).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state.pubkey(), 0, event_id).0;
     let event_nft = EventRegistryPda::event_nft(&event_registry_state.pubkey(), event_id).0;
 
