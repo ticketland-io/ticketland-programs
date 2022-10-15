@@ -102,7 +102,6 @@ async fn before_each(ctx: &mut TestContext) -> (
       seat_index,
       ticket_type_index,
       ticket_nft_state.pubkey(),
-      purchase_token,
       &ticket_buyer, 
     ).await;
     assert!(result.is_ok());
@@ -631,7 +630,6 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
       seat_index,
       ticket_type_index,
       ticket_nft_state.pubkey(),
-      purchase_token,
       &ticket_buyer, // the new owner
     ).await;
     assert!(result.is_ok());
