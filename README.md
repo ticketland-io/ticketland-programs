@@ -170,3 +170,35 @@ More specifically we need to add the following types to the event_registry.json 
     }
   ],
 	```
+
+
+Inititalize config file
+===
+
+Create a new config file (scripts/.config.json) with the following structure
+
+```json
+{
+  "depositTreasury": "",
+  "serviceFeeTreasury": "",
+  "sellerFeeBasisPoint": 1000,
+  "secondaryMarket": {
+    "treasury": "",
+    "protocolFee": 500
+  },
+  "uriUpdateOperators": [
+    ""
+  ],
+  "mintOperators": [
+    ""
+  ],
+  "secondaryMarketOperators": [
+    ""
+  ],
+  "supportedMintAccounts": [{
+    "mintAccount": "So11111111111111111111111111111111111111112",
+    "depositAmount": 1000000000,
+    "serviceFee": 1000
+  }]
+}
+```

@@ -191,10 +191,10 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
 
     let event_registry_runner = &mut ctx.event_registry_runner;
     let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
+    let recipient = event_registry_runner.get_participant(3);
     
-    let result = secondary_market_runner.fill_sell_listing(
+    let result = secondary_market_runner.operator_fill_sell_listing(
       event_id,
       secondary_market_state.pubkey(),
       event_registry_state.pubkey(),
@@ -202,66 +202,12 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       seat_index,
       ticket_type_index,
       ticket_nft_state.pubkey(),
-      purchase_token,
-      treasury.pubkey(),
       ticket_owner.pubkey(),
       &ticket_buyer,
-      event_organizer.pubkey(),
+      recipient.pubkey(),
     ).await;
 
     Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongSaleAccount);
-  }
-
-  // should fail if wrong purchase token is given
-  {
-    let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let event_registry_runner = &mut ctx.event_registry_runner;
-    let wrong_purchase_token = event_registry_runner.deposit_tokens[1];
-    let treasury = event_registry_runner.get_participant(5);
-    let ticket_buyer = event_registry_runner.get_participant(4);
-
-    let result = secondary_market_runner.fill_sell_listing(
-      event_id,
-      secondary_market_state.pubkey(),
-      event_registry_state.pubkey(),
-      sale,
-      seat_index,
-      ticket_type_index,
-      ticket_nft_state.pubkey(),
-      wrong_purchase_token,
-      treasury.pubkey(),
-      ticket_owner.pubkey(),
-      &ticket_buyer,
-      event_organizer.pubkey(),
-    ).await;
-
-    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongPurchaseToken);
-  }
-
-  // should fail if wrong event_organizer account is used
-  {
-    let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let event_registry_runner = &mut ctx.event_registry_runner;
-    let treasury = event_registry_runner.get_participant(5);
-    let ticket_buyer = event_registry_runner.get_participant(4);
-    let wrong_event_organizer = event_registry_runner.get_participant(2);
-    
-    let result = secondary_market_runner.fill_sell_listing(
-      event_id,
-      secondary_market_state.pubkey(),
-      event_registry_state.pubkey(),
-      sale,
-      seat_index,
-      ticket_type_index,
-      ticket_nft_state.pubkey(),
-      purchase_token,
-      treasury.pubkey(),
-      ticket_owner.pubkey(),
-      &ticket_buyer,
-      wrong_event_organizer.pubkey(),
-    ).await;
-
-    Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyEventOrganizer);
   }
 
   // move to the end of sale
@@ -275,10 +221,10 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
     let event_registry_runner = &mut ctx.event_registry_runner;
-    let treasury = event_registry_runner.get_participant(5);
     let ticket_buyer = event_registry_runner.get_participant(4);
+    let recipient = event_registry_runner.get_participant(3);
     
-    let result = secondary_market_runner.fill_sell_listing(
+    let result = secondary_market_runner.operator_fill_sell_listing(
       event_id,
       secondary_market_state.pubkey(),
       event_registry_state.pubkey(),
@@ -286,11 +232,9 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
       seat_index,
       ticket_type_index,
       ticket_nft_state.pubkey(),
-      purchase_token,
-      treasury.pubkey(),
       ticket_owner.pubkey(),
       &ticket_buyer,
-      event_organizer.pubkey(),
+      recipient.pubkey(),
     ).await;
     
     Error::assert_ticket_sale_err(result, ticket_sale::utils::program_error::ErrorCode::SaleFinished);
@@ -307,9 +251,9 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
     secondary_market_state,
     event_id,
     seat_index,
-    event_organizer,
     _,
-    purchase_token,
+    _,
+    _,
     ticket_type_index,
     _,
   ) = before_each(ctx).await;
@@ -322,11 +266,11 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
 
   let secondary_market_runner = &mut ctx.secondary_market_runner;
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let treasury = event_registry_runner.get_participant(5);
   let ticket_buyer = event_registry_runner.get_participant(4);
+  let recipient = event_registry_runner.get_participant(3);
   let wrong_ticket_owner = event_registry_runner.get_participant(1);
   
-  let result = secondary_market_runner.fill_sell_listing(
+  let result = secondary_market_runner.operator_fill_sell_listing(
     event_id,
     secondary_market_state.pubkey(),
     event_registry_state.pubkey(),
@@ -334,123 +278,12 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
     seat_index,
     ticket_type_index,
     ticket_nft_state.pubkey(),
-    purchase_token,
-    treasury.pubkey(),
     wrong_ticket_owner.pubkey(),
     &ticket_buyer,
-    event_organizer.pubkey(),
+    recipient.pubkey(),
   ).await;
 
   Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner);
-}
-
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_when_wrong_treasury(ctx: &mut TestContext) {
-  let (
-    event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
-    secondary_market_state,
-    event_id,
-    seat_index,
-    event_organizer,
-    ticket_owner, // ticket buyer from primary market is the ticket owner
-    purchase_token,
-    ticket_type_index,
-    _,
-  ) = before_each(ctx).await;
-
-  let sale = TicketSalePda::ticket_sale_state(
-    &ticket_sale_state.pubkey(),
-    ticket_type_index,
-    event_id,
-  ).0;
-
-  let secondary_market_runner = &mut ctx.secondary_market_runner;
-  let event_registry_runner = &mut ctx.event_registry_runner;
-  let ticket_buyer = event_registry_runner.get_participant(4);
-  let wrong_treasury = event_registry_runner.get_participant(1);
-  
-  let result = secondary_market_runner.fill_sell_listing(
-    event_id,
-    secondary_market_state.pubkey(),
-    event_registry_state.pubkey(),
-    sale,
-    seat_index,
-    ticket_type_index,
-    ticket_nft_state.pubkey(),
-    purchase_token,
-    wrong_treasury.pubkey(),
-    ticket_owner.pubkey(),
-    &ticket_buyer,
-    event_organizer.pubkey(),
-  ).await;
-
-  Error::assert_err(result, secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount);
-}
-
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_transfer_funds(ctx: &mut TestContext) {
-  let (
-    event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
-    secondary_market_state,
-    event_id,
-    seat_index,
-    event_organizer,
-    ticket_owner, // ticket buyer from primary market is the ticket owner
-    purchase_token,
-    ticket_type_index,
-    _,
-  ) = before_each(ctx).await;
-
-  let secondary_market_runner = &mut ctx.secondary_market_runner;
-  let sale = TicketSalePda::ticket_sale_state(
-    &ticket_sale_state.pubkey(),
-    ticket_type_index,
-    event_id,
-  ).0;
-
-  let event_registry_runner = &mut ctx.event_registry_runner;
-  let treasury = event_registry_runner.get_participant(5);
-  let ticket_buyer = event_registry_runner.get_participant(4);
-  
-  let (
-    treasury_balance_before,
-    event_organizer_balance_before,
-    ticket_owner_balance_before,
-  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
-
-  let result = secondary_market_runner.fill_sell_listing(
-    event_id,
-    secondary_market_state.pubkey(),
-    event_registry_state.pubkey(),
-    sale,
-    seat_index,
-    ticket_type_index,
-    ticket_nft_state.pubkey(),
-    purchase_token,
-    treasury.pubkey(),
-    ticket_owner.pubkey(),
-    &ticket_buyer,
-    event_organizer.pubkey(),
-  ).await;
-  assert!(result.is_ok());
-
-  let (
-    treasury_balance_after,
-    event_organizer_balance_after,
-    ticket_owner_balance_after,
-  ) = secondary_market_runner.get_ata_balances(treasury.pubkey(), event_organizer.pubkey(), ticket_owner.pubkey(), purchase_token).await;
-
-  // 5% goes to treasury and 5% to the event organizer
-  // The sell price is 1.1
-  assert_eq!(treasury_balance_after - treasury_balance_before, sol_to_lamports(0.055));
-  assert_eq!(event_organizer_balance_after - event_organizer_balance_before, sol_to_lamports(0.055));
-  assert_eq!(ticket_owner_balance_after - ticket_owner_balance_before, sol_to_lamports(0.99));
 }
 
 #[test_context(TestContext)]
@@ -463,9 +296,9 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
     secondary_market_state,
     event_id,
     seat_index,
-    event_organizer,
+    _,
     ticket_owner, // ticket buyer from primary market is the ticket owner
-    purchase_token,
+    _,
     ticket_type_index,
     _,
   ) = before_each(ctx).await;
@@ -479,10 +312,10 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let treasury = event_registry_runner.get_participant(5);
   let ticket_buyer = event_registry_runner.get_participant(4);
+  let recipient = event_registry_runner.get_participant(3);
 
-  let result = secondary_market_runner.fill_sell_listing(
+  let result = secondary_market_runner.operator_fill_sell_listing(
     event_id,
     secondary_market_state.pubkey(),
     event_registry_state.pubkey(),
@@ -490,11 +323,9 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
     seat_index,
     ticket_type_index,
     ticket_nft_state.pubkey(),
-    purchase_token,
-    treasury.pubkey(),
     ticket_owner.pubkey(),
     &ticket_buyer,
-    event_organizer.pubkey(),
+    recipient.pubkey(),
   ).await;
   assert!(result.is_ok());
 
@@ -505,7 +336,7 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
     let mut pt = secondary_market_runner.pt.lock().await;
     let ticket_metadata_data = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
 
-    assert_eq!(ticket_metadata_data.owner, ticket_buyer.pubkey());
+    assert_eq!(ticket_metadata_data.owner, recipient.pubkey());
   }
 }
 
@@ -519,9 +350,9 @@ async fn should_close_sell_listing_account(ctx: &mut TestContext) {
     secondary_market_state,
     event_id,
     seat_index,
-    event_organizer,
+    _,
     ticket_owner, // ticket buyer from primary market is the ticket owner
-    purchase_token,
+    _,
     ticket_type_index,
     _,
   ) = before_each(ctx).await;
@@ -535,10 +366,10 @@ async fn should_close_sell_listing_account(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let treasury = event_registry_runner.get_participant(5);
   let ticket_buyer = event_registry_runner.get_participant(4);
+  let recipient = event_registry_runner.get_participant(3);
 
-  let result = secondary_market_runner.fill_sell_listing(
+  let result = secondary_market_runner.operator_fill_sell_listing(
     event_id,
     secondary_market_state.pubkey(),
     event_registry_state.pubkey(),
@@ -546,11 +377,9 @@ async fn should_close_sell_listing_account(ctx: &mut TestContext) {
     seat_index,
     ticket_type_index,
     ticket_nft_state.pubkey(),
-    purchase_token,
-    treasury.pubkey(),
     ticket_owner.pubkey(),
     &ticket_buyer,
-    event_organizer.pubkey(),
+    recipient.pubkey(),
   ).await;
   assert!(result.is_ok());
 
@@ -576,9 +405,9 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
     secondary_market_state,
     event_id,
     seat_index,
-    event_organizer,
+    _,
     ticket_owner, // ticket buyer from primary market is the ticket owner
-    purchase_token,
+    _,
     ticket_type_index,
     _,
   ) = before_each(ctx).await;
@@ -591,10 +420,10 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let treasury = event_registry_runner.get_participant(5);
   let ticket_buyer = event_registry_runner.get_participant(4);
+  let recipient = event_registry_runner.get_participant(3);
 
-  let result = secondary_market_runner.fill_sell_listing(
+  let result = secondary_market_runner.operator_fill_sell_listing(
     event_id,
     secondary_market_state.pubkey(),
     event_registry_state.pubkey(),
@@ -602,11 +431,9 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
     seat_index,
     ticket_type_index,
     ticket_nft_state.pubkey(),
-    purchase_token,
-    treasury.pubkey(),
     ticket_owner.pubkey(),
     &ticket_buyer,
-    event_organizer.pubkey(),
+    recipient.pubkey(),
   ).await;
   assert!(result.is_ok());
 
@@ -630,7 +457,7 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
       seat_index,
       ticket_type_index,
       ticket_nft_state.pubkey(),
-      &ticket_buyer, // the new owner
+      &recipient, // the new owner
     ).await;
     assert!(result.is_ok());
   }

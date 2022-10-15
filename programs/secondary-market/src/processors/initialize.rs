@@ -16,6 +16,7 @@ pub fn exec(
   ticket_nft_state: Pubkey,
   ticket_nft_program: Pubkey,
   protocol_fee: u16,
+  operators: Vec<Pubkey>,
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
@@ -31,6 +32,7 @@ pub fn exec(
   state.ticket_nft_program = ticket_nft_program;
   state.deployer = ctx.accounts.deployer.key();
   state.protocol_fee = protocol_fee;
+  state.operators = operators;
 
   Ok(())
 }

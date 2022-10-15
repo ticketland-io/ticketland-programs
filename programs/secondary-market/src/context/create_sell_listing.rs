@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::mem::size_of;
 use anchor_spl::{
-  token::{Mint, Token, TokenAccount},
+  token::{Token},
   associated_token::AssociatedToken,
 };
 use crate::{
@@ -48,7 +48,6 @@ pub struct CreateSellListing<'info> {
   )]
   pub market: Box<Account<'info, Market>>,
   
-
   // The sell listing account
   // Note we don't include the ticket_owner in the PDA because this account will be closed when this listing is filled.
   // Thus, the new owner can further list it for sell. The account pubkey will be the same in both cases.
@@ -78,19 +77,6 @@ pub struct CreateSellListing<'info> {
     seeds::program = state.ticket_nft_program,
   )]
   pub ticket_metadata: AccountInfo<'info>,
-
-  /// CHECK: The token that was used in the primary market of this event
-  #[account()]
-  pub purchase_token: Box<Account<'info, Mint>>,
-
-  /// The event organizer ATA that till be receiving the funds from the ticket sale if purchase token is not SOL
-  #[account(
-    init_if_needed,
-    payer = ticket_owner,
-    associated_token::mint = purchase_token,
-    associated_token::authority = ticket_owner,
-  )]
-  pub ticket_owner_purchase_token_ata: Box<Account<'info, TokenAccount>>,
 
   #[account(mut)]
   pub ticket_owner: Signer<'info>,

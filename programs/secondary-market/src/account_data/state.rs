@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+pub const MAX_OPERATORS: usize = 10;
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub cpi_authority: u8,
@@ -20,4 +22,6 @@ pub struct State {
   pub ticket_sale_program: Pubkey,
   pub ticket_nft_state: Pubkey,
   pub ticket_nft_program: Pubkey,
+  /// The list of all operators that can fill sell listing on users' behalf
+  pub operators: Vec<Pubkey>,
 }

@@ -15,7 +15,6 @@ use crate::{
     sale_time_checks,
     sale_account,
     price_cap,
-    purchase_token,
   },
   utils::program_error::ErrorCode,
 };
@@ -45,10 +44,6 @@ fn ticket_metadata_account_checks(
     &ctx.accounts.ticket_metadata,
     ctx.accounts.market.resale_cap,
     ask_price,
-  )
-  purchase_token::check(
-    &ctx.accounts.event,
-    &ctx.accounts.purchase_token,
   )
 )]
 pub fn exec(
