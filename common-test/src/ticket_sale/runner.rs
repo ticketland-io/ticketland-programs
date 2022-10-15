@@ -98,6 +98,14 @@ impl Runner {
     MerkleTree::new(seats.to_vec())
   }
 
+  pub fn get_participant(&self, index: usize) -> Keypair {
+    Keypair::from_bytes(self.test_account.participants[index].to_bytes().as_ref()).unwrap()
+  }
+  
+  pub fn get_mint_operators(&self) -> Vec<Pubkey> {
+    vec![self.get_participant(7).pubkey(), self.get_participant(8).pubkey()]
+  }
+
   pub async fn process_transaction(
     &self,
     instructions: &[Instruction],
@@ -126,6 +134,7 @@ impl Runner {
       treasury: self.treasury.pubkey(),
       event_registry_state,
       event_registry_program: event_registry_program_id(),
+      mint_operators: self.get_mint_operators(),
     }.data();
 
     let ix = Instruction {

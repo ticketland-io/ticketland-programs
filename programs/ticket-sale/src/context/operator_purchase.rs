@@ -64,7 +64,7 @@ pub struct OperatorPurchase<'info> {
       &sale.event_id
     ],
     bump = sale.bump,
-    constraint = sale.ticket_type.sale_type.is_free() @ ErrorCode::UnexpectedSaleAccount,
+    constraint = sale.ticket_type.sale_type.is_fixed_price() @ ErrorCode::UnexpectedSaleAccount,
   )]
   pub sale: Box<Account<'info, Sale>>,
 
