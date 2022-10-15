@@ -34,6 +34,32 @@ macro_rules! expand_pre_checks {
   }
 }
 
+macro_rules! expand_mint_ticket {
+  ($ctx:ident, $price_sold:ident, $seat_index:ident,  $seat_name:ident) => {
+    mint_ticket(
+      $price_sold,
+      $seat_index,
+      $seat_name,
+      &$ctx.accounts.state,
+      &$ctx.accounts.sale,
+      &$ctx.accounts.ticket_nft_program,
+      &$ctx.accounts.ticket_nft_program_state,
+      &$ctx.accounts.ticket_metadata,
+      &$ctx.accounts.nft_authority,
+      &$ctx.accounts.ticket_nft,
+      &$ctx.accounts.event_nft_metadata,
+      &$ctx.accounts.ticket_nft_ata,
+      &$ctx.accounts.cpi_authority,
+      &$ctx.accounts.ticket_buyer,
+      &$ctx.accounts.token_program,
+      &$ctx.accounts.associated_token_program,
+      &$ctx.accounts.system_program,
+      &$ctx.accounts.rent,
+    )?;
+  
+  }
+}
+
 /// The main issue stems from the fact that we can't have the following account in the FixedPricePurchase context
 ///  
 /// `pub event: Box<Account<'info, Event>>`
@@ -163,26 +189,7 @@ pub fn fixed_price_purchase_mint_ticket(
   seat_index: u32,
   seat_name: String
 ) -> Result<()> {
-  mint_ticket(
-    price_sold,
-    seat_index,
-    seat_name,
-    &ctx.accounts.state,
-    &ctx.accounts.sale,
-    &ctx.accounts.ticket_nft_program,
-    &ctx.accounts.ticket_nft_program_state,
-    &ctx.accounts.ticket_metadata,
-    &ctx.accounts.nft_authority,
-    &ctx.accounts.ticket_nft,
-    &ctx.accounts.event_nft_metadata,
-    &ctx.accounts.ticket_nft_ata,
-    &ctx.accounts.cpi_authority,
-    &ctx.accounts.ticket_buyer,
-    &ctx.accounts.token_program,
-    &ctx.accounts.associated_token_program,
-    &ctx.accounts.system_program,
-    &ctx.accounts.rent,
-  )?;
+  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
 
   Ok(())
 }
@@ -193,26 +200,7 @@ pub fn free_purchase_mint_ticket(
   seat_index: u32,
   seat_name: String
 ) -> Result<()> {
-  mint_ticket(
-    price_sold,
-    seat_index,
-    seat_name,
-    &ctx.accounts.state,
-    &ctx.accounts.sale,
-    &ctx.accounts.ticket_nft_program,
-    &ctx.accounts.ticket_nft_program_state,
-    &ctx.accounts.ticket_metadata,
-    &ctx.accounts.nft_authority,
-    &ctx.accounts.ticket_nft,
-    &ctx.accounts.event_nft_metadata,
-    &ctx.accounts.ticket_nft_ata,
-    &ctx.accounts.cpi_authority,
-    &ctx.accounts.ticket_buyer,
-    &ctx.accounts.token_program,
-    &ctx.accounts.associated_token_program,
-    &ctx.accounts.system_program,
-    &ctx.accounts.rent,
-  )?;
+  expand_mint_ticket!(ctx, price_sold, seat_index, seat_name);
 
   Ok(())
 }
