@@ -69,11 +69,13 @@ const initializeTicketSale = async (deploymentConfig, eventRegistryState) => {
   const treasury = new PublicKey(deploymentConfig.serviceFeeTreasury)
   const program = anchor.workspace.TicketSale
   const deployer = provider.wallet.publicKey
+  const mintOperators = deploymentConfig.mintOperators.map(pk => new PublicKey(pk))
 
   await program.rpc.initialize(
     treasury,
     eventRegistryState,
     anchor.workspace.EventRegistry.programId,
+    mintOperators,
     {
       accounts: {
         state: state.publicKey,
