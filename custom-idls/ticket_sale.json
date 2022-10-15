@@ -10,7 +10,10 @@
         "# Arguments",
         "",
         "* `ctx` - The Anchor context holding the accounts",
-        "* `treasury` - The ticketland.io treasury address"
+        "* `treasury` - The ticketland.io treasury address",
+        "* `event_registry_state` - The event registry program state",
+        "* `event_registry_program` - The event registry program address",
+        "* `mint_operators` - The list of all operators that can mint tickets"
       ],
       "accounts": [
         {
@@ -51,6 +54,12 @@
         {
           "name": "eventRegistryProgram",
           "type": "publicKey"
+        },
+        {
+          "name": "mintOperators",
+          "type": {
+            "vec": "publicKey"
+          }
         }
       ]
     },
@@ -429,7 +438,7 @@
     {
       "name": "freePurchase",
       "docs": [
-        "Allows user to purchase a ticket on a fixed price",
+        "Allows user to purchase a ticket for free",
         "",
         "# Arguments",
         "",
@@ -563,6 +572,151 @@
         {
           "name": "seatName",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "operatorPurchase",
+      "docs": [
+        "Allows a mint operator to mint a new ticket to the recipient account",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
+        "* `recipient` - The recipient account that will receive the ticket NFT"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatVerification",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventCapacity",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNft",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "We use AccountInfo instead of Account<'info, Mint> because the latter will check if the",
+            "account is initialized. However, this account will be initialized in the Ticket NFT program after",
+            "the CPI is done."
+          ]
+        },
+        {
+          "name": "nftAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ATA that is a PDA controlled by this program and will be the owner of the Ticket NFT",
+            "until the end of the event.",
+            "We use AccountInfo for the reason explained above. Also we can add these constraints.",
+            "",
+            "associated_token::mint = ticket_nft,",
+            "associated_token::authority = cpi_authority,",
+            "",
+            "If we add them then Anchor would have to load the TokenAccount and check these constraints. However, there is",
+            "not account yet; it will be created in the Ticket NFT Program"
+          ]
+        },
+        {
+          "name": "eventNft",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventNftMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "recipient",
+          "type": "publicKey"
         }
       ]
     }
@@ -705,6 +859,15 @@
               "The account that will be calling other programs"
             ],
             "type": "publicKey"
+          },
+          {
+            "name": "mintOperators",
+            "docs": [
+              "The list of all operators that can mint tickets"
+            ],
+            "type": {
+              "vec": "publicKey"
+            }
           }
         ]
       }
@@ -1017,6 +1180,11 @@
       "code": 6016,
       "name": "SeatNotVerified",
       "msg": "Seat was not verified"
+    },
+    {
+      "code": 6017,
+      "name": "OnlyMintOperator",
+      "msg": "Not a mint operator"
     }
   ]
 }
