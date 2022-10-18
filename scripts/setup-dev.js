@@ -22,7 +22,7 @@ const provider = anchor.AnchorProvider.local(
 
 const createMintAccount = async () => {
   // Create the Wrapped SOL Mint account
-  const wrappedSol = await spl.createMint(
+  const mintAccount = await spl.createMint(
     provider.connection,
     provider.wallet.payer,
     provider.wallet.publicKey,
@@ -30,7 +30,7 @@ const createMintAccount = async () => {
     9
   )
 
-  return wrappedSol.toBase58()
+  return mintAccount.toBase58()
 }
 
 const main = async () => {
