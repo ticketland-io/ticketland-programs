@@ -287,7 +287,6 @@ impl Runner {
       ticket_owner,
       ticket_buyer: ticket_buyer.pubkey(),
       ticket_nft_program: ticket_nft_program_id(),
-      token_program: Token::id(),
     }.to_account_metas(None);
 
     let data = secondary_market::instruction::OperatorFillSellListing {

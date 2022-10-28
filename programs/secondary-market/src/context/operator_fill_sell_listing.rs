@@ -1,7 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{
-  token::{Token},
-};
 use ticket_nft::{
   program::TicketNft,
 };
@@ -93,5 +90,4 @@ pub struct OperatorFillSellListing<'info> {
   pub ticket_buyer: Signer<'info>,
 
   pub ticket_nft_program: Program<'info, TicketNft>,
-  pub token_program: Program<'info, Token>,
 }
