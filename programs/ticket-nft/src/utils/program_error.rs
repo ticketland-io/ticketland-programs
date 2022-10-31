@@ -6,4 +6,6 @@ pub enum ErrorCode {
   OnlyDeployer,
   #[msg("Not ticket sale program")]
   WrongTicketSaleProgram,
+  #[msg("Only Operator")]
+  OnlyOperator,
 }

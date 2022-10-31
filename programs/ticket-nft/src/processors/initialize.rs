@@ -10,6 +10,7 @@ pub fn exec(
   ctx: Context<Initialize>,
   ticket_sale_state: Pubkey,
   ticket_sale_program: Pubkey,
+  operators: Vec<Pubkey>,
 ) -> Result<()> {
   let state = &mut ctx.accounts.state;
 
@@ -20,6 +21,7 @@ pub fn exec(
   state.ticket_sale_program = ticket_sale_program;
   state.ticket_sale_state = ticket_sale_state;
   state.deployer = ctx.accounts.deployer.key();
+  state.operators = operators;
 
   Ok(())
 }
