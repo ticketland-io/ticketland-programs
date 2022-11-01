@@ -4,6 +4,7 @@ import {writeFile} from 'fs/promises'
 import * as pda from './helpers/pda.js'
 import deploymentConfig from './.config.json' assert { type: 'json' }
 
+
 const {SystemProgram, SYSVAR_RENT_PUBKEY, Keypair, PublicKey} = anchor.web3
 
 const getClusterUrl = () => {
