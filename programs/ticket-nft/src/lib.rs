@@ -18,26 +18,26 @@ declare_id!("599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL");
 pub mod ticket_nft {
   use super::*;
 
-	/// Initializes the state i.e. instance of a given program
-	///
-	/// # Arguments
-	///
-	/// * `ctx` - The Anchor context holding the accounts
-	/// * `ticket_sale_state` - The state of the ticket sale program
-	/// * `ticket_sale_program` - The program id of the ticket sale program
-	pub fn initialize(
-		ctx: Context<Initialize>,
-		ticket_sale_state: Pubkey,
-		ticket_sale_program: Pubkey,
+  /// Initializes the state i.e. instance of a given program
+  ///
+  /// # Arguments
+  ///
+  /// * `ctx` - The Anchor context holding the accounts
+  /// * `ticket_sale_state` - The state of the ticket sale program
+  /// * `ticket_sale_program` - The program id of the ticket sale program
+  pub fn initialize(
+    ctx: Context<Initialize>,
+    ticket_sale_state: Pubkey,
+    ticket_sale_program: Pubkey,
     operators: Vec<Pubkey>,
-	) -> Result<()> {
+  ) -> Result<()> {
     processors::initialize::exec(
-			ctx,
-			ticket_sale_state,
-			ticket_sale_program,
+      ctx,
+      ticket_sale_state,
+      ticket_sale_program,
       operators,
-		)
-	}
+    )
+  }
 
   /// Stores the secondary market state and program id
   ///
@@ -91,7 +91,7 @@ pub mod ticket_nft {
     processors::transfer::exec(ctx, new_owner)
   }
 
-	pub fn set_attended(ctx: Context<SetAttended>) -> Result<()> {
-		processors::set_attended::exec(ctx)
-	}
+  pub fn set_attended(ctx: Context<SetAttended>) -> Result<()> {
+    processors::set_attended::exec(ctx)
+  }
 }
