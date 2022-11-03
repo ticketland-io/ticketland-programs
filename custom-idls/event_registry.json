@@ -575,6 +575,10 @@
             "type": "u32"
           },
           {
+            "name": "name",
+            "type": "string"
+          },
+          {
             "name": "sale_type",
             "type": {
               "defined": "SaleType"
