@@ -100,6 +100,7 @@ pub async fn setup(
 
     ticket_types = vec![
       TicketType {
+        name: "Basic".to_string(),
         n_tickets: 4,
         sale_type: SaleType::FixedPrice {amount: sol_to_lamports(1_f64)},
         sale_start_time: now + 1, // 10 seconds
@@ -108,6 +109,7 @@ pub async fn setup(
         seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
+        name: "VIP".to_string(),
         n_tickets: 6,
         sale_type: SaleType::DutchAuction {
           start_price: 150,

@@ -30,7 +30,7 @@ pub fn exec(
   let event: Event = deser(ctx.accounts.event.clone())?;
   event_account_checks(&ctx, &event, ticket_type_index)?;
 
-  let ticket_type = event.ticket_types[ticket_type_index as usize];
+  let ticket_type = event.ticket_types[ticket_type_index as usize].clone();
   let sale = &mut ctx.accounts.sale;
 
   sale.bump = *ctx.bumps.get("sale").unwrap();

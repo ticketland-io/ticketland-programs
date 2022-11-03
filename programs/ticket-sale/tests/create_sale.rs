@@ -78,6 +78,7 @@ async fn custom_create_event(
 
     ticket_types = vec![
       TicketType {
+        name: "Basic".to_string(),
         n_tickets: 4,
         sale_type: SaleType::Free,
         sale_start_time: now + 10, // 10 seconds
@@ -86,6 +87,7 @@ async fn custom_create_event(
         seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
+        name: "VIP".to_string(),
         n_tickets: 6,
         sale_type: SaleType::DutchAuction {
           start_price: 150,
@@ -182,7 +184,10 @@ async fn should_create_a_new_sale(ctx: &mut TestContext) {
     
     assert_eq!(sale_data.event_id, event_id);
     assert_eq!(sale_data.ticket_type_index, ticket_type_index);
-    assert_eq!(sale_data.ticket_type, ticket_types[0].clone());
+
+    let mut ticket_type = sale_data.ticket_type.clone();
+    ticket_type.name = ticket_type.name.trim_matches(char::from(0)).to_string();
+    assert_eq!(ticket_type, ticket_types[0].clone());
   }
 
   // Create a new ticket sale for the second ticket type
@@ -210,6 +215,9 @@ async fn should_create_a_new_sale(ctx: &mut TestContext) {
     assert_eq!(sale_data.bump, ticket_sale_state_bump);
     assert_eq!(sale_data.event_id, event_id);
     assert_eq!(sale_data.ticket_type_index, ticket_type_index);
-    assert_eq!(sale_data.ticket_type, ticket_types[1].clone());
+
+    let mut ticket_type = sale_data.ticket_type.clone();
+    ticket_type.name = ticket_type.name.trim_matches(char::from(0)).to_string();
+    assert_eq!(ticket_type, ticket_types[1].clone());
   }
 }

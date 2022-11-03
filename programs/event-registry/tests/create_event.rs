@@ -86,6 +86,7 @@ async fn custom_create_event(
   let deposit_token = runner.deposit_tokens[deposit_token_idx];
   let ticket_types = vec![
     TicketType {
+      name: "Basic".to_string(),
       n_tickets: 1000,
       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
@@ -94,6 +95,7 @@ async fn custom_create_event(
       seat_range: SeatRange {l: 0, r: 10_000},
     },
     TicketType {
+      name: "VIP".to_string(),
       n_tickets: 1000,
       sale_type: SaleType::DutchAuction {
         start_price: 150,
@@ -175,8 +177,15 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     assert_eq!(event_data.event_organizer, event_organizer.pubkey());
     assert_eq!(event_data.currency, runner.supported_currencies[0]);
     assert_eq!(event_data.event_organizer_purchase_token_ata, Spl::get_associated_token_address(&event_organizer.pubkey(), &purchase_token),);
-    assert_eq!(event_data.ticket_types,  vec![
+
+    let ticket_types = event_data.ticket_types.clone().into_iter().map(|mut t| {
+      t.name = t.name.trim_matches(char::from(0)).to_string();
+      t
+    }).collect::<Vec<TicketType>>();
+
+    assert_eq!(ticket_types,  vec![
       TicketType {
+        name: "Basic".to_string(),
         n_tickets: 1000,
         sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
@@ -185,6 +194,7 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
         seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
+        name: "VIP".to_string(),
         n_tickets: 1000,
         sale_type: SaleType::DutchAuction {
           start_price: 150,
@@ -309,6 +319,7 @@ async fn should_fail_if_max_ticket_types_violated(ctx: &mut TestContext) {
   for i in 0..11 {
     ticket_types.push(
       TicketType {
+        name: "Basic".to_string(),
         n_tickets: 1000,
         sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
         sale_start_time: 50,
@@ -473,6 +484,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
 
   let ticket_types = vec![
     TicketType {
+      name: "Basic".to_string(),
       n_tickets: 1000,
       sale_type: SaleType::FixedPrice {amount: to_base(100, 6)},
       sale_start_time: 50,
@@ -481,6 +493,7 @@ async fn should_fail_if_deposit_token_not_supported(ctx: &mut TestContext) {
       seat_range: SeatRange {l: 0, r: 10_000},
     },
     TicketType {
+      name: "VIP".to_string(),
       n_tickets: 1000,
       sale_type: SaleType::DutchAuction {
         start_price: 150,

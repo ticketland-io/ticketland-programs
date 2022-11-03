@@ -3,6 +3,8 @@ use super::{
   sale_type::SaleType,
 };
 
+pub const MAX_NAME_LENGTH: usize = 32;
+
 // l and r are the list and right boundaries of the range which is inclusive.
 #[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone,  Eq, PartialEq, Default, Debug)]
 pub struct SeatRange {
@@ -10,8 +12,9 @@ pub struct SeatRange {
   pub r: u32,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Eq, PartialEq, Debug)]
 pub struct TicketType {
+  pub name: String,
   pub n_tickets: u32,
   pub sale_type: SaleType,
   pub sale_start_time: i64,

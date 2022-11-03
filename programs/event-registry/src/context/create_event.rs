@@ -8,7 +8,7 @@ use common::{
   account_data::event::{
     MAX_TICKET_TYPES,
   },
-  state::ticket_type::TicketType,
+  state::ticket_type::{TicketType, MAX_NAME_LENGTH},
 };
 use ticket_sale::{
   program::TicketSale,
@@ -33,7 +33,7 @@ pub struct CreateEvent<'info> {
   #[account(
     init,
     payer = event_organizer,
-    space = 8 + size_of::<Event>() + (size_of::<TicketType>() * MAX_TICKET_TYPES),
+    space = 8 + size_of::<Event>() + ((size_of::<TicketType>() + MAX_NAME_LENGTH) * MAX_TICKET_TYPES),
     seeds = [b"event", state.key().as_ref(), &event_id],
     bump
   )]

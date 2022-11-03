@@ -143,6 +143,7 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
 
     ticket_types = vec![
       TicketType {
+        name: "Basic".to_string(),
         n_tickets: 4,
         sale_type: SaleType::Free,
         sale_start_time: now + 10, // 10 seconds
@@ -151,6 +152,7 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
         seat_range: SeatRange {l: 0, r: 10_000},
       },
       TicketType {
+        name: "VIP".to_string(),
         n_tickets: 6,
         sale_type: SaleType::DutchAuction {
           start_price: 150,

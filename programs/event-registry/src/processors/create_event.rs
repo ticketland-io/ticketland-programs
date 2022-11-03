@@ -4,8 +4,9 @@ use anchor_safe_math::SafeMath;
 use common::{
   account_data::event::*,
   state::{
-    ticket_type::TicketType,
+    ticket_type::{TicketType, MAX_NAME_LENGTH},
   },
+  utils::string::puffed_out_string,
 };
 use crate::{
   utils::program_error::ErrorCode,
@@ -73,6 +74,11 @@ pub fn exec(
   ticket_types: Vec<TicketType>,
 ) -> Result<()> {
   require!(ticket_types.len() <= MAX_TICKET_TYPES, ErrorCode::TooManyTicketTypes);
+  let ticket_types = ticket_types.into_iter().map(|mut t| {
+    t.name = puffed_out_string(&t.name, MAX_NAME_LENGTH);
+    t
+  })
+  .collect::<Vec<TicketType>>();
   
   lock_deposit(&ctx)?;
 
