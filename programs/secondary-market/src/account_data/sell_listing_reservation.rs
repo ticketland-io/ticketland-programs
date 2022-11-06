@@ -8,9 +8,9 @@ use common::{
 };
 
 #[account]
-pub struct SeatReservation(pub Reservation);
+pub struct SellListingReservation(pub Reservation);
 
-impl Deref for SeatReservation {
+impl Deref for SellListingReservation {
   type Target = Reservation;
 
   fn deref(&self) -> &Self::Target {
@@ -18,7 +18,7 @@ impl Deref for SeatReservation {
   }
 }
 
-impl DerefMut for SeatReservation {
+impl DerefMut for SellListingReservation {
   fn deref_mut(&mut self) -> &mut Self::Target {
     &mut self.0
   }

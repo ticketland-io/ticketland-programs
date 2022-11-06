@@ -41,6 +41,8 @@ impl TryFrom<u32> for Error {
       7 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTicketNftState)),
       8 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyTicketOwner)),
       9 => Ok(Error(secondary_market::utils::program_error::ErrorCode::WrongTreasuryAccount)),
+      10 => Ok(Error(secondary_market::utils::program_error::ErrorCode::OnlyMintOperator)),
+      11 => Ok(Error(secondary_market::utils::program_error::ErrorCode::SellListingReserved)),
       _ => Err(())
     }
   }

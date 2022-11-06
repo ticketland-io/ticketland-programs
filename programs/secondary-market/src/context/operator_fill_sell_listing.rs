@@ -86,7 +86,10 @@ pub struct OperatorFillSellListing<'info> {
   #[account(mut)]
   pub ticket_owner: AccountInfo<'info>,
 
-  #[account(mut)]
+  #[account(
+    mut,
+    constraint = state.operators.iter().any(|m| *m == ticket_buyer.key()) @ ErrorCode::OnlyMintOperator,
+  )]
   pub ticket_buyer: Signer<'info>,
 
   pub ticket_nft_program: Program<'info, TicketNft>,

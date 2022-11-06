@@ -22,4 +22,8 @@ pub enum ErrorCode {
   OnlyTicketOwner,
   #[msg("Wrong treasury account")]
   WrongTreasuryAccount,
+  #[msg("Not a mint operator")]
+  OnlyMintOperator,
+  #[msg("Sell listing reserved")]
+  SellListingReserved,
 }
