@@ -177,7 +177,7 @@ pub mod ticket_sale {
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
 	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
-  /// * `duration` - The duration in Slot that his seat will be reserved fors
+  /// * `duration` - The duration in Slot that his seat will be reserved for
 	/// * `recipient` - The utlimate recipient of the ticket nft when it will be minted by the operator
   pub fn reserve_seat(
     ctx: Context<ReserveSeat>,

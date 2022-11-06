@@ -3,7 +3,6 @@ use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
-    sale::*,
     sell_listing_reservation::*,
   },
   utils::program_error::ErrorCode,
@@ -25,11 +24,11 @@ pub struct ReserveSellListing<'info> {
     ],
     bump,
   )]
-  pub seat_reservation: Account<'info, SellListingReservation>,
+  pub sell_listing_reservation: Account<'info, SellListingReservation>,
 
   #[account(
     mut,
-    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+    constraint = state.operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
   )]
   pub operator: Signer<'info>,
 
