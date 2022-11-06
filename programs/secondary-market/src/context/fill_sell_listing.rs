@@ -141,13 +141,6 @@ pub struct FillSellListing<'info> {
 
   #[account(mut)]
   pub ticket_buyer: Signer<'info>,
-
-  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
-  #[account(
-    mut,
-    constraint = state.operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
-  )]
-  pub operator: AccountInfo<'info>,
     
   #[account(
     mut,
@@ -155,6 +148,13 @@ pub struct FillSellListing<'info> {
     associated_token::authority = ticket_buyer,
   )]
   pub ticket_buyer_ata: Box<Account<'info, TokenAccount>>,
+
+  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
+  #[account(
+    mut,
+    constraint = state.operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
+  pub operator: AccountInfo<'info>,
 
   pub ticket_nft_program: Program<'info, TicketNft>,
   pub token_program: Program<'info, Token>,

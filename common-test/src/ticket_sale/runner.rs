@@ -33,6 +33,7 @@ use anchor_metaplex::{
   },
 };
 use common::{
+  state::alias::Slot,
   crypto::mt::{
     create_seat_leaf,
     get_null_leaf,
@@ -367,7 +368,6 @@ impl Runner {
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
     let seat_reservation = TickerSalePda::seat_reservation(&sale, seat_index, &seat_name).0;
-    let operator = self.get_mint_operators()[0];
 
     let accounts = ticket_sale::accounts::OperatorPurchase {
       state: ticket_sale_state,
@@ -386,7 +386,6 @@ impl Runner {
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
-      operator,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
@@ -403,5 +402,44 @@ impl Runner {
     };
 
     self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
+
+  pub async fn reserve_seat(
+    &mut self,
+    ticket_sale_state: Pubkey,
+    operator: &Keypair,
+    recipient: Pubkey,
+    event_id: [u8; 32],
+    ticket_type_index: u8,
+    seat_index: u32,
+		seat_name: String,
+    duration: Slot,
+  ) -> AnchorResult<()> {
+    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
+    let seat_reservation = TickerSalePda::seat_reservation(&sale, seat_index, &seat_name).0;
+
+    let accounts = ticket_sale::accounts::ReserveSeat {
+      state: ticket_sale_state,
+      sale,
+      seat_reservation,
+      operator: operator.pubkey(),
+      system_program: system_program::ID,
+      rent: Rent::id(),
+    }.to_account_metas(None);
+
+    let data = ticket_sale::instruction::ReserveSeat {
+      _seat_index: seat_index,
+      _seat_name: seat_name,
+      duration,
+      recipient,
+    }.data();
+
+    let ix = Instruction {
+      program_id: ticket_sale_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&operator])).await
   }
 }

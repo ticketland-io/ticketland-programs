@@ -50,7 +50,7 @@ async fn before_each(ctx: &mut TestContext) -> (
   let seat_index = 0;
   let event_registry_runner = &mut ctx.event_registry_runner;
   let event_organizer = event_registry_runner.get_participant(1);
-  let ticket_buyer = event_registry_runner.get_participant(2);
+  let ticket_buyer = event_registry_runner.get_participant(4);
   let deposit_token = event_registry_runner.deposit_tokens[2];
   let purchase_token = deposit_token;
   let ticket_type_index = 0;
@@ -191,7 +191,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
 
     let event_registry_runner = &mut ctx.event_registry_runner;
     let secondary_market_runner = &mut ctx.secondary_market_runner;
-    let ticket_buyer = event_registry_runner.get_participant(4);
+    let ticket_buyer = secondary_market_runner.get_participant(7);
     let recipient = event_registry_runner.get_participant(3);
     
     let result = secondary_market_runner.operator_fill_sell_listing(
@@ -221,7 +221,7 @@ async fn should_enforce_access_control(ctx: &mut TestContext) {
   {
     let secondary_market_runner = &mut ctx.secondary_market_runner;
     let event_registry_runner = &mut ctx.event_registry_runner;
-    let ticket_buyer = event_registry_runner.get_participant(4);
+    let ticket_buyer = secondary_market_runner.get_participant(7);
     let recipient = event_registry_runner.get_participant(3);
     
     let result = secondary_market_runner.operator_fill_sell_listing(
@@ -266,7 +266,7 @@ async fn should_fail_when_wrong_ticket_owner(ctx: &mut TestContext) {
 
   let secondary_market_runner = &mut ctx.secondary_market_runner;
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let ticket_buyer = event_registry_runner.get_participant(4);
+  let ticket_buyer = secondary_market_runner.get_participant(7);
   let recipient = event_registry_runner.get_participant(3);
   let wrong_ticket_owner = event_registry_runner.get_participant(1);
   
@@ -312,7 +312,7 @@ async fn should_change_ownership_of_the_ticket(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let ticket_buyer = event_registry_runner.get_participant(4);
+  let ticket_buyer = secondary_market_runner.get_participant(7);
   let recipient = event_registry_runner.get_participant(3);
 
   let result = secondary_market_runner.operator_fill_sell_listing(
@@ -366,7 +366,7 @@ async fn should_close_sell_listing_account(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let ticket_buyer = event_registry_runner.get_participant(4);
+  let ticket_buyer = secondary_market_runner.get_participant(7);
   let recipient = event_registry_runner.get_participant(3);
 
   let result = secondary_market_runner.operator_fill_sell_listing(
@@ -420,7 +420,7 @@ async fn should_allow_new_owner_list_ticket_for_sale(ctx: &mut TestContext) {
   ).0;
 
   let event_registry_runner = &mut ctx.event_registry_runner;
-  let ticket_buyer = event_registry_runner.get_participant(4);
+  let ticket_buyer = secondary_market_runner.get_participant(7);
   let recipient = event_registry_runner.get_participant(3);
 
   let result = secondary_market_runner.operator_fill_sell_listing(

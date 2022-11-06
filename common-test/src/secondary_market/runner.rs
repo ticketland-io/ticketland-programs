@@ -219,12 +219,15 @@ impl Runner {
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
+    let sell_listing_reservation = pda::sell_listing_reservation(&sell_listing).0;
+    let operator = self.get_operators()[0];
 
     let accounts = secondary_market::accounts::FillSellListing {
       state,
       ticket_nft_program_state,
       sell_listing,
       event,
+      sell_listing_reservation,
       market,
       sale,
       cpi_authority: pda::cpi_authority(&state).0,
@@ -238,6 +241,7 @@ impl Runner {
       service_fee_ata: Spl::get_associated_token_address(&treasury, &purchase_token),
       ticket_buyer: ticket_buyer.pubkey(),
       ticket_buyer_ata: Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token),
+      operator,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
@@ -274,12 +278,14 @@ impl Runner {
     let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
     let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
+    let sell_listing_reservation = pda::sell_listing_reservation(&sell_listing).0;
 
     let accounts = secondary_market::accounts::OperatorFillSellListing {
       state,
       ticket_nft_program_state,
       sell_listing,
       event,
+      sell_listing_reservation,
       market,
       sale,
       cpi_authority: pda::cpi_authority(&state).0,
