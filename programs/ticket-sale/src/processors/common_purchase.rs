@@ -103,8 +103,6 @@ pub fn seat_reservation_checks<'info>(
   operator: AccountInfo<'info>,
   ticket_buyer: Pubkey,
 ) -> Result<()> {
-  msg!("lamports {:?}", seat_reservation.lamports());
-
   // if account exists then check if it has expired or the sender is the recipient
   if seat_reservation.lamports() != 0 {
     // This will no fail because it lamports is no 0. It will also check that seat_reservation account

@@ -54,6 +54,7 @@ pub struct OperatorFillSellListing<'info> {
 
   /// CHECK: The processor will do checks like whether this account exists or if it has expired
   #[account(
+    mut,
     seeds = [
       b"sell_listing_reservation",
       sell_listing.key().as_ref(),
