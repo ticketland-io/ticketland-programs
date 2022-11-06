@@ -52,6 +52,16 @@ pub struct OperatorFillSellListing<'info> {
   )]
   pub event: AccountInfo<'info>,
 
+  /// CHECK: The processor will do checks like whether this account exists or if it has expired
+  #[account(
+    seeds = [
+      b"sell_listing_reservation",
+      sell_listing.key().as_ref(),
+    ],
+    bump,
+  )]
+  pub sell_listing_reservation: AccountInfo<'info>,
+
   // The market account
   #[account(
     seeds = [
@@ -92,5 +102,14 @@ pub struct OperatorFillSellListing<'info> {
   )]
   pub ticket_buyer: Signer<'info>,
 
+  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
+  /// It might be same as the ticket_buyer above
+  #[account(
+    mut,
+    constraint = state.operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
+  pub operator: AccountInfo<'info>,
+    
+    
   pub ticket_nft_program: Program<'info, TicketNft>,
 }

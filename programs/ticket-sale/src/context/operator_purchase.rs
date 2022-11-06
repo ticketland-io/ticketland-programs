@@ -41,7 +41,7 @@ pub struct OperatorPurchase<'info> {
   )]
   pub event: AccountInfo<'info>,
 
-  /// CHECK: The processor will do checks like wether this account exists or if it has expired
+  /// CHECK: The processor will do checks like whether this account exists or if it has expired
   #[account(
     seeds = [
       b"seat_reservation",
@@ -182,7 +182,8 @@ pub struct OperatorPurchase<'info> {
   )]
   pub event_nft_metadata: AccountInfo<'info>,
 
-  /// CHECK: This might be the same as ticket_buyer account above
+  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
+  /// This might be the same as ticket_buyer account above
   #[account(
     mut,
     constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
