@@ -2,6 +2,7 @@
 use anchor_lang::{
   prelude::{
     Pubkey,
+    Result as AnchorResult,
   },
   AccountDeserialize,
 };
@@ -148,8 +149,8 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
         name: "Basic".to_string(),
         n_tickets: 4,
         sale_type: SaleType::FixedPrice {amount: 10000}, // $100 dollars
-        sale_start_time: now + 10, // 10 seconds
-        sale_end_time: now + 10 + 10,
+        sale_start_time: now + 20, // 20 seconds
+        sale_end_time: now + 20 + 20,
         merkle_root: mt_type_1.root().unwrap(),
         seat_range: SeatRange {l: 0, r: 10_000},
       },
@@ -162,8 +163,8 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
           curve_length: 200 * 60,
           drop_interval: 20 * 60,
         },
-        sale_start_time: now + 15, // 15 seconds
-        sale_end_time: now + 15 + 10,
+        sale_start_time: now + 25, // 25 seconds
+        sale_end_time: now + 25 + 10,
         merkle_root: mt_type_2.root().unwrap(),
         seat_range: SeatRange {l: 10_001, r: 20_000},
       },
@@ -200,6 +201,84 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
     mt_type_1,
     event_capacity,
   )
+}
+
+async fn setup_reservation(ctx: &mut TestContext, recipient: Pubkey, should_expire: bool) -> (AnchorResult<()>, Pubkey) {
+  let (
+    event_organizer,
+    event_registry_state,
+    ticket_sale_state,
+    ticket_nft_state,
+    ticket_types,
+    event_id,
+    mt_type_1,
+    event_capacity,
+  ) = setup(ctx).await;
+
+  // move to the start of sale
+  {
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+  }
+
+  let seat_index = 0;
+  let operator = ctx.ticket_sale_runner.get_participant(7);
+
+  // verify the seat
+  {
+    let result = ctx.ticket_sale_runner.verify_seat(
+      &operator,
+      ticket_sale_state.pubkey(),
+      event_id,
+      0, // ticket_type_index
+      seat_index,
+      TicketSaleRunner::dummy_seat_name(0),
+      mt_type_1.proof(&[0]), // proof path for leaf 0
+    ).await;
+
+    assert!(result.is_ok());
+  }
+
+  let new_recipient = ctx.ticket_sale_runner.get_participant(3).pubkey();
+  let seat_name = TicketSaleRunner::dummy_seat_name(0);
+  // operator reserves this seat
+  {
+    let result = ctx.ticket_sale_runner.reserve_seat(
+      ticket_sale_state.pubkey(),
+      &operator,
+      new_recipient,
+      event_id,
+      0, // ticket_type_index
+      seat_index,
+      seat_name.clone(),
+      10
+    ).await;
+
+    assert!(result.is_ok());
+  }
+
+  if should_expire {
+    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+    pt.advance_clock_by_slots(11).await;
+  }
+
+  let result = ctx.ticket_sale_runner.operator_purchase(
+    &operator,
+    recipient,
+    event_registry_state.pubkey(),
+    ticket_sale_state.pubkey(),
+    event_capacity,
+    event_organizer.pubkey(),
+    ticket_nft_state.pubkey(),
+    event_id,
+    0,
+    seat_index,
+		TicketSaleRunner::dummy_seat_name(0),
+  ).await;
+
+  let seat_reservation = TickerSalePda::seat_reservation(&ticket_sale_state.pubkey(), seat_index, &seat_name).0;
+
+  (result, seat_reservation)
 }
 
 #[test_context(TestContext)]
@@ -475,5 +554,43 @@ let ticket_buyer = ctx.ticket_sale_runner.get_participant(7);
   let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state.pubkey(), seat_index, &TicketSaleRunner::dummy_seat_name(0)).0;
   let mut pt = ctx.ticket_sale_runner.pt.lock().await;
   let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
+  assert!(account.is_none());
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_fail_if_seat_is_reserved(ctx: &mut TestContext) {
+  let recipient = ctx.ticket_sale_runner.get_participant(2);
+  let (result, _) = setup_reservation(ctx, recipient.pubkey(), false).await;
+
+  Error::assert_err(result, ticket_sale::utils::program_error::ErrorCode::SeatReserved);
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_not_fail_if_seat_reservation_has_expired(ctx: &mut TestContext) {
+  let recipient = ctx.ticket_sale_runner.get_participant(2);
+  let (result, _) = setup_reservation(ctx, recipient.pubkey(), true).await;
+  
+  assert!(result.is_ok());
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_not_fail_if_seat_reserved_for_the_current_user(ctx: &mut TestContext) {
+  let recipient = ctx.ticket_sale_runner.get_participant(3);
+  let (result, _) = setup_reservation(ctx, recipient.pubkey(), false).await;
+
+  assert!(result.is_ok());
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_the_seat_reservation_account(ctx: &mut TestContext) {
+  let recipient = ctx.ticket_sale_runner.get_participant(2);
+  let (_, seat_reservation) = setup_reservation(ctx, recipient.pubkey(), false).await;
+
+  let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+  let account = pt.context.banks_client.get_account(seat_reservation).await.unwrap();
   assert!(account.is_none());
 }
