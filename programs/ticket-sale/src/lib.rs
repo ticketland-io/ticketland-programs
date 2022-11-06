@@ -5,6 +5,7 @@ pub mod processors;
 pub mod utils;
 
 use anchor_lang::prelude::*;
+use common::state::alias::Slot;
 use crate::{
   context::{
     initialize::*,
@@ -14,6 +15,7 @@ use crate::{
 		free_purchase::*,
     operator_purchase::*,
 		verify_seat::*,
+    reserve_seat::*,
   },
 };
 
@@ -166,4 +168,24 @@ pub mod ticket_sale {
       recipient,
 		)
 	}
+
+  /// This can only be called by a ticketland operator and it reserves the given seat until the given slot.
+  /// This will reserve the seat so no other script can purchase it. The OperatorPurchase Ix will ultimately 
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
+	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
+  /// * `valid_until` - The slot until which this seat is considered reserved
+	/// * `recipient` - The utlimate recipient of the ticket nft when it will be minted by the operator
+  pub fn reserve_seat(
+    ctx: Context<ReserveSeat>,
+		_seat_index: u32,
+		_seat_name: String,
+    valid_until: Slot,
+    recipient: Pubkey,
+  ) -> Result<()> {
+    processors::reserve_seat::exec(ctx, valid_until, recipient)
+  }
 }

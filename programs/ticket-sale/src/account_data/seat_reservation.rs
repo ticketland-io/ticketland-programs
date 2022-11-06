@@ -3,6 +3,6 @@ use common::state::alias::Slot;
 
 #[account]
 pub struct SeatReservation {
-  pub created: Slot,
+  pub valid_until: Slot,
   pub recipient: Pubkey,
 }
