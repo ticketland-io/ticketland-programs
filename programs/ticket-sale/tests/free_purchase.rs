@@ -202,7 +202,7 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
   )
 }
 
-async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipient: Pubkey, should_expire: bool) -> AnchorResult<()> {
+async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipient: Pubkey, should_expire: bool) -> (AnchorResult<()>, Pubkey) {
   let (
     event_organizer,
     event_registry_state,
@@ -236,6 +236,7 @@ async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipi
     assert!(result.is_ok());
   }
 
+  let seat_name = TicketSaleRunner::dummy_seat_name(0);
   // operator reserves this seat
   {
     let operator = ctx.ticket_sale_runner.get_participant(7);
@@ -246,7 +247,7 @@ async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipi
       event_id,
       0, // ticket_type_index
       seat_index,
-      TicketSaleRunner::dummy_seat_name(0),
+      seat_name.clone(),
       10
     ).await;
 
@@ -258,7 +259,7 @@ async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipi
     pt.advance_clock_by_slots(11).await;
   }
 
-  ctx.ticket_sale_runner.free_purchase(
+  let result = ctx.ticket_sale_runner.free_purchase(
     &ticket_buyer,
     event_registry_state.pubkey(),
     ticket_sale_state.pubkey(),
@@ -269,7 +270,11 @@ async fn setup_reservation(ctx: &mut TestContext, ticket_buyer: &Keypair, recipi
     0, // ticket_type_index
     seat_index,
 		TicketSaleRunner::dummy_seat_name(0),
-  ).await
+  ).await;
+
+  let seat_reservation = TickerSalePda::seat_reservation(&ticket_sale_state.pubkey(), seat_index, &seat_name).0;
+
+  (result, seat_reservation)
 }
 
 #[test_context(TestContext)]
@@ -482,7 +487,6 @@ async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
   let mut pt = ctx.ticket_sale_runner.pt.lock().await;
   let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
   assert!(account.is_none());
-
 }
 
 #[test_context(TestContext)]
@@ -490,7 +494,7 @@ async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
 async fn should_fail_if_seat_is_reserved(ctx: &mut TestContext) {
   let recipient = ctx.event_registry_runner.get_participant(2);
   let ticket_buyer = ctx.event_registry_runner.get_participant(3);
-  let result = setup_reservation(ctx, &ticket_buyer, recipient.pubkey(), false).await;
+  let (result, _) = setup_reservation(ctx, &ticket_buyer, recipient.pubkey(), false).await;
 
   Error::assert_err(result, ticket_sale::utils::program_error::ErrorCode::SeatReserved);
 }
@@ -500,7 +504,7 @@ async fn should_fail_if_seat_is_reserved(ctx: &mut TestContext) {
 async fn should_not_fail_if_seat_reservation_has_expired(ctx: &mut TestContext) {
   let recipient = ctx.event_registry_runner.get_participant(2);
   let ticket_buyer = ctx.event_registry_runner.get_participant(3);
-  let result = setup_reservation(ctx, &ticket_buyer, recipient.pubkey(), true).await;
+  let (result, _) = setup_reservation(ctx, &ticket_buyer, recipient.pubkey(), true).await;
   
   assert!(result.is_ok());
 }
@@ -509,7 +513,18 @@ async fn should_not_fail_if_seat_reservation_has_expired(ctx: &mut TestContext) 
 #[tokio::test(flavor = "multi_thread")]
 async fn should_not_fail_if_seat_reserved_for_the_current_user(ctx: &mut TestContext) {
   let ticket_buyer = ctx.event_registry_runner.get_participant(2);
-  let result = setup_reservation(ctx, &ticket_buyer, ticket_buyer.pubkey(), false).await;
+  let (result, _) = setup_reservation(ctx, &ticket_buyer, ticket_buyer.pubkey(), false).await;
 
   assert!(result.is_ok());
+}
+
+#[test_context(TestContext)]
+#[tokio::test(flavor = "multi_thread")]
+async fn should_close_the_seat_reservation_account(ctx: &mut TestContext) {
+  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+  let (_, seat_reservation) = setup_reservation(ctx, &ticket_buyer, ticket_buyer.pubkey(), false).await;
+
+  let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+  let account = pt.context.banks_client.get_account(seat_reservation).await.unwrap();
+  assert!(account.is_none());
 }
