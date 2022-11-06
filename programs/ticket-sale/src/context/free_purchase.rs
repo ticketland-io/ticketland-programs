@@ -13,13 +13,14 @@ use anchor_metaplex::{
   }
 };
 use crate::{
+  ID,
   account_data::{
     state::*,
     event_capacity::*,
     sale::*,
     seat_verification::*,
-    seat_reservation::*,
   },
+  utils::program_error::ErrorCode,
 };
 
 #[derive(Accounts)]
@@ -177,6 +178,13 @@ pub struct FreePurchase<'info> {
     bump,
   )]
   pub event_nft_metadata: AccountInfo<'info>,
+
+  /// CHECK: This might be the same as ticket_buyer account above
+  #[account(
+    mut,
+    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
+  pub operator: AccountInfo<'info>,
 
   /// CHECK: This is the ticket sale program account
   pub ticket_nft_program: Program<'info, TicketNft>,

@@ -41,6 +41,18 @@ pub struct OperatorPurchase<'info> {
   )]
   pub event: AccountInfo<'info>,
 
+  /// CHECK: The processor will do checks like wether this account exists or if it has expired
+  #[account(
+    seeds = [
+      b"seat_reservation",
+      sale.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
+    ],
+    bump,
+  )]
+  pub seat_reservation: AccountInfo<'info>,
+
   #[account(
     mut,
     close = ticket_buyer,
@@ -169,6 +181,13 @@ pub struct OperatorPurchase<'info> {
     bump,
   )]
   pub event_nft_metadata: AccountInfo<'info>,
+
+  /// CHECK: This might be the same as ticket_buyer account above
+  #[account(
+    mut,
+    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
+  pub operator: AccountInfo<'info>,
 
   /// CHECK: This is the ticket sale program account
   pub ticket_nft_program: Program<'info, TicketNft>,
