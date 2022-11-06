@@ -13,14 +13,13 @@ use anchor_metaplex::{
   }
 };
 use crate::{
-  ID,
   account_data::{
     state::*,
     event_capacity::*,
     sale::*,
     seat_verification::*,
+    seat_reservation::*,
   },
-  utils::program_error::ErrorCode,
 };
 
 #[derive(Accounts)]
@@ -40,6 +39,18 @@ pub struct FreePurchase<'info> {
     seeds::program = state.event_registry_program,
   )]
   pub event: AccountInfo<'info>,
+
+  /// CHECK: The processor will do checks like wether this account exists or if it has expired
+  #[account(
+    seeds = [
+      b"seat_reservation",
+      sale.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
+    ],
+    bump,
+  )]
+  pub seat_reservation: AccountInfo<'info>,
 
   #[account(
     mut,
