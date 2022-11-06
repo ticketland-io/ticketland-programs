@@ -246,11 +246,14 @@ impl Runner {
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
+    let seat_reservation = TickerSalePda::seat_reservation(&sale, seat_index, &seat_name).0;
+    let operator = self.get_mint_operators()[0];
 
     let accounts = ticket_sale::accounts::FixedPricePurchase {
       state: ticket_sale_state,
       seat_verification,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
+      seat_reservation,
       sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
       cpi_authority,
       event_capacity,
@@ -268,6 +271,7 @@ impl Runner {
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
+      operator,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
@@ -304,11 +308,14 @@ impl Runner {
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
+    let seat_reservation = TickerSalePda::seat_reservation(&sale, seat_index, &seat_name).0;
+    let operator = self.get_mint_operators()[0];
 
     let accounts = ticket_sale::accounts::FreePurchase {
       state: ticket_sale_state,
       seat_verification,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
+      seat_reservation,
       sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
       cpi_authority,
       event_capacity,
@@ -321,6 +328,7 @@ impl Runner {
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
+      operator,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,
@@ -358,11 +366,14 @@ impl Runner {
     let event_nft = EventRegistryPda::event_nft(&event_registry_state, event_id).0;
     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0;
     let seat_verification = TickerSalePda::seat_verification(&sale, seat_index, &seat_name).0;
+    let seat_reservation = TickerSalePda::seat_reservation(&sale, seat_index, &seat_name).0;
+    let operator = self.get_mint_operators()[0];
 
     let accounts = ticket_sale::accounts::OperatorPurchase {
       state: ticket_sale_state,
       seat_verification,
       event: EventRegistryPda::event(&event_registry_state, event_id).0,
+      seat_reservation,
       sale: TickerSalePda::ticket_sale_state(&ticket_sale_state, ticket_type_index, event_id).0,
       cpi_authority,
       event_capacity,
@@ -375,6 +386,7 @@ impl Runner {
       ticket_nft_ata: Spl::get_associated_token_address(&cpi_authority, &ticket_nft),
       event_nft,
       event_nft_metadata: find_metadata_account(&event_nft).0,
+      operator,
       ticket_nft_program: ticket_nft_program_id(),
       token_program: Token::id(),
       associated_token_program: spl_associated_token_account::ID,

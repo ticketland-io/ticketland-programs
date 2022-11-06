@@ -39,3 +39,15 @@ pub fn seat_verification(sale: &Pubkey, seat_index: u32, seat_name: &String) -> 
     &ticket_sale_program_id(),
   )
 }
+
+pub fn seat_reservation(sale: &Pubkey, seat_index: u32, seat_name: &String) -> (Pubkey, u8) {
+  Pubkey::find_program_address(
+    &[
+      b"seat_reservation",
+      sale.as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),  
+    ],
+    &ticket_sale_program_id(),
+  )
+}
