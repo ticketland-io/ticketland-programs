@@ -189,6 +189,9 @@ Create a new config file (scripts/.config.json) with the following structure
   "uriUpdateOperators": [
     ""
   ],
+  "ticketNftOperators": [
+    ""
+  ],
   "mintOperators": [
     ""
   ],
