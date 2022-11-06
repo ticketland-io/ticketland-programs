@@ -24,10 +24,10 @@ use crate::{
 
 #[macro_export]
 macro_rules! expand_pre_checks {
-  ($ctx:ident, $event:ident, $seat_index:ident) => {
+  ($ctx:ident, $event:ident, $seat_index:ident, $operator:expr) => {
     super::common_purchase::seat_reservation_checks(
       &$ctx.accounts.seat_reservation,
-      $ctx.accounts.operator.clone(),
+      $operator.to_account_info(),
       $ctx.accounts.ticket_buyer.key(),
     )?;
 

@@ -34,7 +34,7 @@ pub fn exec(
     return Err(ErrorCode::UnexpectedSaleAccount.into());
   };
 
-  expand_pre_checks!(ctx, event, seat_index);
+  expand_pre_checks!(ctx, event, seat_index, ctx.accounts.ticket_buyer);
   expand_mint_ticket!(ctx, recipient, price_sold, seat_index, seat_name);
   post_checks(&mut ctx.accounts.state, &mut ctx.accounts.event_capacity, seat_index)?;
 

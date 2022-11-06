@@ -182,14 +182,6 @@ pub struct OperatorPurchase<'info> {
   )]
   pub event_nft_metadata: AccountInfo<'info>,
 
-  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
-  /// This might be the same as ticket_buyer account above
-  #[account(
-    mut,
-    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
-  )]
-  pub operator: AccountInfo<'info>,
-
   /// CHECK: This is the ticket sale program account
   pub ticket_nft_program: Program<'info, TicketNft>,
 
