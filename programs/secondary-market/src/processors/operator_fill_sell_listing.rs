@@ -10,10 +10,16 @@ use crate::{
     sale_time_checks,
     sale_account,
     only_ticket_metadata_owner,
+    reservation_checks,
   },
 };
 
 #[access_control(
+  reservation_checks::check(
+    &ctx.accounts.sell_listing_reservation,
+    &ctx.accounts.ticket_buyer,
+    &ctx.accounts.ticket_buyer,
+  )
   sale_time_checks::check(&ctx.accounts.sale)
   sale_account::check(
     &ctx.accounts.ticket_metadata,

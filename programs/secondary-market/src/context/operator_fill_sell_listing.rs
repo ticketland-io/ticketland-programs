@@ -101,15 +101,6 @@ pub struct OperatorFillSellListing<'info> {
     constraint = state.operators.iter().any(|m| *m == ticket_buyer.key()) @ ErrorCode::OnlyMintOperator,
   )]
   pub ticket_buyer: Signer<'info>,
-
-  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
-  /// It might be same as the ticket_buyer above
-  #[account(
-    mut,
-    constraint = state.operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
-  )]
-  pub operator: AccountInfo<'info>,
-    
     
   pub ticket_nft_program: Program<'info, TicketNft>,
 }
