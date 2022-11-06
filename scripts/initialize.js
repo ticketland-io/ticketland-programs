@@ -95,10 +95,12 @@ const initializeTicketNft = async (ticketSaleState) => {
   const state = Keypair.generate()
   const program = anchor.workspace.TicketNft
   const deployer = provider.wallet.publicKey
+  const ticketNftOperators = deploymentConfig.ticketNftOperators.map(pk => new PublicKey(pk))
 
   await program.rpc.initialize(
     ticketSaleState,
     anchor.workspace.TicketSale.programId,
+    ticketNftOperators,
     {
       accounts: {
         state: state.publicKey,
