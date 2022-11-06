@@ -43,6 +43,7 @@ pub struct OperatorPurchase<'info> {
 
   /// CHECK: The processor will do checks like whether this account exists or if it has expired
   #[account(
+    mut,
     seeds = [
       b"seat_reservation",
       sale.key().as_ref(),

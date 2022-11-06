@@ -40,6 +40,7 @@ use common_test::{
   ticket_sale::{
     runner::Runner as TicketSaleRunner,
     pda as TickerSalePda,
+    error::Error,
   },
   ticket_nft::{
     pda as TicketNftPda,
@@ -200,9 +201,222 @@ async fn setup(ctx: &mut TestContext) -> (Keypair, Keypair, Keypair, Keypair, Ve
   )
 }
 
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestContext) {
+//   let (
+//     event_organizer,
+//     event_registry_state,
+//     ticket_sale_state,
+//     ticket_nft_state,
+//     ticket_types,
+//     event_id,
+//     mt_type_1,
+//     event_capacity,
+//   ) = setup(ctx).await;
+
+//   let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+//   // move to the start of sale
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+//   }
+
+//   let seat_index = 0;
+//   // verify the seat
+//   {
+//     let result = ctx.ticket_sale_runner.verify_seat(
+//       &ticket_buyer,
+//       ticket_sale_state.pubkey(),
+//       event_id,
+//       0, // ticket_type_index
+//       seat_index,
+//       TicketSaleRunner::dummy_seat_name(0),
+//       mt_type_1.proof(&[0]), // proof path for leaf 0
+//     ).await;
+
+//     assert!(result.is_ok());
+//   }
+
+//   let ticket_type_index = 0;
+//   let result = ctx.ticket_sale_runner.free_purchase(
+//     &ticket_buyer,
+//     event_registry_state.pubkey(),
+//     ticket_sale_state.pubkey(),
+//     event_capacity,
+//     event_organizer.pubkey(),
+//     ticket_nft_state.pubkey(),
+//     event_id,
+//     ticket_type_index,
+//     seat_index,
+// 		TicketSaleRunner::dummy_seat_name(0),
+//   ).await;
+
+//   assert!(result.is_ok());
+
+//   let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
+
+//   // ticket nft Mint account
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+
+//     // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA
+//     // controlled by the ticket sale program.
+//     let ticket_sale_cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state.pubkey()).0;
+//     let ticket_nft_ata = Spl::get_associated_token_address(&ticket_sale_cpi_authority, &ticket_nft);
+//     let ticket_nft_ata_data = pt.context.banks_client.get_account(ticket_nft_ata).await.unwrap().unwrap();
+//     let ticket_nft_ata_data = TokenAccount::try_deserialize_unchecked(&mut &ticket_nft_ata_data.data[..]).unwrap();
+
+//     assert_eq!(ticket_nft_ata_data.mint, ticket_nft);
+//     assert_eq!(ticket_nft_ata_data.owner, ticket_sale_cpi_authority);
+//     assert_eq!(ticket_nft_ata_data.amount, 1);
+//   }
+
+//   // Check out custom Ticket Metadata
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
+//     let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
+//     let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state.pubkey(), 0, event_id).0;
+//     let event_nft = EventRegistryPda::event_nft(&event_registry_state.pubkey(), event_id).0;
+
+//     assert_eq!(ticket_metadata.mint, ticket_nft);
+//     assert_eq!(ticket_metadata.collection, find_metadata_account(&event_nft).0);
+//     assert_eq!(ticket_metadata.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
+//     assert_eq!(ticket_metadata.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
+//     assert_eq!(ticket_metadata.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
+//     assert_eq!(ticket_metadata.event_id, event_id);
+//     assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
+//     assert_eq!(ticket_metadata.seat_index, seat_index);
+//     assert_eq!(ticket_metadata.price_sold, 0);
+//     assert_eq!(ticket_metadata.sale, sale);
+//     assert_eq!(ticket_metadata.attended, false);
+//   }
+
+//   // Ticket sale state is updated
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     let ticket_metadata = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
+
+//     assert_eq!(ticket_metadata.total_sold, 1);
+//   }
+
+//   // Event capacity is updated
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     let event_capacity = pt.get_account::<EventCapacity>(event_capacity).await;
+//     let available_tickets = event_capacity.available_tickets;
+
+//     assert!(bitmap::is_set(seat_index, &event_capacity.seats));
+//     assert_eq!(available_tickets, 9);
+//     assert_eq!(event_capacity.is_initialized, true);
+//     assert_eq!(event_capacity.event_id, event_id);
+//   }
+// }
+
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_fail_if_seat_was_not_verified(ctx: &mut TestContext) {
+//   let (
+//     event_organizer,
+//     event_registry_state,
+//     ticket_sale_state,
+//     ticket_nft_state,
+//     ticket_types,
+//     event_id,
+//     _,
+//     event_capacity,
+//   ) = setup(ctx).await;
+
+//   let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+//   // move to the start of sale
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+//   }
+
+//   let result = ctx.ticket_sale_runner.free_purchase(
+//     &ticket_buyer,
+//     event_registry_state.pubkey(),
+//     ticket_sale_state.pubkey(),
+//     event_capacity,
+//     event_organizer.pubkey(),
+//     ticket_nft_state.pubkey(),
+//     event_id,
+//     0, // ticket_type_index
+//     0,
+// 		TicketSaleRunner::dummy_seat_name(0),
+//   ).await;
+
+//   // Fails with Anchor Error Code: AccountNotInitialized. Error Number: 3012
+//   assert!(!result.is_ok());
+// }
+
+// #[test_context(TestContext)]
+// #[tokio::test(flavor = "multi_thread")]
+// async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
+//   let (
+//     event_organizer,
+//     event_registry_state,
+//     ticket_sale_state,
+//     ticket_nft_state,
+//     ticket_types,
+//     event_id,
+//     mt_type_1,
+//     event_capacity,
+//   ) = setup(ctx).await;
+
+//   let ticket_buyer = ctx.event_registry_runner.get_participant(2);
+
+//   // move to the start of sale
+//   {
+//     let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//     pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
+//   }
+
+//   let seat_index = 0;
+//   // verify the seat
+//   {
+//     let result = ctx.ticket_sale_runner.verify_seat(
+//       &ticket_buyer,
+//       ticket_sale_state.pubkey(),
+//       event_id,
+//       0, // ticket_type_index
+//       seat_index,
+//       TicketSaleRunner::dummy_seat_name(0),
+//       mt_type_1.proof(&[0]), // proof path for leaf 0
+//     ).await;
+
+//     assert!(result.is_ok());
+//   }
+
+//   let result = ctx.ticket_sale_runner.free_purchase(
+//     &ticket_buyer,
+//     event_registry_state.pubkey(),
+//     ticket_sale_state.pubkey(),
+//     event_capacity,
+//     event_organizer.pubkey(),
+//     ticket_nft_state.pubkey(),
+//     event_id,
+//     0, // ticket_type_index
+//     seat_index,
+// 		TicketSaleRunner::dummy_seat_name(0),
+//   ).await;
+
+//   assert!(result.is_ok());
+
+//   let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state.pubkey(), seat_index, &TicketSaleRunner::dummy_seat_name(0)).0;
+//   let mut pt = ctx.ticket_sale_runner.pt.lock().await;
+//   let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
+//   assert!(account.is_none());
+
+// }
+
 #[test_context(TestContext)]
 #[tokio::test(flavor = "multi_thread")]
-async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestContext) {
+async fn should_fail_if_seat_is_reserved(ctx: &mut TestContext) {
   let (
     event_organizer,
     event_registry_state,
@@ -238,154 +452,19 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     assert!(result.is_ok());
   }
 
-  let ticket_type_index = 0;
-  let result = ctx.ticket_sale_runner.free_purchase(
-    &ticket_buyer,
-    event_registry_state.pubkey(),
-    ticket_sale_state.pubkey(),
-    event_capacity,
-    event_organizer.pubkey(),
-    ticket_nft_state.pubkey(),
-    event_id,
-    ticket_type_index,
-    seat_index,
-		TicketSaleRunner::dummy_seat_name(0),
-  ).await;
-
-  assert!(result.is_ok());
-
-  let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_state.pubkey(), seat_index, event_id, ticket_type_index).0;
-
-  // ticket nft Mint account
+  // operator reserves this seat
   {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-
-    // Assert the ATA account. This account is the holder of the NFT and is owned by the CPI Authority PDA
-    // controlled by the ticket sale program.
-    let ticket_sale_cpi_authority = TickerSalePda::cpi_authority(&ticket_sale_state.pubkey()).0;
-    let ticket_nft_ata = Spl::get_associated_token_address(&ticket_sale_cpi_authority, &ticket_nft);
-    let ticket_nft_ata_data = pt.context.banks_client.get_account(ticket_nft_ata).await.unwrap().unwrap();
-    let ticket_nft_ata_data = TokenAccount::try_deserialize_unchecked(&mut &ticket_nft_ata_data.data[..]).unwrap();
-
-    assert_eq!(ticket_nft_ata_data.mint, ticket_nft);
-    assert_eq!(ticket_nft_ata_data.owner, ticket_sale_cpi_authority);
-    assert_eq!(ticket_nft_ata_data.amount, 1);
-  }
-
-  // Check out custom Ticket Metadata
-  {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_state.pubkey(), &ticket_nft).0;
-    let ticket_metadata = pt.get_account::<ticket_nft::account_data::ticket_metadata::TicketMetadata>(ticket_metadata).await;
-    let sale = TickerSalePda::ticket_sale_state(&ticket_sale_state.pubkey(), 0, event_id).0;
-    let event_nft = EventRegistryPda::event_nft(&event_registry_state.pubkey(), event_id).0;
-
-    assert_eq!(ticket_metadata.mint, ticket_nft);
-    assert_eq!(ticket_metadata.collection, find_metadata_account(&event_nft).0);
-    assert_eq!(ticket_metadata.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
-    assert_eq!(ticket_metadata.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
-    assert_eq!(ticket_metadata.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
-    assert_eq!(ticket_metadata.event_id, event_id);
-    assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
-    assert_eq!(ticket_metadata.seat_index, seat_index);
-    assert_eq!(ticket_metadata.price_sold, 0);
-    assert_eq!(ticket_metadata.sale, sale);
-    assert_eq!(ticket_metadata.attended, false);
-  }
-
-  // Ticket sale state is updated
-  {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    let ticket_metadata = pt.get_account::<ticket_sale::account_data::state::State>(ticket_sale_state.pubkey()).await;
-
-    assert_eq!(ticket_metadata.total_sold, 1);
-  }
-
-  // Event capacity is updated
-  {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    let event_capacity = pt.get_account::<EventCapacity>(event_capacity).await;
-    let available_tickets = event_capacity.available_tickets;
-
-    assert!(bitmap::is_set(seat_index, &event_capacity.seats));
-    assert_eq!(available_tickets, 9);
-    assert_eq!(event_capacity.is_initialized, true);
-    assert_eq!(event_capacity.event_id, event_id);
-  }
-}
-
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_fail_if_seat_was_not_verified(ctx: &mut TestContext) {
-  let (
-    event_organizer,
-    event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
-    ticket_types,
-    event_id,
-    _,
-    event_capacity,
-  ) = setup(ctx).await;
-
-  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
-
-  // move to the start of sale
-  {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
-  }
-
-  let result = ctx.ticket_sale_runner.free_purchase(
-    &ticket_buyer,
-    event_registry_state.pubkey(),
-    ticket_sale_state.pubkey(),
-    event_capacity,
-    event_organizer.pubkey(),
-    ticket_nft_state.pubkey(),
-    event_id,
-    0, // ticket_type_index
-    0,
-		TicketSaleRunner::dummy_seat_name(0),
-  ).await;
-
-  // Fails with Anchor Error Code: AccountNotInitialized. Error Number: 3012
-  assert!(!result.is_ok());
-}
-
-#[test_context(TestContext)]
-#[tokio::test(flavor = "multi_thread")]
-async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
-  let (
-    event_organizer,
-    event_registry_state,
-    ticket_sale_state,
-    ticket_nft_state,
-    ticket_types,
-    event_id,
-    mt_type_1,
-    event_capacity,
-  ) = setup(ctx).await;
-
-  let ticket_buyer = ctx.event_registry_runner.get_participant(2);
-
-  // move to the start of sale
-  {
-    let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-    pt.advance_clock_past_timestamp(ticket_types[0].sale_start_time).await;
-  }
-
-  let seat_index = 0;
-  // verify the seat
-  {
-    let result = ctx.ticket_sale_runner.verify_seat(
-      &ticket_buyer,
+    let new_ticket_buyer = ctx.event_registry_runner.get_participant(3);
+    let operator = ctx.ticket_sale_runner.get_participant(7);
+    let result = ctx.ticket_sale_runner.reserve_seat(
       ticket_sale_state.pubkey(),
+      &operator,
+      new_ticket_buyer.pubkey(),
       event_id,
       0, // ticket_type_index
       seat_index,
       TicketSaleRunner::dummy_seat_name(0),
-      mt_type_1.proof(&[0]), // proof path for leaf 0
+      10
     ).await;
 
     assert!(result.is_ok());
@@ -404,11 +483,5 @@ async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
 		TicketSaleRunner::dummy_seat_name(0),
   ).await;
 
-  assert!(result.is_ok());
-
-  let seat_verification = TickerSalePda::seat_verification(&ticket_sale_state.pubkey(), seat_index, &TicketSaleRunner::dummy_seat_name(0)).0;
-  let mut pt = ctx.ticket_sale_runner.pt.lock().await;
-  let account = pt.context.banks_client.get_account(seat_verification).await.unwrap();
-  assert!(account.is_none());
-
+  Error::assert_err(result, ticket_sale::utils::program_error::ErrorCode::SeatReserved);
 }
