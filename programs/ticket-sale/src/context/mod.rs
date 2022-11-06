@@ -5,3 +5,4 @@ pub mod fixed_price_purchase;
 pub mod free_purchase;
 pub mod verify_seat;
 pub mod operator_purchase;
+pub mod reserve_seat;
