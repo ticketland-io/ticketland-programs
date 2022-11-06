@@ -183,7 +183,7 @@ pub mod secondary_market {
 	/// * `sell_listing` - The sell listing that is reserver
   /// * `duration` - The duration in Slot that his sell listing will be reserved for
 	/// * `recipient` - The utlimate recipient of the ticket nft stored in the sell listing
-  pub fn reserve_seat(
+  pub fn reserve_sell_listing(
     ctx: Context<ReserveSellListing>,
 		_sell_listing: Pubkey,
     duration: Slot,
