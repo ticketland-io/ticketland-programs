@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use std::mem::size_of;
 use crate::{
   account_data::{
     state::*,
@@ -11,7 +10,7 @@ use crate::{
 
 #[derive(Accounts)]
 #[instruction(seat_index: u32, seat_name: String)]
-pub struct ReserveSeat<'info> {
+pub struct CloseSeatReservation<'info> {
   #[account()]
   pub state: Account<'info, State>,
 
@@ -27,9 +26,8 @@ pub struct ReserveSeat<'info> {
   pub sale: Account<'info, Sale>,
 
   #[account(
-    init_if_needed,
-    payer = operator,
-    space = 8 + size_of::<SeatReservation>(),
+    mut,
+    close = operator,
     seeds = [
       b"seat_reservation",
       sale.key().as_ref(),
@@ -45,7 +43,4 @@ pub struct ReserveSeat<'info> {
     constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
   )]
   pub operator: Signer<'info>,
-
-  pub system_program: Program<'info, System>,
-  pub rent: Sysvar<'info, Rent>,
 }

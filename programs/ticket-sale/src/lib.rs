@@ -16,6 +16,7 @@ use crate::{
     operator_purchase::*,
 		verify_seat::*,
     reserve_seat::*,
+    close_seat_reservation::*,
   },
 };
 
@@ -187,5 +188,23 @@ pub mod ticket_sale {
     recipient: Pubkey,
   ) -> Result<()> {
     processors::reserve_seat::exec(ctx, duration, recipient)
+  }
+
+
+  /// Allow operator to close the seat reservation account. This might be useful for cleanup reasons
+  /// as well as, application specific logic. The processor does not have any implementation because
+  /// the closing of the account is carried out by Anchor generated code.
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value
+	/// * `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT
+  pub fn close_seat_reservation(
+    _: Context<CloseSeatReservation>,
+		_seat_index: u32,
+		_seat_name: String,
+  ) -> Result<()> {
+    Ok(())
   }
 }

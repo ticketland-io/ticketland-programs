@@ -11,7 +11,7 @@ use crate::{
 #[derive(Accounts)]
 #[instruction(sell_listing: Pubkey)]
 pub struct ReserveSellListing<'info> {
-  #[account(mut)]
+  #[account()]
   pub state: Account<'info, State>,
 
   #[account(
