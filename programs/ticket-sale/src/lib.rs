@@ -191,10 +191,11 @@ pub mod ticket_sale {
   }
 
 
+
   /// Allow operator to close the seat reservation account. This might be useful for cleanup reasons
   /// as well as, application specific logic. The processor does not have any implementation because
   /// the closing of the account is carried out by Anchor generated code.
-	/// 
+  /// 
 	/// # Arguments
 	/// 
 	/// * `ctx` - The Anchor context holding the accounts

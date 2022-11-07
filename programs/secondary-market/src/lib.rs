@@ -15,6 +15,7 @@ use crate::context::{
   fill_sell_listing::*,
   operator_fill_sell_listing::*,
   reserve_sell_listing::*,
+  close_sell_listing_reservation::*,
 };
 
 declare_id!("ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f");
@@ -190,5 +191,19 @@ pub mod secondary_market {
     recipient: Pubkey,
   ) -> Result<()> {
     processors::reserve_sell_listing::exec(ctx, duration, recipient)
+  }
+
+  /// This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.
+  /// This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `sell_listing` - The sell listing that is reserver
+  pub fn close_sell_listing_reservation(
+    _: Context<CloseSellListingReservation>,
+		_sell_listing: Pubkey,
+  ) -> Result<()> {
+    Ok(())
   }
 }

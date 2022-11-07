@@ -6,3 +6,4 @@ pub mod fill_sell_listing;
 pub mod fill_buy_listing;
 pub mod operator_fill_sell_listing;
 pub mod reserve_sell_listing;
+pub mod close_sell_listing_reservation;
