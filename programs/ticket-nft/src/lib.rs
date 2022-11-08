@@ -3,7 +3,13 @@ pub mod context;
 pub mod processors;
 pub mod utils;
 
-use crate::context::{create_ticket::*, initialize::*, set_secondary_market::*, transfer::*};
+use crate::context::{
+  create_ticket::*,
+  initialize::*,
+  set_secondary_market::*,
+  transfer::*,
+  set_attended::*
+};
 use anchor_lang::prelude::*;
 
 declare_id!("599YwRjALAKVj7z9bcBijrYHyNGLTJSjmJTzeyttnEFL");
@@ -23,8 +29,14 @@ pub mod ticket_nft {
     ctx: Context<Initialize>,
     ticket_sale_state: Pubkey,
     ticket_sale_program: Pubkey,
+    operators: Vec<Pubkey>,
   ) -> Result<()> {
-    processors::initialize::exec(ctx, ticket_sale_state, ticket_sale_program)
+    processors::initialize::exec(
+      ctx,
+      ticket_sale_state,
+      ticket_sale_program,
+      operators,
+    )
   }
 
   /// Stores the secondary market state and program id
@@ -77,5 +89,9 @@ pub mod ticket_nft {
 
   pub fn transfer(ctx: Context<Transfer>, new_owner: Pubkey) -> Result<()> {
     processors::transfer::exec(ctx, new_owner)
+  }
+
+  pub fn set_attended(ctx: Context<SetAttended>) -> Result<()> {
+    processors::set_attended::exec(ctx)
   }
 }

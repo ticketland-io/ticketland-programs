@@ -3,7 +3,7 @@ use std::{
 };
 use solana_test_utils::{
   program_test::ProgramTest,
-  spl::Spl,
+  spl::Spl, test_account::TestAccount,
 };
 use solana_program_test::{tokio::sync::{Mutex}};
 use solana_sdk::{
@@ -28,6 +28,7 @@ use super::pda;
 
 pub struct Runner {
   pub pt: Arc<Mutex<ProgramTest>>,
+  pub test_account: TestAccount,
   pub spl: Spl,
   pub deployer: Keypair,
 }
@@ -36,13 +37,23 @@ impl Runner {
   pub async fn new(pt: Arc<Mutex<ProgramTest>>) -> Self {
     let mut pt_lock = pt.lock().await;
     let deployer = pt_lock.create_account(sol_to_lamports(1000_f64), 0, &system_program::ID).await;
+    let test_account = TestAccount::new(&mut pt_lock, 10).await;
     let spl = Spl::new(Arc::clone(&pt));
 
     Self {
       pt: Arc::clone(&pt),
+      test_account,
       spl,
       deployer,
     }
+  }
+
+  pub fn get_participant(&self, index: usize) -> Keypair {
+    Keypair::from_bytes(self.test_account.participants[index].to_bytes().as_ref()).unwrap()
+  }
+
+  pub fn get_operators(&self) -> Vec<Pubkey> {
+    vec![self.get_participant(5).pubkey(), self.get_participant(6).pubkey()]
   }
 
   pub async fn initialize(
@@ -61,6 +72,7 @@ impl Runner {
     let data = ticket_nft::instruction::Initialize {
       ticket_sale_state,
       ticket_sale_program: ticket_sale_program_id(),
+      operators: self.get_operators(),
     }.data();
 
     let ix = Instruction {

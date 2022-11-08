@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+pub const MAX_TICKET_NFT_OPERATORS: usize = 10;
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct InitBumps {
   pub nft_authority: u8,
@@ -25,5 +27,8 @@ pub struct State {
   pub nft_authority: Pubkey,
 
   /// The deployer of this instance
-  pub deployer: Pubkey
+  pub deployer: Pubkey,
+
+  /// The array of operators
+  pub operators: Vec<Pubkey>,
 }

@@ -12,7 +12,7 @@ pub struct Initialize<'info> {
   #[account(
     init,
     payer = deployer,
-    space = 8 + size_of::<State>(),
+    space = 8 + size_of::<State>() + size_of::<Pubkey>() * MAX_TICKET_NFT_OPERATORS,
   )]
   pub state: Account<'info, State>,
   
