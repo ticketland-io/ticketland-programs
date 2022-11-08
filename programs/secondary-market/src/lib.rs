@@ -4,11 +4,19 @@ pub mod context;
 pub mod processors;
 pub mod utils;
 
-use crate::context::{
-  create_buy_listing::*, create_market::*, create_sell_listing::*, fill_buy_listing::*,
-  fill_sell_listing::*, initialize::*, operator_fill_sell_listing::*,
-};
 use anchor_lang::prelude::*;
+use common::state::alias::Slot;
+use crate::context::{
+  initialize::*,
+  create_buy_listing::*,
+  create_market::*,
+  create_sell_listing::*,
+  fill_buy_listing::*,
+  fill_sell_listing::*,
+  operator_fill_sell_listing::*,
+  reserve_sell_listing::*,
+  close_sell_listing_reservation::*,
+};
 
 declare_id!("ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f");
 
@@ -165,5 +173,37 @@ pub mod secondary_market {
     event_id: [u8; 32],
   ) -> Result<()> {
     processors::fill_buy_listing::exec(ctx, event_id)
+  }
+
+  /// This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.
+  /// This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `sell_listing` - The sell listing that is reserver
+  /// * `duration` - The duration in Slot that his sell listing will be reserved for
+	/// * `recipient` - The utlimate recipient of the ticket nft stored in the sell listing
+  pub fn reserve_sell_listing(
+    ctx: Context<ReserveSellListing>,
+		_sell_listing: Pubkey,
+    duration: Slot,
+    recipient: Pubkey,
+  ) -> Result<()> {
+    processors::reserve_sell_listing::exec(ctx, duration, recipient)
+  }
+
+  /// This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.
+  /// This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix
+	/// 
+	/// # Arguments
+	/// 
+	/// * `ctx` - The Anchor context holding the accounts
+	/// * `sell_listing` - The sell listing that is reserver
+  pub fn close_sell_listing_reservation(
+    _: Context<CloseSellListingReservation>,
+		_sell_listing: Pubkey,
+  ) -> Result<()> {
+    Ok(())
   }
 }

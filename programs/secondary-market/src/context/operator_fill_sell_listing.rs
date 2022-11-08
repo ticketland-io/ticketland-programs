@@ -52,6 +52,17 @@ pub struct OperatorFillSellListing<'info> {
   )]
   pub event: AccountInfo<'info>,
 
+  /// CHECK: The processor will do checks like whether this account exists or if it has expired
+  #[account(
+    mut,
+    seeds = [
+      b"sell_listing_reservation",
+      sell_listing.key().as_ref(),
+    ],
+    bump,
+  )]
+  pub sell_listing_reservation: AccountInfo<'info>,
+
   // The market account
   #[account(
     seeds = [
@@ -86,8 +97,11 @@ pub struct OperatorFillSellListing<'info> {
   #[account(mut)]
   pub ticket_owner: AccountInfo<'info>,
 
-  #[account(mut)]
+  #[account(
+    mut,
+    constraint = state.operators.iter().any(|m| *m == ticket_buyer.key()) @ ErrorCode::OnlyMintOperator,
+  )]
   pub ticket_buyer: Signer<'info>,
-
+    
   pub ticket_nft_program: Program<'info, TicketNft>,
 }

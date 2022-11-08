@@ -1,4 +1,7 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{
+  prelude::*,
+  AccountsClose,
+};
 use anchor_safe_math::SafeMath;
 use anchor_spl::{
   token::{Token},
@@ -16,19 +19,28 @@ use crate::{
     event::Event,
     event_capacity::EventCapacity,
     sale::Sale,
+    seat_reservation::SeatReservation,
   },
   utils::program_error::ErrorCode,
 };
 
 #[macro_export]
 macro_rules! expand_pre_checks {
-  ($ctx:ident, $event:ident, $seat_index:ident) => {
+  ($ctx:ident, $event:ident, $seat_index:ident, $operator:expr, $recipient:expr, $should_close:ident) => {
+    super::common_purchase::seat_reservation_checks(
+      &$ctx.accounts.seat_reservation,
+      $operator.to_account_info(),
+      $recipient,
+      $should_close,
+    )?;
+
     super::common_purchase::account_checks(
       $ctx.accounts.event_organizer.key(),
       $ctx.accounts.event_capacity.key(),
       &$event,
       $ctx.accounts.sale.event_id,
     )?;
+
     super::common_purchase::pre_checks(&$ctx.accounts.sale, &$ctx.accounts.event_capacity, $seat_index)?;
   }
 }
@@ -86,6 +98,33 @@ pub fn account_checks(
   require!(event.event_organizer == event_organizer.key(), ErrorCode::WrongEventOrganizer);
   require!(event.event_capacity == event_capacity.key(), ErrorCode::WrongEventCapacityAccount);
   
+  Ok(())
+}
+
+pub fn seat_reservation_checks<'info>(
+  seat_reservation: &AccountInfo<'info>,
+  operator: AccountInfo<'info>,
+  recipient: Pubkey,
+  should_close: bool
+) -> Result<()> {
+  // if account exists then check if it has expired or the sender is the recipient
+  if seat_reservation.lamports() != 0 {
+    // This will no fail because it lamports is no 0. It will also check that seat_reservation account
+    // is owned by the TicketSale program
+    let seat_reservation = Account::<SeatReservation>::try_from(&seat_reservation)?;
+
+    if seat_reservation.recipient == recipient || Clock::get().unwrap().slot > seat_reservation.valid_until {
+      // We don't want to close this account when the operator purchase is called. The reason is that that ix has
+      // got 2 close account ixs which cause the following error https://github.com/solana-labs/solana/issues/20348.
+      // Instead we close the seat_reservation as the last ix in the processor
+      if should_close {
+        seat_reservation.close(operator)?;
+      }
+    } else {
+      return Err(ErrorCode::SeatReserved.into())
+    }
+  }
+
   Ok(())
 }
 

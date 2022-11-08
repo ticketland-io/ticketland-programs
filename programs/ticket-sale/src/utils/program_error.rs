@@ -38,4 +38,6 @@ pub enum ErrorCode {
   SeatNotVerified,
   #[msg("Not a mint operator")]
   OnlyMintOperator,
+  #[msg("Seat reserved")]
+  SeatReserved,
 }

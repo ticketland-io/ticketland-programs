@@ -281,6 +281,11 @@
           "isSigner": false
         },
         {
+          "name": "seatReservation",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "seatVerification",
           "isMut": true,
           "isSigner": false
@@ -399,6 +404,11 @@
           "isSigner": false
         },
         {
+          "name": "operator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "ticketNftProgram",
           "isMut": false,
           "isSigner": false
@@ -455,6 +465,11 @@
         {
           "name": "event",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatReservation",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -539,6 +554,11 @@
           "isSigner": false
         },
         {
+          "name": "operator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "ticketNftProgram",
           "isMut": false,
           "isSigner": false
@@ -596,6 +616,11 @@
         {
           "name": "event",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatReservation",
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -719,6 +744,71 @@
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "reserveSeat",
+      "docs": [
+        "This can only be called by a ticketland operator and it reserves the given seat until the given slot.",
+        "This will reserve the seat so no other script can purchase it. The OperatorPurchase Ix will ultimately",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `seat_index` - The index of the seat which is the bitmap index i.e. a monotonic value",
+        "* `seat_name` - Arbitrary name of the seat a defined in the leaves of the MT",
+        "* `duration` - The duration in Slot that his seat will be reserved for",
+        "* `recipient` - The utlimate recipient of the ticket nft when it will be minted by the operator"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seatReservation",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "seatIndex",
+          "type": "u32"
+        },
+        {
+          "name": "seatName",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "recipient",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -803,6 +893,22 @@
           {
             "name": "verified",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SeatReservation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "validUntil",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "publicKey"
           }
         ]
       }
@@ -991,29 +1097,29 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "n_tickets",
-            "type": "u32"
-          },
-          {
             "name": "name",
             "type": "string"
           },
           {
-            "name": "sale_type",
+            "name": "nTickets",
+            "type": "u32"
+          },
+          {
+            "name": "saleType",
             "type": {
               "defined": "SaleType"
             }
           },
           {
-            "name": "sale_start_time",
+            "name": "saleStartTime",
             "type": "i64"
           },
           {
-            "name": "sale_end_time",
+            "name": "saleEndTime",
             "type": "i64"
           },
           {
-            "name": "merkle_root",
+            "name": "merkleRoot",
             "type": {
               "array": [
                 "u8",
@@ -1022,7 +1128,7 @@
             }
           },
           {
-            "name": "seat_range",
+            "name": "seatRange",
             "type": {
               "defined": "SeatRange"
             }
@@ -1189,6 +1295,11 @@
       "code": 6017,
       "name": "OnlyMintOperator",
       "msg": "Not a mint operator"
+    },
+    {
+      "code": 6018,
+      "name": "SeatReserved",
+      "msg": "Seat reserved"
     }
   ]
 }

@@ -41,6 +41,19 @@ pub struct OperatorPurchase<'info> {
   )]
   pub event: AccountInfo<'info>,
 
+  /// CHECK: The processor will do checks like whether this account exists or if it has expired
+  #[account(
+    mut,
+    seeds = [
+      b"seat_reservation",
+      sale.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
+    ],
+    bump,
+  )]
+  pub seat_reservation: AccountInfo<'info>,
+
   #[account(
     mut,
     close = ticket_buyer,

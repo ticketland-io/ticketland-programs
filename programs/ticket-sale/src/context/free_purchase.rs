@@ -41,6 +41,19 @@ pub struct FreePurchase<'info> {
   )]
   pub event: AccountInfo<'info>,
 
+  /// CHECK: The processor will do checks like whether this account exists or if it has expired
+  #[account(
+    mut,
+    seeds = [
+      b"seat_reservation",
+      sale.key().as_ref(),
+      seat_index.to_string().as_ref(),
+      seat_name.as_ref(),
+    ],
+    bump,
+  )]
+  pub seat_reservation: AccountInfo<'info>,
+
   #[account(
     mut,
     close = ticket_buyer,
@@ -166,6 +179,13 @@ pub struct FreePurchase<'info> {
     bump,
   )]
   pub event_nft_metadata: AccountInfo<'info>,
+
+  /// CHECK: this is the ticketland operator that will receive the funds if the fill listing reservation account is closed
+  #[account(
+    mut,
+    constraint = state.mint_operators.iter().any(|m| *m == operator.key()) @ ErrorCode::OnlyMintOperator,
+  )]
+  pub operator: AccountInfo<'info>,
 
   /// CHECK: This is the ticket sale program account
   pub ticket_nft_program: Program<'info, TicketNft>,

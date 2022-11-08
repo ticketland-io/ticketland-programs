@@ -1,0 +1,1129 @@
+{
+  "version": "0.1.0",
+  "name": "secondary_market",
+  "instructions": [
+    {
+      "name": "initialize",
+      "docs": [
+        "Initializes the state i.e. instance of a given program",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_registry_state` - The state of the event registry program",
+        "* `event_registry_program` - The id of the event registry program",
+        "* `ticket_sale_state` - The state of the ticket sale program",
+        "* `ticket_sale_program` - The program id of the ticket sale program",
+        "* `ticket_nft_state` - The state of the ticket nft program",
+        "* `ticket_nft_program` - The program id of the ticket nft program",
+        "* `treasury` - The treasury whose ATA will be receiving the protocol fee",
+        "* `protocol_fee` - The ticketland protocol fees of every resale",
+        "* `operators` - The list of all operators that can fill sell listing on users' behalf"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deployer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventRegistryState",
+          "type": "publicKey"
+        },
+        {
+          "name": "eventRegistryProgram",
+          "type": "publicKey"
+        },
+        {
+          "name": "ticketSaleState",
+          "type": "publicKey"
+        },
+        {
+          "name": "ticketSaleProgram",
+          "type": "publicKey"
+        },
+        {
+          "name": "ticketNftState",
+          "type": "publicKey"
+        },
+        {
+          "name": "ticketNftProgram",
+          "type": "publicKey"
+        },
+        {
+          "name": "treasury",
+          "type": "publicKey"
+        },
+        {
+          "name": "protocolFee",
+          "type": "u16"
+        },
+        {
+          "name": "operators",
+          "type": {
+            "vec": "publicKey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createMarket",
+      "docs": [
+        "Allows the event organizer of the given event id to create a new secondary market",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for",
+        "* `organizer_resale_fee` - The percentage of the resale price the event organizer will collect",
+        "* `resale_cap` - The max price a ticket can be sold on the secondary market. That will be",
+        "(ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Constraints will be checked in the processor fn"
+          ]
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "This is the user that created the event earlier",
+            "event_organizer.key() == event.event_organizer will be checked in the processor"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "organizerResaleFee",
+          "type": "u16"
+        },
+        {
+          "name": "resaleCap",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "createSellListing",
+      "docs": [
+        "Allows the ticket owner to list the ticket for sale",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for",
+        "* `_ticket_nft` - The pubic key of the ticket NFT Mint account. The processor will have to check that it belongs to the",
+        "signer of this tx",
+        "* `ask_price` - The  price a ticket will be sold. It must be",
+        "lower than (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Processor will check that the ticket_metadata.sale does match this key",
+            "This is useful because it contains data such as ticket type"
+          ]
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Additional checks will take place in the processor"
+          ]
+        },
+        {
+          "name": "ticketOwner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ticketNft",
+          "type": "publicKey"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "askPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "createBuyListing",
+      "docs": [
+        "Allows anyone to create a buy listing that is to publish an interest to buy a ticket at a given price",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for",
+        "* `bid_price` - The  price at which the user is willing to buy a ticket. Note that during the settlemt the following must be true",
+        "bid_price <= (ticket_matadata.price_sold * (10_000 + resale_cap)) / 10_000"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "buyerData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingEscrowAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "bidPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "fillSellListing",
+      "docs": [
+        "It will:",
+        "- transfer funds from the buyer to the seller ATA",
+        "- transfer the service fees to the ticket land treasury",
+        "- transfer the event organizer fees",
+        "- close the SellListing account since it's not needed anymore",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListingReservation",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Processor will check that the ticket_metadata.sale does much this key"
+          ]
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Additional checks take place in the processor"
+          ]
+        },
+        {
+          "name": "ticketOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketOwnerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ticket owner ata that will receive the funds from the ticket sell"
+          ]
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The event organizer ATA that till be receiving the funds from the fees"
+          ]
+        },
+        {
+          "name": "serviceFeeAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The token token account that will be receiving the service fee from the resale"
+          ]
+        },
+        {
+          "name": "treasury",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketBuyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "operatorFillSellListing",
+      "docs": [
+        "Allows an operator to fill a sell listing on user's behalf",
+        "",
+        "It will:",
+        "- transfer funds from the buyer to the seller ATA",
+        "- transfer the service fees to the ticket land treasury",
+        "- transfer the event organizer fees",
+        "- close the SellListing account since it's not needed anymore",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for",
+        "* `recipient` - The recipient account that will be the new owner of the ticket"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListingReservation",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Processor will check that the ticket_metadata.sale does much this key"
+          ]
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "fillBuyListing",
+      "docs": [
+        "It will:",
+        "- transfer funds from the buy listing escrow ata to the seller's ATA",
+        "- transfer the service fees to the ticket land treasury",
+        "- transfer the event organizer fees",
+        "- close the BuyListing account since it's not needed anymore",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `n_listing` - This is part of the seed to re-create the buy_listing PDA",
+        "* `event_id` - The event id for which the secondary market is created for"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketNftProgramState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "buyListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sale",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Processor will check that the ticket_metadata.sale does much this key"
+          ]
+        },
+        {
+          "name": "cpiAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Additional checks take place in the processor"
+          ]
+        },
+        {
+          "name": "listingEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingEscrowAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "We already used ticket buyer in the buy_listing seeds above thus there is no need to do any",
+            "further account checks."
+          ]
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Additional account checks will happen in the processor"
+          ]
+        },
+        {
+          "name": "eventOrganizer",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Check about the correctness of this account will take place in the Ticket sale before this CPI is called"
+          ]
+        },
+        {
+          "name": "eventOrganizerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The event organizer ATA that till be receiving the funds from the fees"
+          ]
+        },
+        {
+          "name": "serviceFeeAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The token token account that will be receiving the service fee from the resale"
+          ]
+        },
+        {
+          "name": "treasury",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ticketOwnerPurchaseTokenAta",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The ticket owner ata that will receive the funds from the ticket sell"
+          ]
+        },
+        {
+          "name": "ticketOwner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketNftProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nListing",
+          "type": "u16"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "reserveSellListing",
+      "docs": [
+        "This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.",
+        "This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `sell_listing` - The sell listing that is reserver",
+        "* `duration` - The duration in Slot that his sell listing will be reserved for",
+        "* `recipient` - The utlimate recipient of the ticket nft stored in the sell listing"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListingReservation",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "operator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "sellListing",
+          "type": "publicKey"
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "recipient",
+          "type": "publicKey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "BuyListing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "BuyListingBumps"
+            }
+          },
+          {
+            "name": "bidPrice",
+            "docs": [
+              "The price that buyer is willing to pay to purchase a ticket"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "buyer",
+            "docs": [
+              "The buyer that is creating this buy listing"
+            ],
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BuyerData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nListing",
+            "docs": [
+              "Useful to count how many buy listing has a"
+            ],
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Listing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nftTicketMetadata",
+            "type": "publicKey"
+          },
+          {
+            "name": "askingPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "eventId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "MarketBump"
+            }
+          },
+          {
+            "name": "organizerResaleFee",
+            "docs": [
+              "percentage fee that will be collected by the event organizer when someone sells the ticket on the secondary maker"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "resaleCap",
+            "docs": [
+              "This is a percentage of the price the ticket was sold in the primary market. One can list a ticket",
+              "which will no exceed the given resale cap"
+            ],
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SellListing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ticketMetadata",
+            "docs": [
+              "The metadata of the ticket nft that is listed for sale"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "askPrice",
+            "docs": [
+              "The listing sell price"
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SeatReservation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "validUntil",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          },
+          {
+            "name": "protocolFee",
+            "docs": [
+              "The fees that will be collected by ticketland on every sale"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          },
+          {
+            "name": "nMarkets",
+            "type": "u32"
+          },
+          {
+            "name": "deployer",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventRegistryState",
+            "type": "publicKey"
+          },
+          {
+            "name": "eventRegistryProgram",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketSaleState",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketSaleProgram",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketNftState",
+            "type": "publicKey"
+          },
+          {
+            "name": "ticketNftProgram",
+            "type": "publicKey"
+          },
+          {
+            "name": "operators",
+            "docs": [
+              "The list of all operators that can fill sell listing on users' behalf"
+            ],
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "BuyListingBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "listingEscrow",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketBump",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "market",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "cpiAuthority",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "WrongEventAccount",
+      "msg": "Not event account"
+    },
+    {
+      "code": 6001,
+      "name": "OnlyEventOrganizer",
+      "msg": "Only event organizer"
+    },
+    {
+      "code": 6002,
+      "name": "EventIdDoesNotMatch",
+      "msg": "Event id of token metadata does not match"
+    },
+    {
+      "code": 6003,
+      "name": "PriceCap",
+      "msg": "Price cap exceeded"
+    },
+    {
+      "code": 6004,
+      "name": "WrongPurchaseToken",
+      "msg": "Wrong purchase token account"
+    },
+    {
+      "code": 6005,
+      "name": "WrongTicketMetadata",
+      "msg": "Wrong ticket metadata account"
+    },
+    {
+      "code": 6006,
+      "name": "WrongSaleAccount",
+      "msg": "Wrong sale account"
+    },
+    {
+      "code": 6007,
+      "name": "WrongTicketNftState",
+      "msg": "Wrong ticket nft state"
+    },
+    {
+      "code": 6008,
+      "name": "OnlyTicketOwner",
+      "msg": "Only ticket owner"
+    },
+    {
+      "code": 6009,
+      "name": "WrongTreasuryAccount",
+      "msg": "Wrong treasury account"
+    },
+    {
+      "code": 6010,
+      "name": "OnlyMintOperator",
+      "msg": "Not a mint operator"
+    },
+    {
+      "code": 6011,
+      "name": "SellListingReserved",
+      "msg": "Sell listing reserved"
+    }
+  ]
+}
