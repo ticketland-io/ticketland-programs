@@ -903,7 +903,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "valid_until",
+            "name": "validUntil",
             "type": "u64"
           },
           {
@@ -1097,29 +1097,29 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "n_tickets",
-            "type": "u32"
-          },
-          {
             "name": "name",
             "type": "string"
           },
           {
-            "name": "sale_type",
+            "name": "nTickets",
+            "type": "u32"
+          },
+          {
+            "name": "saleType",
             "type": {
               "defined": "SaleType"
             }
           },
           {
-            "name": "sale_start_time",
+            "name": "saleStartTime",
             "type": "i64"
           },
           {
-            "name": "sale_end_time",
+            "name": "saleEndTime",
             "type": "i64"
           },
           {
-            "name": "merkle_root",
+            "name": "merkleRoot",
             "type": {
               "array": [
                 "u8",
@@ -1128,7 +1128,7 @@
             }
           },
           {
-            "name": "seat_range",
+            "name": "seatRange",
             "type": {
               "defined": "SeatRange"
             }

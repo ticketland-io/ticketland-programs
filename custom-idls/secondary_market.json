@@ -949,7 +949,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "valid_until",
+            "name": "validUntil",
             "type": "u64"
           },
           {
