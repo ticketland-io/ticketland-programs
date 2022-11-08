@@ -814,9 +814,7 @@
         },
         {
           "name": "duration",
-          "type": {
-            "defined": "Slot"
-          }
+          "type": "u64"
         },
         {
           "name": "recipient",
