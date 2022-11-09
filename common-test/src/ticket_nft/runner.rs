@@ -71,6 +71,7 @@ impl Runner {
 
     let data = ticket_nft::instruction::Initialize {
       ticket_sale_state,
+      operators: self.get_operators(),
       ticket_sale_program: ticket_sale_program_id(),
       operators: self.get_operators(),
     }.data();
