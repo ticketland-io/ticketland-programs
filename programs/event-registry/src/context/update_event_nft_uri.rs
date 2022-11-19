@@ -42,5 +42,8 @@ pub struct UpdateEventNftUri<'info> {
   pub uri_update_operator: Signer<'info>,
 
   /// CHECK: The metadata program
+  #[account(
+    constraint = metadata_program.key() == metadata_id,
+  )]
   pub metadata_program: AccountInfo<'info>,
 }
