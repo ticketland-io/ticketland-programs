@@ -47,6 +47,7 @@ pub struct CreateEventNft<'info> {
     payer = event_organizer,
     mint::decimals = 0,
     mint::authority = event_nft_authority,
+    mint::freeze_authority = event_nft_authority,
     seeds = [b"event_nft", state.key().as_ref(), &event_id],
     bump,
   )]
