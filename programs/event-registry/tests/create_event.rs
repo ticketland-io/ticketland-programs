@@ -1,6 +1,6 @@
 #![cfg(feature = "test-bpf")]
 
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use anchor_lang::{
   prelude::*,
 };
@@ -15,7 +15,7 @@ use solana_test_utils::{
 };
 use anchor_metaplex::{
   mpl_token_metadata::{
-    deser::meta_deser,
+    state::Metadata,
     pda::{
       find_metadata_account,
       find_master_edition_account,
@@ -226,8 +226,8 @@ async fn should_create_a_new_event(ctx: &mut TestContext) {
     let metadata = find_metadata_account(&event_nft).0;
     let mut pt = runner.pt.lock().await;
     let account = pt.context.banks_client.get_account(metadata).await.unwrap().unwrap();
-    let metadata = meta_deser(&mut &account.data[..]).unwrap();
 
+    let metadata = Metadata::deserialize(&mut &account.data[..]).unwrap();
     assert_eq!(metadata.update_authority, pda::event_nft_authority(&state.pubkey()).0);
     assert_eq!(metadata.mint, event_nft);
     assert_eq!(metadata.collection, None);
