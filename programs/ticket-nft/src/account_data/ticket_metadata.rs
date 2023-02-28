@@ -24,12 +24,6 @@ pub struct TicketMetadata {
   /// The name of the asset
   pub name: String,
 
-  /// The symbol for the asset
-  pub symbol: String,
-  
-  /// URI pointing to JSON representing the asset
-  pub uri: String,
-
   /// Indicated if the owner of this ticket attended the event
   pub attended: bool,
   

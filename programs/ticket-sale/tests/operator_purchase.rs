@@ -510,7 +510,7 @@ async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
     event_capacity,
   ) = setup(ctx).await;
 
-let ticket_buyer = ctx.ticket_sale_runner.get_participant(7);
+  let ticket_buyer = ctx.ticket_sale_runner.get_participant(7);
   let recipient = ctx.event_registry_runner.get_participant(3);
 
   // move to the start of sale

@@ -69,7 +69,7 @@ macro_rules! expand_mint_ticket {
       &$ctx.accounts.system_program,
       &$ctx.accounts.rent,
     )?;
-  
+
   }
 }
 
