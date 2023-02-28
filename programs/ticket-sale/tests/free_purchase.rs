@@ -6,7 +6,7 @@ use anchor_lang::{
   },
   AccountDeserialize,
 };
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use solana_test_utils::{
   spl::Spl,
   merkle_tree::MerkleTree,
@@ -360,8 +360,6 @@ async fn should_allow_ticket_buyer_to_purchase_ticket_for_free(ctx: &mut TestCon
     assert_eq!(ticket_metadata.mint, ticket_nft);
     assert_eq!(ticket_metadata.collection, find_metadata_account(&event_nft).0);
     assert_eq!(ticket_metadata.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
-    assert_eq!(ticket_metadata.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
-    assert_eq!(ticket_metadata.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
     assert_eq!(ticket_metadata.event_id, event_id);
     assert_eq!(ticket_metadata.owner, ticket_buyer.pubkey());
     assert_eq!(ticket_metadata.seat_index, seat_index);

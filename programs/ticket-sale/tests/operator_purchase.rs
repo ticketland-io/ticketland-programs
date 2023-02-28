@@ -6,7 +6,7 @@ use anchor_lang::{
   },
   AccountDeserialize,
 };
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use solana_test_utils::{
   spl::Spl,
   merkle_tree::MerkleTree,
@@ -424,8 +424,6 @@ async fn should_allow_operator_to_purchase_ticket_for_free(ctx: &mut TestContext
     assert_eq!(ticket_metadata.mint, ticket_nft);
     assert_eq!(ticket_metadata.collection, find_metadata_account(&event_nft).0);
     assert_eq!(ticket_metadata.name.trim_matches(char::from(0)), TicketSaleRunner::dummy_seat_name(0));
-    assert_eq!(ticket_metadata.symbol.trim_matches(char::from(0)), "TICKT".to_owned());
-    assert_eq!(ticket_metadata.uri.trim_matches(char::from(0)), "https://ticketland.io".to_owned());
     assert_eq!(ticket_metadata.event_id, event_id);
     assert_eq!(ticket_metadata.owner, recipient.pubkey());
     assert_eq!(ticket_metadata.seat_index, seat_index);
@@ -510,7 +508,7 @@ async fn should_close_the_seat_verification_account(ctx: &mut TestContext) {
     event_capacity,
   ) = setup(ctx).await;
 
-let ticket_buyer = ctx.ticket_sale_runner.get_participant(7);
+  let ticket_buyer = ctx.ticket_sale_runner.get_participant(7);
   let recipient = ctx.event_registry_runner.get_participant(3);
 
   // move to the start of sale

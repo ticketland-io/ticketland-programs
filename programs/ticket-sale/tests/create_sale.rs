@@ -1,6 +1,6 @@
 #![cfg(feature = "test-bpf")]
 
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use anchor_lang::{prelude::*};
 use solana_sdk::{
   signature::{Signer, Keypair},

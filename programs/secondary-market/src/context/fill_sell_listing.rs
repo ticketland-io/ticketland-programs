@@ -23,7 +23,7 @@ pub struct FillSellListing<'info> {
   #[account(mut)]
   pub state: Box<Account<'info, State>>,
 
-  /// CHECK: It should be the same as the one stored in the state during initialize
+  /// CHECK: It should be the same as the one stored in the state during Fialize
   #[account(
     constraint = ticket_nft_program_state.key() == state.ticket_nft_state @ ErrorCode::WrongTicketNftState
   )]

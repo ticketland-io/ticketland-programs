@@ -1,5 +1,5 @@
 #![cfg(feature = "test-bpf")]
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use solana_sdk::{
   signature::{Signer},
 };

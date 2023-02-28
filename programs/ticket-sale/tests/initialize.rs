@@ -1,6 +1,6 @@
 #![cfg(feature = "test-bpf")]
 use std::{assert_eq};
-use test_context::{test_context, futures};
+use test_context::{test_context};
 use solana_sdk::{
   signature::{Signer, Keypair},
 };
