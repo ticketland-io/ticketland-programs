@@ -2,6 +2,7 @@
 	"type": "module",
 	"license": "BUSL-1.1",
 	"scripts": {
+		"build": "cargo build-sbf --arch bpf",
 		"test-validator": "./scripts/test-validator.sh",
 		"airdrop": "./scripts/airdrop.sh",
 		"setup:dev": "ENV=dev ANCHOR_WALLET=wallets-dev/deployer.json node --experimental-json-modules scripts/setup-dev.js",

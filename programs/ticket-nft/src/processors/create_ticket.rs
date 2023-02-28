@@ -1,8 +1,5 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, MintTo};
-use anchor_metaplex::{
-  mpl_token_metadata::state::{Metadata},
-};
 use common::{
   utils::string::puffed_out_string,
 };
@@ -36,13 +33,10 @@ pub fn exec(
   name: String,
 ) -> Result<()> {  
   let ticket_metadata = &mut ctx.accounts.ticket_metadata;
-  let event_nft_metadata = Metadata::from_account_info(&ctx.accounts.event_nft_metadata)?;
 
   ticket_metadata.mint = ctx.accounts.nft.key();
   ticket_metadata.collection = ctx.accounts.event_nft_metadata.key();
   ticket_metadata.name = puffed_out_string(&name, MAX_NAME_LENGTH);
-  ticket_metadata.symbol = event_nft_metadata.data.symbol;
-  ticket_metadata.uri = event_nft_metadata.data.uri;
   ticket_metadata.event_id = event_id;
   ticket_metadata.seat_index = seat_index;
   ticket_metadata.sale = sale;

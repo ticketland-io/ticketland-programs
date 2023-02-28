@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_metaplex::{
   UpdateMetadata,
   update_metadata,
-  mpl_token_metadata::state::{DataV2, Metadata},
+  mpl_token_metadata::state::{DataV2, Metadata, TokenMetadataAccount},
 };
 use crate::{
   context::update_event_nft_uri::UpdateEventNftUri,
