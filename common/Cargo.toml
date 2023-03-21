@@ -6,8 +6,8 @@ license = "BUSL-1.1"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
+anchor-lang = { version = "0.27.0", features = ["init-if-needed"] }
 thiserror = "1.0.31"
 anyhow = "1.0.60"
-anchor-safe-math = "0.2.2"
+anchor-safe-math = { git = "https://github.com/Apocentre/anchor-safe-math", tag = "v0.3.0" }
 spl-math = { version = "0.1.0", features = ["no-entrypoint"] }
