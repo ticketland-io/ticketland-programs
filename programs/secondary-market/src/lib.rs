@@ -16,6 +16,8 @@ use crate::context::{
   operator_fill_sell_listing::*,
   reserve_sell_listing::*,
   close_sell_listing_reservation::*,
+  cancel_buy_listing::*,
+  cancel_sell_listing::*,
 };
 
 declare_id!("ECRCx1XuhFC1DatvsvMu6nwrHQzMo3h41X2vKdvD7S5f");
@@ -177,9 +179,9 @@ pub mod secondary_market {
 
   /// This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.
   /// This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `sell_listing` - The sell listing that is reserver
   /// * `duration` - The duration in Slot that his sell listing will be reserved for
@@ -195,9 +197,9 @@ pub mod secondary_market {
 
   /// This can only be called by a ticketland operator and it reserves the given sell listing until the given slot.
   /// This will reserve the sell listing so no other script can purchase it thiugh the OperatorFillSellListing Ix
-	/// 
+	///
 	/// # Arguments
-	/// 
+	///
 	/// * `ctx` - The Anchor context holding the accounts
 	/// * `sell_listing` - The sell listing that is reserver
   pub fn close_sell_listing_reservation(
@@ -206,4 +208,37 @@ pub mod secondary_market {
   ) -> Result<()> {
     Ok(())
   }
+
+  /// It will:
+  /// - transfer funds from the buy listing escrow ata back to the buyer's ATA
+  /// - close the BuyListing account since it's not needed anymore
+  ///
+	/// # Arguments
+	///
+  /// * `ctx` - The Anchor context holding the accounts
+  /// * `n_listing` - This is part of the seed to re-create the buy_listing PDA
+  /// * `event_id` - The event id for which the secondary market is created for
+  pub fn cancel_buy_listing(
+    ctx: Context<CancelBuyListing>,
+    _n_listing: u16,
+    event_id: [u8; 32],
+  ) -> Result<()> {
+    processors::cancel_buy_listing::exec(ctx, event_id)
+  }
+
+  /// It will:
+  /// - close the SellListing account since it's not needed anymore
+  ///
+	/// # Arguments
+	///
+	/// * `ctx` - The Anchor context holding the accounts
+  /// * `event_id` - The event id for which the secondary market is created for
+  pub fn cancel_sell_listing(
+    ctx: Context<CancelSellListing>,
+    _ticket_nft: Pubkey,
+    event_id: [u8; 32]
+  ) -> Result<()> {
+    processors::cancel_sell_listing::exec(ctx, event_id)
+  }
+
 }

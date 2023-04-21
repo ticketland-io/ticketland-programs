@@ -107,8 +107,8 @@ pub fn close_ata<'info>(
 ) -> Result<()> {
   let cpi_accounts = CloseAccount {
     account: account.clone(),
-    destination: destination,
-    authority:authority,
+    destination,
+    authority,
   };
   let cpi_program = token_program.to_account_info();
 
@@ -133,7 +133,7 @@ pub fn change_ticket_ownership<'info>(
   let cpi_accounts = ticket_nft::cpi::accounts::Transfer {
     state: ticket_nft_program_state.to_account_info(),
     ticket_metadata: ticket_metadata.to_account_info(),
-    secondary_market_cpi_authority:  cpi_authority.to_account_info(),
+    secondary_market_cpi_authority: cpi_authority.to_account_info(),
   };
 
   let state_key = state.key();
