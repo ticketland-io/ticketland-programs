@@ -456,6 +456,83 @@ impl Runner {
     self.process_transaction(&[ix], Some(&[&operator])).await
   }
 
+  pub async fn cancel_buy_listing(
+    &self,
+    event_id: [u8; 32],
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    purchase_token: Pubkey,
+    ticket_buyer: &Keypair,
+    n_listing: u16,
+  ) -> AnchorResult<()> {
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let buy_listing = pda::buy_listing(&state, event_id, &ticket_buyer.pubkey(), n_listing).0;
+    let listing_escrow = pda::listing_escrow(&state, event_id, &buy_listing).0;
+
+    let accounts = secondary_market::accounts::CancelBuyListing {
+      state,
+      buy_listing,
+      event,
+      purchase_token,
+      listing_escrow,
+      listing_escrow_ata: Spl::get_associated_token_address(&listing_escrow, &purchase_token),
+      ticket_buyer: ticket_buyer.pubkey(),
+      ticket_buyer_ata: Spl::get_associated_token_address(&ticket_buyer.pubkey(), &purchase_token),
+      token_program: Token::id(),
+      associated_token_program: spl_associated_token_account::ID,
+    }.to_account_metas(None);
+
+    let data = secondary_market::instruction::CancelBuyListing {
+      _n_listing: n_listing,
+      event_id,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_buyer])).await
+  }
+
+  pub async fn cancel_sell_listing(
+    &self,
+    event_id: [u8; 32],
+    state: Pubkey,
+    event_registry_state: Pubkey,
+    seat_index: u32,
+    ticket_type_index: u8,
+    ticket_nft_program_state: Pubkey,
+    ticket_owner: &Keypair,
+  ) -> AnchorResult<()> {
+    let event = EventRegistryPda::event(&event_registry_state, event_id).0;
+    let ticket_nft = TicketNftPda::ticket_nft(&ticket_nft_program_state, seat_index, event_id, ticket_type_index).0;
+    let ticket_metadata = TicketNftPda::ticket_metadata(&ticket_nft_program_state, &ticket_nft).0;
+    let sell_listing = pda::sell_listing(&state, event_id, &ticket_metadata).0;
+
+    let accounts = secondary_market::accounts::CancelSellListing {
+      state,
+      sell_listing,
+      event,
+      ticket_metadata,
+      ticket_owner: ticket_owner.pubkey(),
+    }.to_account_metas(None);
+
+    let data = secondary_market::instruction::CancelSellListing {
+      _ticket_nft: ticket_nft,
+      event_id,
+    }.data();
+
+    let ix = Instruction {
+      program_id: secondary_market_program_id(),
+      accounts,
+      data,
+    };
+
+    self.process_transaction(&[ix], Some(&[&ticket_owner])).await
+  }
+
   pub async fn get_ata_balances(
     &mut self,
     treasury: Pubkey,
