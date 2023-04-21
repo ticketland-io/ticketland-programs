@@ -821,6 +821,147 @@
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "cancelBuyListing",
+      "docs": [
+        "It will:",
+        "- transfer funds from the buy listing escrow ata back to the buyer's ATA",
+        "- close the BuyListing account since it's not needed anymore",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `n_listing` - This is part of the seed to re-create the buy_listing PDA",
+        "* `event_id` - The event id for which the secondary market is created for"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "purchaseToken",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Additional checks take place in the processor"
+          ]
+        },
+        {
+          "name": "listingEscrow",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingEscrowAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketBuyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ticketBuyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nListing",
+          "type": "u16"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancelSellListing",
+      "docs": [
+        "It will:",
+        "- close the SellListing account since it's not needed anymore",
+        "",
+        "# Arguments",
+        "",
+        "* `ctx` - The Anchor context holding the accounts",
+        "* `event_id` - The event id for which the secondary market is created for"
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "event",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ticketMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Additional checks will take place in the processor"
+          ]
+        },
+        {
+          "name": "ticketOwner",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "ticketNft",
+          "type": "publicKey"
+        },
+        {
+          "name": "eventId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
     }
   ],
   "accounts": [
